@@ -1,12 +1,13 @@
 [
   {
+    "_id": "6a8d3f3e181ae861f1c381b6",
     "id": "AP-001",
     "code": "ATM",
     "categoryId": "atm-pouches",
     "subCategory": "ATM CARD SLEEVES & POUCHES",
     "name": "ATM Pouch",
     "slug": "atm-pouch",
-    "image": "/assets/images/categories (3).webp",
+    "image": "/uploads/upload-1788158044637-866736704.jpg",
     "description": "Branded custom printed ATM card sleeve pouches crafted from 210 GSM Art Paper with Smooth Matte & Gloss lamination finishes. Ideal for banking, card holders, and corporate branding applications.",
     "minQuantity": 1000,
     "quantityStep": 1000,
@@ -217,16 +218,24 @@
       "safeArea": "W: 74.00 mm X H: 46.00 mm",
       "finalSize": "W: 88.00 mm X H: 57.00 mm",
       "bleed": "3 mm"
-    }
+    },
+    "options": [],
+    "quantityPricingTiers": [],
+    "updatedAt": "2026-08-31T06:46:20.361Z",
+    "images": [
+      "/uploads/upload-1788158044637-866736704.jpg",
+      "/uploads/upload-1788158778713-734370658.png"
+    ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b7",
     "id": "BB-001",
     "code": "BB-1",
     "categoryId": "bill-books",
     "subCategory": "NCR CARBONLESS BILL BOOKS",
     "name": "Bill Book",
     "slug": "duplicate-ncr-bill-book",
-    "image": "/assets/images/categories (8).webp",
+    "image": "/src/assets/images/categories (8).webp",
     "description": "Custom printed Carbonless NCR paper Bill Books & Invoice Books available in 2 Copy (Duplicate) and 3 Copy (Triplicate) with sequential numbering and staple binding.",
     "minQuantity": 10,
     "quantityStep": 5,
@@ -595,16 +604,22 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "quantityPricingTiers": [],
+    "updatedAt": "2026-08-31T07:40:18.963Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b8",
     "id": "CH-001",
     "code": "CH-001",
     "categoryId": "card-holders",
     "subCategory": "HORIZONTAL LASER PRINTED",
     "name": "Horizontal Laser Printed Card Holders",
     "slug": "horizontal-laser-printed-card-holders",
-    "image": "/assets/images/categories (16).webp",
+    "image": "/src/assets/images/categories (16).webp",
     "description": "Executive horizontal metal & leatherette visiting card case with custom laser printing. Ideal for Corporate Gifting, Business Meetings, & Top Management Use. Perfect for Brand Promotion & Premium Client Presentation.",
     "variantCombinations": [
       "Horizontal Laser Printed Card Holders"
@@ -673,13 +688,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b9",
     "id": "CH-002",
     "code": "CH-002",
     "categoryId": "card-holders",
     "subCategory": "VERTICAL LASER PRINTED",
     "name": "Vertical Laser Printed Card Holders",
     "slug": "vertical-laser-printed-card-holders",
-    "image": "/assets/images/categories (17).webp",
+    "image": "/src/assets/images/categories (17).webp",
     "description": "Executive vertical metal & leatherette visiting card case with custom laser printing. Ideal for Corporate Gifting, Business Meetings, & Top Management Use. Perfect for Brand Promotion & Premium Client Presentation.",
     "variantCombinations": [
       "Vertical Laser Printed Card Holders"
@@ -748,13 +764,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ba",
     "id": "DPP-001",
     "code": "DPP-LH",
     "categoryId": "digital-paper-printing",
     "subCategory": "PAPER PRINTING",
     "name": "LETTER HEAD PAPER",
     "slug": "letter-head-paper",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Digital paper printing on high-quality letterhead paper stock (12×18 inch / A4). Available in Deo Paper and Excel Bond Paper options.",
     "variantCombinations": [
       "Deo Paper",
@@ -918,13 +935,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bb",
     "id": "DPP-002",
     "code": "DPP-ART",
     "categoryId": "digital-paper-printing",
     "subCategory": "PAPER PRINTING",
     "name": "ART PAPER",
     "slug": "art-paper",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "High-definition digital color printing on Gloss and Matt Art Paper (120 GSM to 350 GSM). Ideal for brochures, flyers, posters, and photo prints.",
     "variantCombinations": [
       "Digital Printout - 170 GSM",
@@ -1418,13 +1436,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bc",
     "id": "DPP-003",
     "code": "DPP-TEXTURE",
     "categoryId": "digital-paper-printing",
     "subCategory": "PREMIUM PAPERS",
     "name": "TEXTURE PAPER",
     "slug": "texture-paper",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Luxury textured paper digital printing featuring fine linen, canvas, SBS White, SBS Natural, and Metallic finishes. Perfect for executive certificates, premium cards, and artistic prints.",
     "variantCombinations": [
       "12x18 - Texture Sheet - SBS White - Code 101",
@@ -1901,13 +1920,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bd",
     "id": "DPP-004",
     "code": "DPP-METALLIC",
     "categoryId": "digital-paper-printing",
     "subCategory": "PREMIUM PAPERS",
     "name": "METALLIC PAPER",
     "slug": "metallic-paper",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Premium metallic shimmer paper digital printing available in gold, silver, and pearl sheen finishes. Designed for luxury invitations, awards, and VIP cards.",
     "minQuantity": 50,
     "quantityStep": 50,
@@ -1984,13 +2004,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381be",
     "id": "DPP-005",
     "code": "DPP-NT-PVC",
     "categoryId": "digital-paper-printing",
     "subCategory": "SYNTHETIC & PVC",
     "name": "NT / PVC SHEETS",
     "slug": "nt-pvc-sheets",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Waterproof and tearproof Non-Tearable (NT) & PVC synthetic sheet digital printing (13×19 inch). Available in PVC White (Matt) 180 Micron and PVC Semi Transparent 200 Micron options.",
     "variantCombinations": [
       "13x19 - PVC White (Matt) - 180 Micron",
@@ -2125,13 +2146,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bf",
     "id": "DPP-006",
     "code": "DPP-PAPER-GUM",
     "categoryId": "digital-paper-printing",
     "subCategory": "STICKERS & GUMMING",
     "name": "PAPER GUMMING",
     "slug": "paper-gumming",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Self-adhesive paper sticker sheet digital printing with peel-off backing. Suitable for product labels, barcode stickers, packaging seals, and promotional branding.",
     "minQuantity": 10,
     "quantityStep": 1,
@@ -2256,13 +2278,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c0",
     "id": "DPP-007",
     "code": "DPP-PVC-GUM",
     "categoryId": "digital-paper-printing",
     "subCategory": "STICKERS & GUMMING",
     "name": "PVC GUMMING",
     "slug": "pvc-gumming",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Waterproof vinyl / PVC sticker sheet digital printing with ultra-strong adhesive backing. Available in PVC Gumming (White), PVC Gumming (Transparent), and PVC Gumming (Golden) options.",
     "variantCombinations": [
       "PVC Gumming (White)",
@@ -2593,13 +2616,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c1",
     "id": "DPP-008",
     "code": "DPP-PRINT-ONLY",
     "categoryId": "digital-paper-printing",
     "subCategory": "JOB PRINTING",
     "name": "ONLY PRINTING",
     "slug": "only-printing",
-    "image": "/assets/images/categories (1).webp",
+    "image": "/src/assets/images/categories (1).webp",
     "description": "Job work digital color printing service on client-supplied paper stock or specialty media using Xerox high-end production press.",
     "minQuantity": 50,
     "quantityStep": 50,
@@ -2676,13 +2700,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c2",
     "id": "ENV-001",
     "code": "EN-1",
     "categoryId": "envelopes",
     "subCategory": "FOR OFFICE LETTERS",
     "name": "ENVELOPE - 9x4",
     "slug": "envelope-9x4",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Standard business letter size envelope (9 × 4 inch) available in 70 GSM Maplitho, 90 GSM Sunshine, and 100 GSM Deo Paper options. Ideal for office correspondence, invoices, and official documents.",
     "utility": "For Office Letters",
     "minQuantity": 1000,
@@ -2823,13 +2848,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c3",
     "id": "ENV-002",
     "code": "EN-3",
     "categoryId": "envelopes",
     "subCategory": "FOR OFFICE LETTERS",
     "name": "ENVELOPE - 10.75x4.75",
     "slug": "envelope-10-75x4-75",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Executive extra-wide business letter envelope (10.75 × 4.75 inch) crafted with 90 GSM Sunshine paper for professional corporate correspondence, cheques, and official documents.",
     "utility": "For Office Letters",
     "minQuantity": 1000,
@@ -2968,13 +2994,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c4",
     "id": "ENV-003",
     "code": "EN-2",
     "categoryId": "envelopes",
     "subCategory": "FOR OFFICE LETTERS",
     "name": "ENVELOPE - 9.70x4.20",
     "slug": "envelope-9-70x4-20",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Commercial office letter envelope (9.70 × 4.20 inch) tailored for business mailing, billing invoices, monthly statements, and daily official correspondence.",
     "utility": "For Office Letters",
     "minQuantity": 1000,
@@ -3105,13 +3132,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c5",
     "id": "ENV-004",
     "code": "EN-4",
     "categoryId": "envelopes",
     "subCategory": "FOR INVITATIONS / CARDS",
     "name": "ENVELOPE - 5x7",
     "slug": "envelope-5x7",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Elegant 5 × 7 inch invitation envelope available in 70 GSM Maplitho, 90 GSM Sunshine, and 100 GSM Deo Paper options. Suitable for invitations, greeting cards, and special communications.",
     "utility": "For Invitations / Cards",
     "minQuantity": 1000,
@@ -3231,13 +3259,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c6",
     "id": "ENV-005",
     "code": "EN-5",
     "categoryId": "envelopes",
     "subCategory": "FOR INVITATIONS / CARDS",
     "name": "ENVELOPE - 6x8",
     "slug": "envelope-6x8",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Mid-size envelope (6 × 8 inch) in 90 GSM Sunshine paper option, ideal for documents, brochures, certificates, and corporate mailings.",
     "utility": "For Invitations / Cards",
     "minQuantity": 1000,
@@ -3350,13 +3379,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c7",
     "id": "ENV-006",
     "code": "EN-6",
     "categoryId": "envelopes",
     "subCategory": "FOR BROCHURES / FILES",
     "name": "ENVELOPE - 8.60x10.60",
     "slug": "envelope-8-60x10-60",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Medium catalog & document envelope (8.60 × 10.60 inch) in 90 GSM Sunshine paper option, ideal for certificates, reports, catalogs, and important documents.",
     "utility": "For Brochures / Files",
     "minQuantity": 1000,
@@ -3487,13 +3517,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c8",
     "id": "ENV-007",
     "code": "EN-7",
     "categoryId": "envelopes",
     "subCategory": "FOR BROCHURES / FILES",
     "name": "ENVELOPE - 9.40x12.40",
     "slug": "envelope-9-40x12-40",
-    "image": "/assets/images/images.jpg",
+    "image": "/src/assets/images/images.jpg",
     "description": "Full A4 catalog & file envelope (9.40 × 12.40 inch) available in 90 GSM, 115 GSM, and 170 GSM Art Paper options. Ideal for corporate presentations, marketing materials, catalogs, and official communications.",
     "utility": "For Brochures / Files",
     "minQuantity": 1000,
@@ -3632,6 +3663,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c9",
     "id": "FL-001",
     "code": "FL-001",
     "categoryId": "files",
@@ -3774,6 +3806,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ca",
     "id": "FL-002",
     "code": "FL-002",
     "categoryId": "files",
@@ -3964,6 +3997,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cb",
     "id": "FL-003",
     "code": "FL-003",
     "categoryId": "files",
@@ -4103,6 +4137,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cc",
     "id": "FL-004",
     "code": "FL-004",
     "categoryId": "files",
@@ -4286,6 +4321,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cd",
     "id": "FL-005",
     "code": "FL-005",
     "categoryId": "files",
@@ -4381,6 +4417,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ce",
     "id": "FB-001",
     "code": "FB-001",
     "categoryId": "flex-board",
@@ -4388,7 +4425,7 @@
     "name": "Flex Board Printing & Frame Calculator",
     "slug": "flex-board-printing",
     "isFlexBoard": true,
-    "image": "/assets/images/categories (15).webp",
+    "image": "/src/assets/images/categories (15).webp",
     "description": "Custom Flex Board printing with optional Iron or Wooden framing, adjustable support rods, angle fittings, and professional installation charges.",
     "minQuantity": 1,
     "quantityStep": 1,
@@ -4444,6 +4481,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cf",
     "id": "LH-001",
     "code": "LH-1",
     "categoryId": "letter-heads",
@@ -4675,6 +4713,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d0",
     "id": "LH-002",
     "code": "LH-2",
     "categoryId": "letter-heads",
@@ -4906,6 +4945,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d1",
     "id": "LH-003",
     "code": "LH-3",
     "categoryId": "letter-heads",
@@ -5137,6 +5177,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d2",
     "id": "LH-004",
     "code": "LH-4",
     "categoryId": "letter-heads",
@@ -5866,6 +5907,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d3",
     "id": "LH-005",
     "code": "LH-5",
     "categoryId": "letter-heads",
@@ -6129,13 +6171,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d4",
     "id": "PP-001",
     "code": "PP-001",
     "categoryId": "pamphlets-posters",
     "subCategory": "PAMPHLET",
     "name": "PAMPHLET",
     "slug": "pamphlet",
-    "image": "/assets/images/categories (18).webp",
+    "image": "/src/assets/images/categories (18).webp",
     "description": "High-volume full color offset printed promotional pamphlets available in Maplitho and Art Paper options.",
     "variantCombinations": [
       "Pamphlet - 70 GSM Maplitho Paper",
@@ -6568,13 +6611,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d5",
     "id": "PP-002",
     "code": "PP-002",
     "categoryId": "pamphlets-posters",
     "subCategory": "POSTER",
     "name": "POSTER",
     "slug": "poster",
-    "image": "/assets/images/categories (19).webp",
+    "image": "/src/assets/images/categories (19).webp",
     "description": "High-impact full color promotional posters available in various standard sizes.",
     "variantCombinations": [
       "Posters - 15x20",
@@ -6868,13 +6912,14 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d6",
     "id": "PN-001",
     "code": "PN-LASER",
     "categoryId": "pens",
     "subCategory": "LASER PRINTED PEN",
     "name": "Laser Printed Pen",
     "slug": "laser-printed-pen",
-    "image": "/assets/images/categories (4).webp",
+    "image": "/src/assets/images/categories (4).webp",
     "description": "Sleek metallic pen with precision mirror laser etching for sharp corporate logos, individual names, and branding.",
     "minQuantity": 50,
     "quantityStep": 25,
@@ -6986,13 +7031,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d7",
     "id": "PN-002",
     "code": "PN-SINGLE",
     "categoryId": "pens",
     "subCategory": "SINGLE COLOR PRINTED PEN",
     "name": "Single Color Printed Pen",
     "slug": "single-color-printed-pen",
-    "image": "/assets/images/categories (4).webp",
+    "image": "/src/assets/images/categories (4).webp",
     "description": "Vibrant custom single-color screen/pad printed promotional pens ideal for high-volume corporate marketing and giveaways.",
     "minQuantity": 500,
     "quantityStep": 500,
@@ -7104,13 +7150,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d8",
     "id": "PN-003",
     "code": "PN-BOX",
     "categoryId": "pens",
     "subCategory": "PEN PACKING BOX",
     "name": "Pen Packing Box",
     "slug": "pen-packing-box",
-    "image": "/assets/images/categories (4).webp",
+    "image": "/src/assets/images/categories (4).webp",
     "description": "Elegant presentation gift box featuring a soft velvet inner tray to hold single or dual pens for corporate gift packaging.",
     "minQuantity": 10,
     "quantityStep": 20,
@@ -7185,13 +7232,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d9",
     "id": "SL-001",
     "code": "STK",
     "categoryId": "stickers-labels",
     "subCategory": "STICKERS & LABELS",
     "name": "Stickers",
     "slug": "waterproof-vinyl-die-cut-sticker",
-    "image": "/assets/images/categories (9).webp",
+    "image": "/src/assets/images/categories (9).webp",
     "description": "High quality custom self-adhesive stickers and labels available in Without Half Cut, With Round Cut, and With Straight Cut options. Ideal for product packaging, branding, seals, and promotional labels.",
     "minQuantity": 1000,
     "quantityStep": 1000,
@@ -7613,6 +7661,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381da",
     "id": "TG-001",
     "code": "TG-001",
     "categoryId": "tags",
@@ -7831,6 +7880,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381db",
     "id": "TG-002",
     "code": "TG-002",
     "categoryId": "tags",
@@ -7985,6 +8035,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dc",
     "id": "TG-003",
     "code": "TG-003",
     "categoryId": "tags",
@@ -8140,6 +8191,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dd",
     "id": "TG-004",
     "code": "TG-004",
     "categoryId": "tags",
@@ -8599,6 +8651,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381de",
     "id": "VC-007",
     "code": "7",
     "categoryId": "visiting-cards",
@@ -8913,12 +8966,8 @@
                 "priceAdjustment": 0
               },
               {
-                "label": "Back Side",
+                "label": "Not Required",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "Front & Back",
-                "priceAdjustment": 100
               }
             ]
           },
@@ -9377,12 +9426,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -9754,11 +9803,13 @@
     "quantityPricingTiers": [
       {
         "minQty": 500,
-        "pricePerUnit": 5
+        "pricePerUnit": 5,
+        "_id": "6a950f81da7d34c853af9941"
       },
       {
         "minQty": 1000,
-        "pricePerUnit": 4.5
+        "pricePerUnit": 4.5,
+        "_id": "6a950f81da7d34c853af9942"
       }
     ],
     "specifications": {
@@ -9941,9 +9992,11 @@
           }
         ]
       }
-    ]
+    ],
+    "updatedAt": "2026-08-31T05:43:44.803Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381df",
     "id": "VC-008",
     "code": "8",
     "categoryId": "visiting-cards",
@@ -10007,17 +10060,17 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2280,
+        "basePrice": 2260,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 4.56
+            "pricePerUnit": 4.5
           },
           {
             "minQty": 1000,
-            "pricePerUnit": 4.26
+            "pricePerUnit": 4.25
           }
         ],
         "specifications": {
@@ -10044,12 +10097,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10064,12 +10117,8 @@
                 "priceAdjustment": 0
               },
               {
-                "label": "Back Side",
+                "label": "Not Required",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "Front & Back",
-                "priceAdjustment": 200
               }
             ]
           },
@@ -10234,13 +10283,13 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2760,
+        "basePrice": 2740,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 5.52
+            "pricePerUnit": 5.48
           },
           {
             "minQty": 1000,
@@ -10272,12 +10321,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10290,14 +10339,6 @@
               {
                 "label": "Front Side",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "Back Side",
-                "priceAdjustment": 0
-              },
-              {
-                "label": "Front & Back",
-                "priceAdjustment": 200
               }
             ]
           },
@@ -10490,13 +10531,13 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2760,
+        "basePrice": 2740,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 5.52
+            "pricePerUnit": 5.48
           },
           {
             "minQty": 1000,
@@ -10528,12 +10569,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10545,6 +10586,10 @@
             "values": [
               {
                 "label": "Front Side",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Not Required",
                 "priceAdjustment": 0
               }
             ]
@@ -10743,9 +10788,20 @@
           }
         ]
       }
-    }
+    },
+    "basePrice": 2230,
+    "minQuantity": 500,
+    "options": [],
+    "pricingModel": "quantity_tiered",
+    "productionTime": "4-5 days",
+    "quantityPricingTiers": [],
+    "quantityStep": 1000,
+    "specifications": {},
+    "unitName": "Units",
+    "updatedAt": "2026-08-31T05:51:59.892Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e0",
     "id": "VC-014",
     "code": "14",
     "categoryId": "visiting-cards",
@@ -11409,6 +11465,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e1",
     "id": "VC-015",
     "code": "15",
     "categoryId": "visiting-cards",
@@ -11496,6 +11553,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e2",
     "id": "VC-016",
     "code": "16",
     "categoryId": "visiting-cards",
@@ -11623,13 +11681,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e3",
     "id": "VC-018",
     "code": "18",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss Lamination Card",
     "slug": "regular-gloss-lamination",
-    "image": "/products/visiting-cards/regular-gloss-lam.jpg",
+    "image": "",
     "description": "1000 qty standard high-gloss thermal film lamination.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nLAMINATION",
@@ -11647,7 +11706,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.72
+        "pricePerUnit": 0.72,
+        "_id": "6a9523c808f6f88a66277a79"
       }
     ],
     "ourSpecialization": [
@@ -11708,16 +11768,21 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:40.460Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e4",
     "id": "VC-019",
     "code": "19",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss UV Coated Card",
     "slug": "regular-gloss-coated",
-    "image": "/products/visiting-cards/regular-gloss-coated.jpg",
+    "image": "",
     "description": "1000 qty express turnaround gloss UV coated cards ready in 12 hours.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nUV COATED",
@@ -11735,7 +11800,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.65
+        "pricePerUnit": 0.65,
+        "_id": "6a9523cd08f6f88a66277a7a"
       }
     ],
     "ourSpecialization": [
@@ -11796,9 +11862,14 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:45.187Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e5",
     "id": "VC-020",
     "code": "20",
     "categoryId": "visiting-cards",
@@ -11887,6 +11958,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e6",
     "id": "VC-017",
     "code": "17",
     "categoryId": "visiting-cards",
@@ -12012,6 +12084,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e7",
     "id": "VC-021",
     "code": "21",
     "categoryId": "visiting-cards",
@@ -12096,6 +12169,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e8",
     "id": "VC-022",
     "code": "22",
     "categoryId": "visiting-cards",
@@ -12180,6 +12254,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e9",
     "id": "VC-010",
     "code": "10",
     "categoryId": "visiting-cards",
@@ -12697,6 +12772,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ea",
     "id": "VC-012",
     "code": "12",
     "categoryId": "visiting-cards",
@@ -12878,6 +12954,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381eb",
     "id": "VC-011",
     "code": "11",
     "categoryId": "visiting-cards",

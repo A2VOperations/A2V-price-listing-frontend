@@ -1,5 +1,6 @@
 [
   {
+    "_id": "6a8d3f3e181ae861f1c381b6",
     "id": "AP-001",
     "code": "ATM",
     "categoryId": "atm-pouches",
@@ -218,16 +219,16 @@
       "finalSize": "W: 88.00 mm X H: 57.00 mm",
       "bleed": "3 mm"
     },
-    "_id": "6a8d3f3e181ae861f1c381b6",
     "options": [],
     "quantityPricingTiers": [],
-    "updatedAt": "2026-08-31T06:34:08.739Z",
+    "updatedAt": "2026-08-31T06:46:20.361Z",
     "images": [
       "/uploads/upload-1788158044637-866736704.jpg",
-      "/uploads/upload-1788157573627-225929464.jpg"
+      "/uploads/upload-1788158778713-734370658.png"
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b7",
     "id": "BB-001",
     "code": "BB-1",
     "categoryId": "bill-books",
@@ -603,9 +604,15 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "quantityPricingTiers": [],
+    "updatedAt": "2026-08-31T07:40:18.963Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b8",
     "id": "CH-001",
     "code": "CH-001",
     "categoryId": "card-holders",
@@ -681,6 +688,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b9",
     "id": "CH-002",
     "code": "CH-002",
     "categoryId": "card-holders",
@@ -756,6 +764,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ba",
     "id": "DPP-001",
     "code": "DPP-LH",
     "categoryId": "digital-paper-printing",
@@ -926,6 +935,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bb",
     "id": "DPP-002",
     "code": "DPP-ART",
     "categoryId": "digital-paper-printing",
@@ -1426,6 +1436,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bc",
     "id": "DPP-003",
     "code": "DPP-TEXTURE",
     "categoryId": "digital-paper-printing",
@@ -1909,6 +1920,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bd",
     "id": "DPP-004",
     "code": "DPP-METALLIC",
     "categoryId": "digital-paper-printing",
@@ -1992,6 +2004,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381be",
     "id": "DPP-005",
     "code": "DPP-NT-PVC",
     "categoryId": "digital-paper-printing",
@@ -2133,6 +2146,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bf",
     "id": "DPP-006",
     "code": "DPP-PAPER-GUM",
     "categoryId": "digital-paper-printing",
@@ -2264,6 +2278,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c0",
     "id": "DPP-007",
     "code": "DPP-PVC-GUM",
     "categoryId": "digital-paper-printing",
@@ -2601,6 +2616,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c1",
     "id": "DPP-008",
     "code": "DPP-PRINT-ONLY",
     "categoryId": "digital-paper-printing",
@@ -2684,6 +2700,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c2",
     "id": "ENV-001",
     "code": "EN-1",
     "categoryId": "envelopes",
@@ -2831,6 +2848,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c3",
     "id": "ENV-002",
     "code": "EN-3",
     "categoryId": "envelopes",
@@ -2976,6 +2994,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c4",
     "id": "ENV-003",
     "code": "EN-2",
     "categoryId": "envelopes",
@@ -3113,6 +3132,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c5",
     "id": "ENV-004",
     "code": "EN-4",
     "categoryId": "envelopes",
@@ -3239,6 +3259,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c6",
     "id": "ENV-005",
     "code": "EN-5",
     "categoryId": "envelopes",
@@ -3358,6 +3379,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c7",
     "id": "ENV-006",
     "code": "EN-6",
     "categoryId": "envelopes",
@@ -3495,6 +3517,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c8",
     "id": "ENV-007",
     "code": "EN-7",
     "categoryId": "envelopes",
@@ -3640,6 +3663,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c9",
     "id": "FL-001",
     "code": "FL-001",
     "categoryId": "files",
@@ -3782,6 +3806,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ca",
     "id": "FL-002",
     "code": "FL-002",
     "categoryId": "files",
@@ -3972,6 +3997,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cb",
     "id": "FL-003",
     "code": "FL-003",
     "categoryId": "files",
@@ -4111,6 +4137,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cc",
     "id": "FL-004",
     "code": "FL-004",
     "categoryId": "files",
@@ -4294,6 +4321,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cd",
     "id": "FL-005",
     "code": "FL-005",
     "categoryId": "files",
@@ -4389,6 +4417,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ce",
     "id": "FB-001",
     "code": "FB-001",
     "categoryId": "flex-board",
@@ -4452,6 +4481,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cf",
     "id": "LH-001",
     "code": "LH-1",
     "categoryId": "letter-heads",
@@ -4683,6 +4713,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d0",
     "id": "LH-002",
     "code": "LH-2",
     "categoryId": "letter-heads",
@@ -4914,6 +4945,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d1",
     "id": "LH-003",
     "code": "LH-3",
     "categoryId": "letter-heads",
@@ -5145,6 +5177,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d2",
     "id": "LH-004",
     "code": "LH-4",
     "categoryId": "letter-heads",
@@ -5874,6 +5907,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d3",
     "id": "LH-005",
     "code": "LH-5",
     "categoryId": "letter-heads",
@@ -6137,6 +6171,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d4",
     "id": "PP-001",
     "code": "PP-001",
     "categoryId": "pamphlets-posters",
@@ -6576,6 +6611,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d5",
     "id": "PP-002",
     "code": "PP-002",
     "categoryId": "pamphlets-posters",
@@ -6876,6 +6912,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d6",
     "id": "PN-001",
     "code": "PN-LASER",
     "categoryId": "pens",
@@ -6994,6 +7031,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d7",
     "id": "PN-002",
     "code": "PN-SINGLE",
     "categoryId": "pens",
@@ -7112,6 +7150,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d8",
     "id": "PN-003",
     "code": "PN-BOX",
     "categoryId": "pens",
@@ -7193,6 +7232,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d9",
     "id": "SL-001",
     "code": "STK",
     "categoryId": "stickers-labels",
@@ -7621,6 +7661,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381da",
     "id": "TG-001",
     "code": "TG-001",
     "categoryId": "tags",
@@ -7839,6 +7880,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381db",
     "id": "TG-002",
     "code": "TG-002",
     "categoryId": "tags",
@@ -7993,6 +8035,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dc",
     "id": "TG-003",
     "code": "TG-003",
     "categoryId": "tags",
@@ -8148,6 +8191,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dd",
     "id": "TG-004",
     "code": "TG-004",
     "categoryId": "tags",
@@ -8607,6 +8651,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381de",
     "id": "VC-007",
     "code": "7",
     "categoryId": "visiting-cards",
@@ -9948,10 +9993,10 @@
         ]
       }
     ],
-    "_id": "6a8d3f3e181ae861f1c381de",
     "updatedAt": "2026-08-31T05:43:44.803Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381df",
     "id": "VC-008",
     "code": "8",
     "categoryId": "visiting-cards",
@@ -10744,7 +10789,6 @@
         ]
       }
     },
-    "_id": "6a8d3f3e181ae861f1c381df",
     "basePrice": 2230,
     "minQuantity": 500,
     "options": [],
@@ -10757,6 +10801,7 @@
     "updatedAt": "2026-08-31T05:51:59.892Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e0",
     "id": "VC-014",
     "code": "14",
     "categoryId": "visiting-cards",
@@ -11420,6 +11465,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e1",
     "id": "VC-015",
     "code": "15",
     "categoryId": "visiting-cards",
@@ -11507,6 +11553,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e2",
     "id": "VC-016",
     "code": "16",
     "categoryId": "visiting-cards",
@@ -11634,13 +11681,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e3",
     "id": "VC-018",
     "code": "18",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss Lamination Card",
     "slug": "regular-gloss-lamination",
-    "image": "/products/visiting-cards/regular-gloss-lam.jpg",
+    "image": "",
     "description": "1000 qty standard high-gloss thermal film lamination.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nLAMINATION",
@@ -11658,7 +11706,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.72
+        "pricePerUnit": 0.72,
+        "_id": "6a9523c808f6f88a66277a79"
       }
     ],
     "ourSpecialization": [
@@ -11719,16 +11768,21 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:40.460Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e4",
     "id": "VC-019",
     "code": "19",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss UV Coated Card",
     "slug": "regular-gloss-coated",
-    "image": "/products/visiting-cards/regular-gloss-coated.jpg",
+    "image": "",
     "description": "1000 qty express turnaround gloss UV coated cards ready in 12 hours.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nUV COATED",
@@ -11746,7 +11800,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.65
+        "pricePerUnit": 0.65,
+        "_id": "6a9523cd08f6f88a66277a7a"
       }
     ],
     "ourSpecialization": [
@@ -11807,9 +11862,14 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:45.187Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e5",
     "id": "VC-020",
     "code": "20",
     "categoryId": "visiting-cards",
@@ -11898,6 +11958,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e6",
     "id": "VC-017",
     "code": "17",
     "categoryId": "visiting-cards",
@@ -12023,6 +12084,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e7",
     "id": "VC-021",
     "code": "21",
     "categoryId": "visiting-cards",
@@ -12107,6 +12169,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e8",
     "id": "VC-022",
     "code": "22",
     "categoryId": "visiting-cards",
@@ -12191,6 +12254,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e9",
     "id": "VC-010",
     "code": "10",
     "categoryId": "visiting-cards",
@@ -12708,6 +12772,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ea",
     "id": "VC-012",
     "code": "12",
     "categoryId": "visiting-cards",
@@ -12889,6 +12954,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381eb",
     "id": "VC-011",
     "code": "11",
     "categoryId": "visiting-cards",
