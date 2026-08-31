@@ -1,4 +1,4 @@
-const API_BASE = ""; // Uses relative path, proxied by Vite or direct in production
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 export async function fetchCategoriesApi() {
   const res = await fetch(`${API_BASE}/api/categories`);
