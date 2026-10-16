@@ -19,7 +19,7 @@ export const categories = [
     name: "Flex Board & Standee",
     image: flexBoard,
     description:
-      "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods, plus Portable Roll-Up Standees.",
+      "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods, plus Heavy-Duty Iron Frame Standee calculator.",
   },
   {
     id: "visiting-cards",

@@ -6,6 +6,7 @@ import EmptyState from "@/components/common/EmptyState";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
 import ProductOrderForm from "@/components/product/ProductOrderForm";
+import StandieOrderForm from "@/components/product/StandieOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
 import { FiClock, FiLayers } from "react-icons/fi";
 
@@ -102,6 +103,21 @@ export default function ProductPage() {
       <div className="space-y-6">
         <Breadcrumb items={breadcrumbItems} />
         <StickerCalculator product={product} />
+        <ProductInfo product={product} />
+      </div>
+    );
+  }
+
+  const isStandie =
+    product.isStandie ||
+    product.subCategory?.toUpperCase().includes("STANDIE") ||
+    product.slug?.includes("standie");
+
+  if (isStandie) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        <StandieOrderForm product={product} />
         <ProductInfo product={product} />
       </div>
     );

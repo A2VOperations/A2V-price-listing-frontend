@@ -1,30 +1,46 @@
 import React from "react";
-import { FiCheck, FiShoppingBag, FiMaximize2, FiAward, FiLayers } from "react-icons/fi";
+import { FiMaximize2, FiLayers, FiShield, FiCheckCircle } from "react-icons/fi";
 
 export default function StandiePreview({
-  width = 2.5,
-  height = 6,
-  sizeLabel = "2.5 × 6 Ft",
-  mediaName = "Star Flex",
-  standType = "Standard Aluminium Roll-Up Stand",
-  lamination = "None",
+  totalHeight = 5,
+  width = 3,
+  legClearance = 1,
+  flexHeight = 4,
+  flexWidth = 3,
+  flexArea = 12,
+  isDoubleSided = true,
+  mediaName = "Normal Frontlit Flex",
+  flexRate = 25,
+  ironRunningFt = 16,
+  ironRate = 35,
+  angleBaseFt = 2,
+  angleRate = 50,
+  supportCount = 4,
+  supportRate = 80,
+  totalPrice = 1580,
 }) {
-  const isLuxury = standType.toLowerCase().includes("luxury") || standType.toLowerCase().includes("teardrop");
-  const isXStand = standType.toLowerCase().includes("x-banner") || standType.toLowerCase().includes("spider");
-  const isNoStand = standType.toLowerCase().includes("no stand") || standType.toLowerCase().includes("banner print only");
+  const numHeight = parseFloat(totalHeight) || 5;
+  const numWidth = parseFloat(width) || 3;
+  const numLeg = parseFloat(legClearance) || 1;
+  const numFlexH = Math.max(0.5, numHeight - numLeg);
 
-  // Approximate aspect ratio calculation for preview container
-  const numWidth = parseFloat(width) || 2.5;
-  const numHeight = parseFloat(height) || 6;
-  const aspectRatio = Math.max(0.3, Math.min(0.65, numWidth / numHeight));
+  // Aspect ratio scaling for visual container
+  const ratio = Math.max(0.35, Math.min(0.85, numWidth / numHeight));
+  const containerWidthPx = Math.round(Math.max(220, Math.min(340, 260 * (ratio / 0.6))));
 
-  const totalAreaSqFt = (numWidth * numHeight).toFixed(1);
+  const flexPercentage = Math.max(40, Math.min(85, (numFlexH / numHeight) * 100));
+  const legPercentage = 100 - flexPercentage;
+
+  const flexCost = Math.round(flexArea * (isDoubleSided ? 2 : 1) * flexRate);
+  const ironCost = Math.round(ironRunningFt * ironRate);
+  const angleCost = Math.round(angleBaseFt * angleRate);
+  const supportCost = Math.round(supportCount * supportRate);
 
   return (
     <div className="bg-slate-900 text-white rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col items-center justify-between relative overflow-hidden select-none">
-      {/* Background ambient glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Ambient background glows */}
+      <div className="absolute top-0 right-0 w-52 h-52 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-52 h-52 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header Info */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800 text-xs">
@@ -33,155 +49,237 @@ export default function StandiePreview({
             <FiMaximize2 className="w-3.5 h-3.5" />
           </span>
           <div>
-            <span className="font-bold text-slate-200">Interactive Standee Preview</span>
-            <span className="text-[10px] text-slate-400 block">{sizeLabel} • {totalAreaSqFt} sq. ft.</span>
+            <span className="font-bold text-slate-100">Iron Frame Standee Visualizer</span>
+            <span className="text-[10px] text-slate-400 block font-mono">
+              Total: {numHeight}ft H × {numWidth}ft W • 1ft Ground Legs
+            </span>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
-            {mediaName}
+          <span className="px-2.5 py-0.5 rounded-full bg-orange-600/20 text-orange-400 text-[10px] font-bold border border-orange-500/30">
+            {isDoubleSided ? "2 SIDES FLEX" : "1 SIDE FLEX"}
           </span>
         </div>
       </div>
 
-      {/* Main Standee Graphic Stage */}
-      <div className="relative py-6 flex flex-col items-center justify-center w-full min-h-[360px]">
-        {/* Height Dimension indicator */}
-        <div className="absolute -left-1 sm:left-2 top-10 bottom-12 flex flex-col items-center justify-between text-[10px] text-slate-400">
-          <div className="w-1.5 h-0.5 bg-slate-600" />
-          <div className="h-full border-l border-dashed border-slate-600 relative">
-            <span className="absolute -left-7 top-1/2 -translate-y-1/2 rotate-[-90deg] bg-slate-900 px-1 text-[9px] text-orange-400 font-bold whitespace-nowrap">
-              {height} ft ({Math.round(numHeight * 12)}")
+      {/* Main Interactive Rig Stage */}
+      <div className="relative py-6 flex flex-col items-center justify-center w-full min-h-[410px]">
+        {/* Left Total Height Dimension Line */}
+        <div className="absolute left-1 sm:left-3 top-8 bottom-12 flex flex-col items-center justify-between text-[10px] text-slate-400">
+          <div className="w-2 h-0.5 bg-orange-500" />
+          <div className="h-full border-l-2 border-dashed border-orange-500/60 relative flex items-center justify-center">
+            <span className="bg-slate-900 px-1 py-0.5 rounded text-[9px] text-orange-400 font-extrabold whitespace-nowrap rotate-[-90deg] shadow-xs border border-orange-500/30">
+              Total Height: {numHeight} Ft
             </span>
           </div>
-          <div className="w-1.5 h-0.5 bg-slate-600" />
+          <div className="w-2 h-0.5 bg-orange-500" />
         </div>
 
-        {/* The Standee Physical Rig */}
-        <div className="flex flex-col items-center transition-all duration-300" style={{ width: `${Math.round(aspectRatio * 320)}px` }}>
-          {/* Top Aluminium Snapping Clamp Profile */}
-          {!isNoStand && (
-            <div className="w-full h-3 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 rounded-xs shadow-md border-b border-slate-500 relative flex items-center justify-center">
-              <div className="w-3 h-1 bg-slate-600 rounded-xs" />
-            </div>
-          )}
-
-          {/* Banner Printed Graphic Pull-Up Sheet */}
-          <div
-            className="w-full relative shadow-2xl overflow-hidden border border-slate-700/80 transition-all duration-300"
-            style={{
-              height: "260px",
-              background: "linear-gradient(145deg, #0F172A 0%, #1E293B 40%, #0B192C 100%)",
-            }}
-          >
-            {/* Glossy sheen overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
-
-            {/* Inner Graphic Mockup Elements */}
-            <div className="p-3.5 h-full flex flex-col justify-between text-center relative z-10">
-              <div>
-                {/* Brand Logo Header */}
-                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 backdrop-blur-xs border border-white/10 mb-2">
-                  <span className="font-extrabold text-[10px] tracking-widest text-white">A2V</span>
-                  <span className="font-extrabold text-[10px] text-orange-400">PRINTS</span>
-                </div>
-                <h4 className="text-[13px] font-black text-white leading-tight uppercase tracking-tight">
-                  PROMOTIONAL DISPLAY
-                </h4>
-                <div className="h-0.5 w-8 bg-orange-500 mx-auto mt-1 rounded-full" />
-              </div>
-
-              {/* Graphic Body Visual Accent */}
-              <div className="my-auto py-2">
-                <div className="w-14 h-14 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-amber-600 p-0.5 shadow-lg flex items-center justify-center">
-                  <div className="w-full h-full rounded-full bg-slate-900/80 flex flex-col items-center justify-center">
-                    <span className="text-[10px] font-extrabold text-white leading-none">{totalAreaSqFt}</span>
-                    <span className="text-[7px] text-orange-400 font-bold uppercase">SQ.FT</span>
-                  </div>
-                </div>
-                <p className="text-[9px] text-slate-300 font-medium mt-2 leading-tight px-1">
-                  High Resolution Vivid Printing
-                </p>
-                <div className="inline-block mt-1 px-2 py-0.5 rounded bg-orange-600 text-[8px] font-bold text-white uppercase tracking-wider">
-                  {mediaName}
-                </div>
-              </div>
-
-              {/* Graphic Footer */}
-              <div className="pt-2 border-t border-white/10">
-                <div className="text-[8px] text-slate-400 font-mono tracking-wider">
-                  {width} FT × {height} FT
-                </div>
-                <div className="text-[7px] text-emerald-400 font-semibold mt-0.5">
-                  ★ Durable &amp; Scratch Resistant
-                </div>
-              </div>
-            </div>
-
-            {/* Lamination ribbon tag */}
-            {lamination && lamination !== "None" && (
-              <div className="absolute top-1.5 right-1.5 bg-blue-600/90 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                {lamination}
-              </div>
-            )}
+        {/* Physical Iron Frame & Flex Standee Rig */}
+        <div
+          className="relative flex flex-col items-center transition-all duration-300"
+          style={{ width: `${containerWidthPx}px` }}
+        >
+          {/* Top Iron Crossbar (Square Pipe) */}
+          <div className="w-full h-3 bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 rounded-t-xs shadow-md border-b border-slate-900 flex items-center justify-between px-1 relative z-20">
+            <div className="w-2 h-2 rounded-full bg-slate-900/60 border border-slate-500" title="Corner Weld" />
+            <span className="text-[8px] font-bold text-slate-300 tracking-wider font-mono">
+              IRON PIPE {numWidth} FT
+            </span>
+            <div className="w-2 h-2 rounded-full bg-slate-900/60 border border-slate-500" title="Corner Weld" />
           </div>
 
-          {/* Bottom Stand Mechanism */}
-          {!isNoStand && (
-            <>
-              {isLuxury ? (
-                // Luxury Teardrop Broad Base
-                <div className="w-[115%] h-6 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-300 rounded-b-xl shadow-xl border-t border-slate-400 relative flex items-center justify-between px-2">
-                  <div className="w-2.5 h-4 bg-gradient-to-r from-slate-200 to-slate-400 rounded-xs shadow-xs border border-slate-300" />
-                  <span className="text-[8px] font-bold text-slate-700 tracking-wider">TEARDROP CHROME</span>
-                  <div className="w-2.5 h-4 bg-gradient-to-r from-slate-400 to-slate-200 rounded-xs shadow-xs border border-slate-300" />
-                </div>
-              ) : isXStand ? (
-                // X-Stand Spider Feet
-                <div className="w-full pt-1 flex justify-between items-center px-1">
-                  <div className="w-1.5 h-5 bg-slate-400 rotate-[-35deg] rounded-full shadow" />
-                  <div className="w-2 h-2 rounded-full bg-slate-500" />
-                  <div className="w-1.5 h-5 bg-slate-400 rotate-[35deg] rounded-full shadow" />
-                </div>
-              ) : (
-                // Standard Roll-up Aluminium Base with Stabilizing Feet
-                <div className="w-[108%] relative">
-                  <div className="w-full h-4.5 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 rounded-xs shadow-lg border-t border-slate-500 flex items-center justify-center">
-                    <div className="w-6 h-1 bg-slate-500/50 rounded-full" />
+          {/* Frame Body with Left & Right Vertical Iron Pipes */}
+          <div className="w-full relative flex justify-between" style={{ height: "300px" }}>
+            {/* Left Vertical Full-Height Iron Pipe */}
+            <div className="w-3.5 h-full bg-gradient-to-b from-slate-600 via-slate-500 to-slate-700 border-x border-slate-900 shadow-md relative z-20 shrink-0 flex flex-col justify-between">
+              <div className="w-full h-1 bg-slate-800/80" />
+              <div className="w-full h-1 bg-slate-800/80" />
+            </div>
+
+            {/* Inner Content Area: Flex Board Area + 1ft Leg Clearance */}
+            <div className="flex-1 flex flex-col relative px-0.5">
+              {/* Flex Banner Board (Occupies top flexPercentage) */}
+              <div
+                className="w-full relative rounded-xs shadow-inner overflow-hidden border border-slate-700/80 transition-all duration-300 flex flex-col justify-between p-3"
+                style={{
+                  height: `${flexPercentage}%`,
+                  background: "linear-gradient(145deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+                }}
+              >
+                {/* Surface sheen effect */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
+
+                {/* Grommets / Mounting Eyelets in 4 corners */}
+                <div className="absolute top-1 left-1 w-2 h-2 rounded-full bg-slate-300 border border-slate-700 shadow-xs" />
+                <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-slate-300 border border-slate-700 shadow-xs" />
+                <div className="absolute bottom-1 left-1 w-2 h-2 rounded-full bg-slate-300 border border-slate-700 shadow-xs" />
+                <div className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-slate-300 border border-slate-700 shadow-xs" />
+
+                {/* Flex Banner Mockup Content */}
+                <div className="text-center relative z-10 my-auto">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 border border-white/10 mb-1.5">
+                    <span className="font-extrabold text-[9px] tracking-wider text-white">A2V</span>
+                    <span className="font-extrabold text-[9px] text-orange-400">PRINTS</span>
                   </div>
-                  {/* Twin Swivel Feet */}
-                  <div className="flex justify-between items-center px-2 -mt-0.5">
-                    <div className="w-8 h-1.5 bg-slate-400 rounded-b-xs shadow border border-slate-500" />
-                    <div className="w-8 h-1.5 bg-slate-400 rounded-b-xs shadow border border-slate-500" />
+                  <h4 className="text-[12px] font-black text-white uppercase tracking-tight leading-tight">
+                    FLEX DISPLAY BOARD
+                  </h4>
+                  <div className="h-0.5 w-10 bg-orange-500 mx-auto my-1 rounded-full" />
+                  <div className="text-[10px] font-bold text-amber-300 font-mono mt-1">
+                    {numFlexH} FT × {numWidth} FT
+                  </div>
+                  <div className="text-[9px] text-slate-300 font-medium">
+                    ({flexArea} Sq.Ft • {isDoubleSided ? "Both Sides × 2" : "1 Side"})
+                  </div>
+
+                  <div className="mt-2 inline-block px-2 py-0.5 rounded-full bg-orange-600/90 text-[8px] font-bold text-white uppercase tracking-wider shadow-xs">
+                    {mediaName}
                   </div>
                 </div>
-              )}
-            </>
-          )}
+
+                {/* Right Flex Height Dimension Marker */}
+                <div className="absolute right-2 top-2 bottom-2 flex items-center pointer-events-none">
+                  <span className="text-[8px] text-amber-400 font-bold bg-slate-900/80 px-1 py-0.5 rounded border border-amber-500/30">
+                    {numFlexH}ft
+                  </span>
+                </div>
+              </div>
+
+              {/* Middle Horizontal Iron Crossbar separating Flex from 1ft Legs */}
+              <div className="w-full h-3 bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 border-y border-slate-900 shadow-sm flex items-center justify-between px-1 relative z-20">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900/80" />
+                <span className="text-[7.5px] font-bold text-slate-300 tracking-wider font-mono">
+                  LOWER CROSS PIPE {numWidth} FT
+                </span>
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900/80" />
+              </div>
+
+              {/* Bottom 1ft Legs Open Air Clearance Gap */}
+              <div
+                className="w-full relative flex items-center justify-center"
+                style={{ height: `${legPercentage}%` }}
+              >
+                {/* 1ft Leg Dimension Callout in center */}
+                <div className="px-2 py-0.5 rounded bg-slate-800/80 border border-slate-700 text-[9px] font-mono text-slate-300 flex items-center gap-1 shadow-xs">
+                  <span>↕ 1 FT STAND ROD / LEGS</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Vertical Full-Height Iron Pipe */}
+            <div className="w-3.5 h-full bg-gradient-to-b from-slate-600 via-slate-500 to-slate-700 border-x border-slate-900 shadow-md relative z-20 shrink-0 flex flex-col justify-between">
+              <div className="w-full h-1 bg-slate-800/80" />
+              <div className="w-full h-1 bg-slate-800/80" />
+            </div>
+          </div>
+
+          {/* Ground Foundation: 2 Angle Iron Base Feet & 4 Support Braces */}
+          <div className="w-full relative flex justify-between items-end px-0 -mt-2 z-30">
+            {/* Left Foot Assembly (Angle Iron Bar + 2 Triangular Supports) */}
+            <div className="flex flex-col items-center relative" style={{ width: "70px", marginLeft: "-28px" }}>
+              {/* 2 Diagonal Welded Support Rods */}
+              <svg className="w-full h-9 overflow-visible" viewBox="0 0 70 36">
+                {/* Vertical center pole line stub */}
+                <line x1="35" y1="0" x2="35" y2="36" stroke="#475569" strokeWidth="4" />
+                {/* Left diagonal support brace */}
+                <line x1="35" y1="6" x2="6" y2="33" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Right diagonal support brace */}
+                <line x1="35" y1="6" x2="64" y2="33" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Weld points */}
+                <circle cx="35" cy="6" r="2.5" fill="#f59e0b" />
+                <circle cx="6" cy="33" r="2.5" fill="#f59e0b" />
+                <circle cx="64" cy="33" r="2.5" fill="#f59e0b" />
+              </svg>
+              {/* Angle Iron Base Foot (Flat on ground) */}
+              <div className="w-full h-2.5 bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 rounded-sm border-t border-slate-400 shadow-lg relative flex items-center justify-between px-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                <span className="text-[6.5px] font-black text-amber-300 font-mono">ANGLE 1FT</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+              </div>
+            </div>
+
+            {/* Ground Clearance Label in middle */}
+            <div className="flex-1 text-center pb-1">
+              <span className="text-[8px] text-slate-500 font-mono uppercase tracking-wider">
+                Heavy Angle Iron Stand Base
+              </span>
+            </div>
+
+            {/* Right Foot Assembly (Angle Iron Bar + 2 Triangular Supports) */}
+            <div className="flex flex-col items-center relative" style={{ width: "70px", marginRight: "-28px" }}>
+              {/* 2 Diagonal Welded Support Rods */}
+              <svg className="w-full h-9 overflow-visible" viewBox="0 0 70 36">
+                {/* Vertical center pole line stub */}
+                <line x1="35" y1="0" x2="35" y2="36" stroke="#475569" strokeWidth="4" />
+                {/* Left diagonal support brace */}
+                <line x1="35" y1="6" x2="6" y2="33" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Right diagonal support brace */}
+                <line x1="35" y1="6" x2="64" y2="33" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Weld points */}
+                <circle cx="35" cy="6" r="2.5" fill="#f59e0b" />
+                <circle cx="6" cy="33" r="2.5" fill="#f59e0b" />
+                <circle cx="64" cy="33" r="2.5" fill="#f59e0b" />
+              </svg>
+              {/* Angle Iron Base Foot (Flat on ground) */}
+              <div className="w-full h-2.5 bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 rounded-sm border-t border-slate-400 shadow-lg relative flex items-center justify-between px-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                <span className="text-[6.5px] font-black text-amber-300 font-mono">ANGLE 1FT</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Width Dimension Indicator */}
-        <div className="w-48 mt-3 flex items-center justify-between text-[10px] text-slate-400">
-          <div className="h-1.5 w-0.5 bg-slate-600" />
-          <div className="w-full border-t border-dashed border-slate-600 relative text-center">
-            <span className="bg-slate-900 px-1 text-[9px] text-orange-400 font-bold">
-              {width} ft ({Math.round(numWidth * 12)}")
+        {/* Bottom Width Dimension Line */}
+        <div className="w-52 mt-4 flex items-center justify-between text-[10px] text-slate-400">
+          <div className="h-2 w-0.5 bg-orange-500" />
+          <div className="w-full border-t-2 border-dashed border-orange-500/60 relative text-center">
+            <span className="bg-slate-900 px-2 text-[9px] text-orange-400 font-extrabold shadow-xs">
+              Frame Width: {numWidth} Ft ({Math.round(numWidth * 12)}")
             </span>
           </div>
-          <div className="h-1.5 w-0.5 bg-slate-600" />
+          <div className="h-2 w-0.5 bg-orange-500" />
         </div>
       </div>
 
-      {/* Highlights & Badges Footer */}
-      <div className="w-full grid grid-cols-2 gap-2 pt-3 border-t border-slate-800 text-[11px]">
-        <div className="flex items-center space-x-1.5 text-slate-300">
-          <FiShoppingBag className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-          <span className="truncate">Includes Carry Bag</span>
+      {/* Formula Verification Pill (Matches Handwritten Note Exactly) */}
+      <div className="w-full bg-slate-800/90 rounded-xl p-3 border border-slate-700 text-[10.5px] space-y-1.5 mt-2">
+        <div className="flex items-center justify-between font-bold text-orange-400 border-b border-slate-700/80 pb-1">
+          <span>Formula Match (From Specifications):</span>
+          <span>₹{totalPrice.toLocaleString()}</span>
         </div>
-        <div className="flex items-center space-x-1.5 text-slate-300">
-          <FiAward className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span className="truncate">Ready in 24 Hours</span>
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-slate-300 text-[10px] font-mono">
+          <div>
+            • Iron Frame ({ironRunningFt} ft × ₹{ironRate}): <span className="font-bold text-white">₹{ironCost}</span>
+          </div>
+          <div>
+            • Angle Rod ({angleBaseFt} ft × ₹{angleRate}): <span className="font-bold text-white">₹{angleCost}</span>
+          </div>
+          <div>
+            • Support Rods ({supportCount} × ₹{supportRate}): <span className="font-bold text-white">₹{supportCost}</span>
+          </div>
+          <div>
+            • Flex ({flexArea} sqft × {isDoubleSided ? "2 sides" : "1"} × ₹{flexRate}):{" "}
+            <span className="font-bold text-white">₹{flexCost}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Highlights Footer */}
+      <div className="w-full grid grid-cols-3 gap-2 pt-3 border-t border-slate-800 text-[10.5px] text-center mt-3">
+        <div className="flex flex-col items-center">
+          <span className="text-orange-400 font-bold">16 Running Ft</span>
+          <span className="text-[9px] text-slate-400">Iron Square Pipe</span>
+        </div>
+        <div className="flex flex-col items-center border-x border-slate-800">
+          <span className="text-amber-400 font-bold">4 Support Rods</span>
+          <span className="text-[9px] text-slate-400">High Stability</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-emerald-400 font-bold">2-Sided Flex</span>
+          <span className="text-[9px] text-slate-400">High Resolution</span>
         </div>
       </div>
     </div>

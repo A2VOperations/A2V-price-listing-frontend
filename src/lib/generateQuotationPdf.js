@@ -410,10 +410,26 @@ export function generateFlexQuotationPdf(data) {
  */
 export function generateStandieQuotationPdf(data) {
   const {
-    standeeSize = "2.5 x 6 Ft",
-    validWidth = 2.5,
-    validHeight = 6,
-    areaSqFt = 15,
+    standeeSize = "5 × 3 Ft",
+    validWidth = 3,
+    validHeight = 5,
+    legClearance = 1,
+    flexHeight = 4,
+    flexWidth = 3,
+    flexArea = 12,
+    isDoubleSided = true,
+    mediaName = "Normal Frontlit Flex",
+    flexRate = 25,
+    flexCost = 600,
+    ironRunningFt = 16,
+    ironRate = 35,
+    ironCost = 560,
+    angleBaseFt = 2,
+    angleRate = 50,
+    angleCost = 100,
+    supportCount = 4,
+    supportRate = 80,
+    supportCost = 320,
     activeMedia,
     mediaCostPerUnit = 0,
     activeStand,
@@ -427,7 +443,7 @@ export function generateStandieQuotationPdf(data) {
     validDiscount = 0,
     totalAmount = 0,
     clientInfo = {},
-    productName = "Roll-Up Standie Display",
+    productName = "Heavy-Duty MS Iron Frame Standee Display",
   } = data;
 
   const doc = new jsPDF({
@@ -487,7 +503,7 @@ export function generateStandieQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(226, 232, 240); // slate-200
-  doc.text("Roll-Up Standee & Portable Promotional Displays", margin + 7, headerY + 20);
+  doc.text("Heavy-Duty MS Iron Frame Standee & Displays", margin + 7, headerY + 20);
 
   // Right Header: Document icon in orange
   const iconX = rightEdge - 78;
@@ -558,8 +574,8 @@ export function generateStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85); // slate-700
-  doc.text(`Model: ${productName}`, rightColX + 8, cardY + 13);
-  doc.text(`Size: ${standeeSize} (${areaSqFt} sq. ft.)`, rightColX + 8, cardY + 18);
+  doc.text(`Standee Size: ${validWidth}ft (W) × ${validHeight}ft (H)`, rightColX + 8, cardY + 13);
+  doc.text(`Flex Area: ${flexWidth}×${flexHeight} ft (${flexArea} sq.ft. ${isDoubleSided ? "Both Sides" : "Single Side"})`, rightColX + 8, cardY + 18);
   doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`, rightColX + 8, cardY + 23);
 
   // 3. ITEMIZED COST BREAKDOWN TABLE
@@ -597,40 +613,50 @@ export function generateStandieQuotationPdf(data) {
   // Rows Data
   const rows = [];
 
-  // Stand hardware
-  if (activeStand && activeStand.name !== "None (Print Only)") {
+  if (ironRunningFt) {
+    // 1. MS Iron Frame
     rows.push({
-      desc: activeStand.name,
-      spec: `Hardware Unit with Padded Bag @ Rs. ${activeStand.price}/unit`,
-      total: `Rs. ${(standCostPerUnit * quantity).toLocaleString()}/-`,
+      desc: "MS Iron Rod Frame (Square Pipe)",
+      spec: `${validHeight}+${validHeight}+${validWidth}+${validWidth} = ${ironRunningFt} Ft @ Rs. ${ironRate}/ft`,
+      total: `Rs. ${(ironCost * quantity).toLocaleString()}/-`,
     });
-  }
 
-  // Media Printing
-  if (activeMedia && activeMedia.name !== "No Print (Hardware Only)") {
+    // 2. Angle Rod Base Stand
     rows.push({
-      desc: `Graphic Banner Printing (${activeMedia.name})`,
-      spec: `${areaSqFt} sqft @ Rs. ${activeMedia.pricePerSqFt}/sqft`,
-      total: `Rs. ${(mediaCostPerUnit * quantity).toLocaleString()}/-`,
+      desc: "Angle Rod Base Stand (Legs)",
+      spec: `2 Welded Angle Feet (${angleBaseFt} Ft) @ Rs. ${angleRate}/ft`,
+      total: `Rs. ${(angleCost * quantity).toLocaleString()}/-`,
     });
-  }
 
-  // Lamination
-  if (activeLamination && activeLamination.name !== "None") {
+    // 3. Support Rods
     rows.push({
-      desc: `Protective Surface ${activeLamination.name}`,
-      spec: `${areaSqFt} sqft @ Rs. ${activeLamination.pricePerSqFt}/sqft`,
-      total: `Rs. ${(laminationCostPerUnit * quantity).toLocaleString()}/-`,
+      desc: "Corner Support Rods (Stays)",
+      spec: `${supportCount} Nos Heavy-Duty Stays @ Rs. ${supportRate}/pc`,
+      total: `Rs. ${(supportCost * quantity).toLocaleString()}/-`,
     });
-  }
 
-  // Design Assistance
-  if (activeDesign && activeDesign.fee > 0) {
+    // 4. Flex Printing
     rows.push({
-      desc: `Artwork & Design (${activeDesign.name})`,
-      spec: "Professional graphic layout & typesetting",
-      total: `Rs. ${designCostTotal.toLocaleString()}/-`,
+      desc: `Graphic Flex Banner (${isDoubleSided ? "Both Sides: Front + Back" : "Single-Sided"})`,
+      spec: `${mediaName || "Normal Flex"} (${flexArea} sqft ${isDoubleSided ? "× 2" : ""}) @ Rs. ${flexRate}/sqft`,
+      total: `Rs. ${(flexCost * quantity).toLocaleString()}/-`,
     });
+  } else {
+    // Legacy fallback
+    if (activeStand && activeStand.name !== "None (Print Only)") {
+      rows.push({
+        desc: activeStand.name,
+        spec: `Hardware Unit with Padded Bag @ Rs. ${activeStand.price}/unit`,
+        total: `Rs. ${(standCostPerUnit * quantity).toLocaleString()}/-`,
+      });
+    }
+    if (activeMedia && activeMedia.name !== "No Print (Hardware Only)") {
+      rows.push({
+        desc: `Graphic Banner Printing (${activeMedia.name})`,
+        spec: `${areaSqFt} sqft @ Rs. ${activeMedia.pricePerSqFt}/sqft`,
+        total: `Rs. ${(mediaCostPerUnit * quantity).toLocaleString()}/-`,
+      });
+    }
   }
 
   // Table Rows Drawing
@@ -697,11 +723,11 @@ export function generateStandieQuotationPdf(data) {
   doc.setFontSize(7);
   doc.setTextColor(71, 85, 105); // slate-600
   const terms = [
-    "• Turnaround Time: 24 Hours from print-ready file approval.",
-    "• Hardware: Premium silver aluminium casing with foldable support rod.",
-    "• Carry Case: Protective nylon carry bag included with each stand.",
-    "• Printing: Vivid UV / Eco-Solvent digital print on specified media.",
-    "• Payment: 50% advance along with confirmed purchase order.",
+    "• Turnaround Time: 24 to 48 Hours from design approval.",
+    "• Structure: Heavy-duty welded MS iron square pipe frame.",
+    "• Base Support: 2 angle iron base feet with 4 diagonal support struts.",
+    "• Flex: High-resolution vibrant digital print mounted both sides.",
+    "• Payment: 50% advance along with purchase confirmation.",
     "• Transportation / Courier charges extra if delivered outside local city.",
   ];
 
