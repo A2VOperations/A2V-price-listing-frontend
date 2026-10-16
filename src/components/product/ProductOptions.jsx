@@ -81,7 +81,7 @@ export default function ProductOptions({
 
         {quantity < minQty && (
           <div className="flex items-center text-xs text-red-600 mt-1">
-            <FiAlertCircle className="w-4 h-4 mr-1 flex-shrink-0" />
+            <FiAlertCircle className="w-4 h-4 mr-1 shrink-0" />
             Quantity cannot be less than minimum required ({minQty} {product.unitName || "Units"}).
           </div>
         )}

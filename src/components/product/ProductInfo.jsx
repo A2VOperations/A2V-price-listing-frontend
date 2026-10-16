@@ -129,7 +129,7 @@ export default function ProductInfo({ product }) {
                 {product.importantNotes.map((note, i) => (
                   <li key={i} className="text-slate-700 bg-amber-50/60 p-3 rounded-lg border border-amber-100/80 whitespace-pre-line leading-relaxed">
                     <div className="flex items-start">
-                      <FiCheck className="w-4 h-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <FiCheck className="w-4 h-4 text-amber-600 mr-2 mt-0.5 shrink-0" />
                       <div>{note}</div>
                     </div>
                   </li>
