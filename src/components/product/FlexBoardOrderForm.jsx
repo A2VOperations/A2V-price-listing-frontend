@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { FiPackage, FiLayers, FiCheck, FiInfo, FiSliders, FiTool, FiCheckCircle, FiEdit3, FiTag, FiFileText, FiDownload } from "react-icons/fi";
+import { FiPackage, FiLayers, FiCheck, FiInfo, FiSliders, FiTool, FiCheckCircle, FiEdit3, FiTag, FiFileText, FiDownload, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import FlexFramePreview from "./FlexFramePreview";
 import { generateFlexQuotationPdf } from "@/lib/generateQuotationPdf";
@@ -9,6 +9,7 @@ const FLEX_MATERIALS = [
   { label: "Star Flex - ₹25 / sqft", name: "Star Flex", pricePerSqFt: 25 },
   { label: "Mini Star Flex - ₹17 / sqft", name: "Mini Star Flex", pricePerSqFt: 17 },
   { label: "Black Out Flex - ₹18 / sqft", name: "Black Out Flex", pricePerSqFt: 18 },
+  { label: "Custom Flex (Manual Price)", name: "Custom Flex", pricePerSqFt: 15 },
 ];
 
 const BOARD_TYPES = [
@@ -24,9 +25,13 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
   const [selectedMaterialLabel, setSelectedMaterialLabel] = useState(
     FLEX_MATERIALS[0].label
   );
+  const [flexRatePerSqFt, setFlexRatePerSqFt] = useState(
+    FLEX_MATERIALS[0].pricePerSqFt
+  );
   const [height, setHeight] = useState(9);
   const [width, setWidth] = useState(18);
   const [boardType, setBoardType] = useState("None");
+  const [boardRatePerFt, setBoardRatePerFt] = useState(35);
   const [hasSupportRod, setHasSupportRod] = useState("No");
   const [supportRodType, setSupportRodType] = useState("Horizontal");
   const [supportRodCount, setSupportRodCount] = useState(1);
@@ -38,6 +43,9 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
   const [angleCount, setAngleCount] = useState(1);
   const [hasAnglePatti, setHasAnglePatti] = useState("No");
   const [anglePattiCount, setAnglePattiCount] = useState(1);
+  const [customHardwareList, setCustomHardwareList] = useState([]);
+  const [newHardwareName, setNewHardwareName] = useState("");
+  const [newHardwarePrice, setNewHardwarePrice] = useState("");
   const [discount, setDiscount] = useState(0);
 
   const [quantity, setQuantity] = useState(1);
@@ -45,26 +53,94 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfGeneratedSuccess, setPdfGeneratedSuccess] = useState(false);
 
-  // Active flex material details
-  const activeMaterial = useMemo(() => {
-    return (
-      FLEX_MATERIALS.find((m) => m.label === selectedMaterialLabel) ||
-      FLEX_MATERIALS[0]
-    );
-  }, [selectedMaterialLabel]);
+  const handleAddCustomHardware = () => {
+    const trimmedName = newHardwareName.trim();
+    if (!trimmedName) return;
 
-  // Active board type details
-  const activeBoard = useMemo(() => {
-    return (
-      BOARD_TYPES.find((b) => b.name === boardType) || BOARD_TYPES[0]
+    const priceNum = parseFloat(newHardwarePrice);
+    const validPrice = isNaN(priceNum) ? 0 : Math.max(0, priceNum);
+
+    const newItem = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+      name: trimmedName,
+      price: validPrice,
+    };
+
+    setCustomHardwareList((prev) => [...prev, newItem]);
+    setNewHardwareName("");
+    setNewHardwarePrice("");
+  };
+
+  const handleRemoveCustomHardware = (id) => {
+    setCustomHardwareList((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleUpdateCustomHardware = (id, field, value) => {
+    setCustomHardwareList((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            [field]: field === "price" ? Math.max(0, parseFloat(value) || 0) : value,
+          };
+        }
+        return item;
+      })
     );
-  }, [boardType]);
+  };
+
+  const handleMaterialChange = (newLabel) => {
+    setSelectedMaterialLabel(newLabel);
+    const matched = FLEX_MATERIALS.find((m) => m.label === newLabel);
+    if (matched) {
+      setFlexRatePerSqFt(matched.pricePerSqFt);
+    }
+    if (onVariantSelect) onVariantSelect(newLabel);
+  };
+
+  const handleBoardTypeChange = (newType) => {
+    setBoardType(newType);
+    const matched = BOARD_TYPES.find((b) => b.name === newType);
+    if (matched && matched.ratePerFt > 0) {
+      setBoardRatePerFt(matched.ratePerFt);
+    }
+  };
+
+  const validFlexRate = Math.max(0.1, Number(flexRatePerSqFt) || 0);
+
+  // Active flex material details with dynamic manual price
+  const activeMaterial = useMemo(() => {
+    const base =
+      FLEX_MATERIALS.find((m) => m.label === selectedMaterialLabel) ||
+      FLEX_MATERIALS[0];
+    return {
+      ...base,
+      pricePerSqFt: validFlexRate,
+      defaultRate: base.pricePerSqFt,
+      isCustomPrice: validFlexRate !== base.pricePerSqFt,
+    };
+  }, [selectedMaterialLabel, validFlexRate]);
+
+  const validBoardRate =
+    boardType === "None" ? 0 : Math.max(0, Number(boardRatePerFt) || 0);
+
+  // Active board type details with dynamic manual price
+  const activeBoard = useMemo(() => {
+    const base =
+      BOARD_TYPES.find((b) => b.name === boardType) || BOARD_TYPES[0];
+    return {
+      ...base,
+      ratePerFt: validBoardRate,
+      defaultRate: base.ratePerFt,
+      isCustomPrice: base.name !== "None" && validBoardRate !== base.ratePerFt,
+    };
+  }, [boardType, validBoardRate]);
 
   // Height & Width Calculations
   const validHeight = Math.max(0.1, Number(height) || 0);
   const validWidth = Math.max(0.1, Number(width) || 0);
   const flexAreaSqFt = Math.round(validHeight * validWidth * 100) / 100;
-  const flexPrintingPricePerUnit = Math.round(flexAreaSqFt * activeMaterial.pricePerSqFt * 100) / 100;
+  const flexPrintingPricePerUnit = Math.round(flexAreaSqFt * validFlexRate * 100) / 100;
 
   // Running Feet Calculation for Board
   const runningFeetDetails = useMemo(() => {
@@ -133,9 +209,17 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
   const pattiUnits = hasAnglePatti === "Yes" ? Math.max(1, Number(anglePattiCount) || 1) : 0;
   const anglePattiCostPerUnit = pattiUnits * 100;
 
+  // Custom Hardware Total
+  const customHardwareTotal = useMemo(() => {
+    return customHardwareList.reduce(
+      (sum, item) => sum + (Math.max(0, Number(item.price) || 0)),
+      0
+    );
+  }, [customHardwareList]);
+
   // Total Unit Cost & Order Subtotal
   const singleUnitCost = flexPrintingPricePerUnit + boardCostPerUnit + angleCostPerUnit + anglePattiCostPerUnit;
-  const grossSubtotal = Math.round((singleUnitCost * quantity + fittingChargesTotal) * 100) / 100;
+  const grossSubtotal = Math.round((singleUnitCost * quantity + fittingChargesTotal + customHardwareTotal) * 100) / 100;
   const discountAmount = Math.max(0, Number(discount) || 0);
   const validDiscount = Math.min(grossSubtotal, discountAmount);
   const totalAmount = Math.max(0, Math.round((grossSubtotal - validDiscount) * 100) / 100);
@@ -144,11 +228,11 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
     e.preventDefault();
 
     const selectedOptionsSummary = {
-      "Flex Subcategory": `${activeMaterial.name} (₹${activeMaterial.pricePerSqFt}/sqft)`,
+      "Flex Subcategory": `${activeMaterial.name} (₹${activeMaterial.pricePerSqFt}/sqft)${activeMaterial.isCustomPrice ? " [Manual Rate]" : ""}`,
       "Dimensions": `${validHeight} ft × ${validWidth} ft (${flexAreaSqFt} sqft)`,
       "Flex Printing Price": `Rs. ${flexPrintingPricePerUnit.toLocaleString()}/-`,
       "Board Structure": activeBoard.name !== "None"
-        ? `${activeBoard.name} (${runningFeetDetails.totalRunningFeet} Running Ft @ ₹${activeBoard.ratePerFt}/ft)`
+        ? `${activeBoard.name} (${runningFeetDetails.totalRunningFeet} Running Ft @ ₹${activeBoard.ratePerFt}/ft)${activeBoard.isCustomPrice ? " [Manual Rate]" : ""}`
         : "Not Required",
       "Support Rods": hasSupportRod === "Yes"
         ? `${supportRodCount} Rod(s) [${supportRodType}]`
@@ -162,6 +246,12 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
           ? `${angleUnits} unit(s) (Rs. ${(angleCostPerUnit * quantity).toLocaleString()}/-)`
           : "Not Required",
       "Angle Patti": hasAnglePatti === "Yes" ? `${pattiUnits} unit(s) (Rs. ${anglePattiCostPerUnit * quantity}/-)` : "Not Required",
+      ...(customHardwareList.length > 0
+        ? customHardwareList.reduce((acc, item) => {
+            acc[`Custom Hardware: ${item.name}`] = `Rs. ${Number(item.price || 0).toLocaleString()}/-`;
+            return acc;
+          }, {})
+        : {}),
       ...(validDiscount > 0 ? { "Discount Applied": `- Rs. ${validDiscount.toLocaleString()}/-` } : {}),
     };
 
@@ -183,6 +273,8 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         angleCostPerUnit,
         angleUnits,
         anglePattiCostPerUnit,
+        customHardwareTotal,
+        customHardwareList,
         runningFeetDetails,
         grossSubtotal,
         discount: validDiscount,
@@ -232,6 +324,8 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         hasAnglePatti,
         pattiUnits,
         anglePattiCostPerUnit,
+        customHardwareList,
+        customHardwareTotal,
         quantity,
         grossSubtotal,
         validDiscount,
@@ -248,25 +342,109 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
 
   return (
     <form onSubmit={handleAddOrder} className="space-y-6 text-slate-800">
-      {/* 1. SELECT FLEX SUBCATEGORY / MATERIAL */}
-      <div className="space-y-1.5">
-        <label className="block text-xs font-black text-slate-900 uppercase tracking-wider">
-          1. SELECT FLEX SUBCATEGORY
-        </label>
-        <select
-          value={selectedMaterialLabel}
-          onChange={(e) => {
-            setSelectedMaterialLabel(e.target.value);
-            if (onVariantSelect) onVariantSelect(e.target.value);
-          }}
-          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-bold focus:ring-2 focus:ring-orange-600 focus:outline-none cursor-pointer"
-        >
-          {FLEX_MATERIALS.map((mat) => (
-            <option key={mat.label} value={mat.label}>
-              {mat.label}
-            </option>
-          ))}
-        </select>
+      {/* 1. SELECT FLEX SUBCATEGORY & MANUAL PRICE */}
+      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3.5 shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <label className="block text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <FiLayers className="w-4 h-4 text-orange-600" />
+            1. Select Flex Subcategory & Price
+          </label>
+          <span className="text-xs font-bold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded border border-orange-200">
+            ₹{validFlexRate} / sq. ft.
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {/* Subcategory Dropdown */}
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold text-slate-700 block">
+              Flex Subcategory
+            </label>
+            <select
+              value={selectedMaterialLabel}
+              onChange={(e) => handleMaterialChange(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900 font-bold focus:ring-2 focus:ring-orange-600 focus:outline-none cursor-pointer"
+            >
+              {FLEX_MATERIALS.map((mat) => (
+                <option key={mat.label} value={mat.label}>
+                  {mat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Manual Rate Entry & Steppers */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold text-slate-700 block">
+                Rate per Sq. Ft. (₹)
+              </label>
+              <span className="text-[10px] text-orange-600 font-bold flex items-center gap-1">
+                <FiEdit3 className="w-3 h-3" /> Manual Price
+              </span>
+            </div>
+
+            <div className="flex items-center border border-orange-300 rounded-lg overflow-hidden bg-white shadow-2xs focus-within:ring-2 focus-within:ring-orange-500">
+              <button
+                type="button"
+                onClick={() =>
+                  setFlexRatePerSqFt((prev) =>
+                    Math.max(1, Math.round(((Number(prev) || 1) - 1) * 10) / 10)
+                  )
+                }
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border-r border-slate-300 select-none active:bg-slate-300"
+                aria-label="Decrease flex rate"
+                title="Decrease rate by ₹1"
+              >
+                -
+              </button>
+              <div className="relative flex-1 flex items-center">
+                <span className="absolute left-3 text-xs font-bold text-slate-400">₹</span>
+                <input
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  value={flexRatePerSqFt}
+                  onChange={(e) => setFlexRatePerSqFt(e.target.value)}
+                  placeholder="Rate per sqft"
+                  className="w-full pl-7 pr-3 py-2 text-xs font-bold text-slate-900 text-center bg-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setFlexRatePerSqFt((prev) =>
+                    Math.round(((Number(prev) || 0) + 1) * 10) / 10
+                  )
+                }
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border-l border-slate-300 select-none active:bg-slate-300"
+                aria-label="Increase flex rate"
+                title="Increase rate by ₹1"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic calculation feedback & reset */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] pt-1 text-slate-600 bg-slate-50/70 p-2.5 rounded-lg border border-slate-100">
+          <div>
+            <span>Calculated Flex Printing Cost: </span>
+            <strong className="text-slate-900 font-bold">
+              {flexAreaSqFt} sqft × ₹{validFlexRate}/sqft = ₹{flexPrintingPricePerUnit.toLocaleString()}
+            </strong>
+          </div>
+          {activeMaterial.isCustomPrice && (
+            <button
+              type="button"
+              onClick={() => setFlexRatePerSqFt(activeMaterial.defaultRate)}
+              className="text-[10px] text-orange-600 hover:underline font-bold self-start sm:self-auto flex items-center gap-1"
+            >
+              Reset to default (₹{activeMaterial.defaultRate}/sqft)
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 2. DYNAMIC FLEX BOARD DIMENSIONS (HEIGHT & WIDTH IN FEET) */}
@@ -383,7 +561,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
               <button
                 type="button"
                 key={b.name}
-                onClick={() => setBoardType(b.name)}
+                onClick={() => handleBoardTypeChange(b.name)}
                 className={`py-2 px-2 text-center rounded-lg text-xs font-bold transition-all border ${
                   boardType === b.name
                     ? "bg-orange-600 text-white border-orange-600 shadow-xs"
@@ -395,6 +573,85 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             ))}
           </div>
         </div>
+
+        {/* Manual Board Rate Entry (If Board Selected) */}
+        {boardType !== "None" && (
+          <div className="p-3 bg-orange-50/60 rounded-xl border border-orange-200 space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <FiEdit3 className="w-3.5 h-3.5 text-orange-600" />
+                  {activeBoard.name} Rate per Running Foot (₹)
+                </label>
+                <span className="text-[10px] text-slate-500">
+                  Preset default: ₹{activeBoard.defaultRate}/ft • Edit or use +/- steppers
+                </span>
+              </div>
+
+              {/* Rate Steppers & Input */}
+              <div className="flex items-center border border-orange-300 rounded-lg overflow-hidden bg-white shadow-2xs focus-within:ring-2 focus-within:ring-orange-500 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setBoardRatePerFt((prev) =>
+                      Math.max(1, Math.round(((Number(prev) || 1) - 1) * 10) / 10)
+                    )
+                  }
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border-r border-slate-300 select-none active:bg-slate-300"
+                  aria-label="Decrease board rate"
+                  title="Decrease rate by ₹1"
+                >
+                  -
+                </button>
+                <div className="relative flex-1 flex items-center min-w-[95px]">
+                  <span className="absolute left-2.5 text-xs font-bold text-slate-400">₹</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={boardRatePerFt}
+                    onChange={(e) => setBoardRatePerFt(e.target.value)}
+                    placeholder="Rate per ft"
+                    className="w-full pl-6 pr-2 py-1.5 text-xs font-bold text-slate-900 text-center bg-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-[10px] text-slate-400 font-semibold pr-2">/ft</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setBoardRatePerFt((prev) =>
+                      Math.round(((Number(prev) || 0) + 1) * 10) / 10
+                    )
+                  }
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border-l border-slate-300 select-none active:bg-slate-300"
+                  aria-label="Increase board rate"
+                  title="Increase rate by ₹1"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Live calculation info & Reset */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] pt-1 text-slate-600 border-t border-orange-200/60">
+              <div>
+                <span>Structure Framing Cost: </span>
+                <strong className="text-slate-900 font-bold">
+                  {runningFeetDetails.totalRunningFeet} running ft × ₹{validBoardRate}/ft = ₹{boardCostPerUnit.toLocaleString()}
+                </strong>
+              </div>
+              {activeBoard.isCustomPrice && (
+                <button
+                  type="button"
+                  onClick={() => setBoardRatePerFt(activeBoard.defaultRate)}
+                  className="text-[10px] text-orange-600 hover:underline font-bold self-start sm:self-auto flex items-center gap-1"
+                >
+                  Reset to default (₹{activeBoard.defaultRate}/ft)
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Support Rod Options (If Board Selected) */}
         {boardType !== "None" && (
@@ -742,6 +999,117 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
           </div>
         </div>
 
+        {/* Custom Hardware / Fitting Items (Manual Add) */}
+        <div className="p-3.5 sm:px-4 space-y-3 bg-slate-50/50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <FiTool className="w-4 h-4 text-orange-600" />
+                <span className="font-bold text-slate-900 block">Custom Hardware & Fitting Items</span>
+              </div>
+              <span className="text-[11px] text-slate-500">
+                Manually add custom hardware, scaffolding, clamps, or services with custom item name and price
+              </span>
+            </div>
+            {customHardwareList.length > 0 && (
+              <span className="text-xs font-bold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded border border-orange-200 self-start sm:self-auto">
+                Total Custom: +₹{customHardwareTotal.toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          {/* List of Added Custom Items */}
+          {customHardwareList.length > 0 && (
+            <div className="space-y-2">
+              {customHardwareList.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-lg shadow-2xs hover:border-orange-300 transition-colors"
+                >
+                  <span className="text-slate-400 font-mono text-[10px] w-4 text-center font-bold">
+                    {idx + 1}.
+                  </span>
+                  <input
+                    type="text"
+                    value={item.name}
+                    onChange={(e) => handleUpdateCustomHardware(item.id, "name", e.target.value)}
+                    placeholder="Item name"
+                    className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded font-semibold text-slate-900 focus:outline-none focus:border-orange-500"
+                  />
+                  <div className="flex items-center border border-slate-200 rounded overflow-hidden bg-slate-50 px-2 py-1">
+                    <span className="text-xs font-bold text-slate-400 mr-1">₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={item.price}
+                      onChange={(e) => handleUpdateCustomHardware(item.id, "price", e.target.value)}
+                      placeholder="0"
+                      className="w-20 text-xs font-bold text-slate-900 bg-transparent text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCustomHardware(item.id)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
+                    title="Delete item"
+                    aria-label={`Delete ${item.name}`}
+                  >
+                    <FiTrash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add New Custom Item Input Row */}
+          <div className="p-3 bg-white rounded-lg border border-dashed border-orange-300/80 space-y-2">
+            <span className="text-[10px] font-bold text-orange-950 uppercase tracking-wider block">
+              + Add Custom Item with Name & Price
+            </span>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <input
+                type="text"
+                value={newHardwareName}
+                onChange={(e) => setNewHardwareName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddCustomHardware();
+                  }
+                }}
+                placeholder="Item name (e.g. Scaffolding, Extra Clamps, Lighting)"
+                className="flex-1 px-3 py-1.5 text-xs border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+              <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
+                <span className="pl-3 text-xs font-bold text-slate-400">₹</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={newHardwarePrice}
+                  onChange={(e) => setNewHardwarePrice(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomHardware();
+                    }
+                  }}
+                  placeholder="Price"
+                  className="w-28 px-2 py-1.5 text-xs font-bold text-slate-900 text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddCustomHardware}
+                disabled={!newHardwareName.trim()}
+                className="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-2xs whitespace-nowrap"
+              >
+                <FiPlus className="w-3.5 h-3.5" />
+                <span>Add Item</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Quantity Row */}
         <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2 font-bold text-slate-900">
@@ -795,7 +1163,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         {boardType !== "None" && (
           <div className="p-3.5 sm:px-4 flex justify-between items-center text-slate-700">
             <span>
-              {activeBoard.name} ({runningFeetDetails.totalRunningFeet} ft @ ₹{activeBoard.ratePerFt})
+              {activeBoard.name} ({runningFeetDetails.totalRunningFeet} ft @ ₹{activeBoard.ratePerFt}/ft)
             </span>
             <span className="font-bold text-slate-900">
               Rs. {(boardCostPerUnit * quantity).toLocaleString()}/-
@@ -831,6 +1199,22 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             </span>
           </div>
         )}
+
+        {/* Custom Hardware & Fitting Options */}
+        {customHardwareList.map((item) => (
+          <div
+            key={item.id}
+            className="p-3.5 sm:px-4 flex justify-between items-center text-slate-700 bg-orange-50/25"
+          >
+            <span className="flex items-center gap-1.5 font-medium">
+              <FiTool className="w-3.5 h-3.5 text-orange-600" />
+              {item.name || "Custom Item"} (Hardware)
+            </span>
+            <span className="font-bold text-slate-900">
+              Rs. {Number(item.price || 0).toLocaleString()}/-
+            </span>
+          </div>
+        ))}
 
         {/* Subtotal (Before Discount) */}
         <div className="p-3.5 sm:px-4 flex justify-between items-center text-slate-700 bg-slate-50/50">

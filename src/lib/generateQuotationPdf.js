@@ -28,6 +28,7 @@ export function generateFlexQuotationPdf(data) {
     hasAnglePatti,
     pattiUnits,
     anglePattiCostPerUnit,
+    customHardwareList = [],
     quantity,
     grossSubtotal,
     validDiscount,
@@ -253,6 +254,13 @@ export function generateFlexQuotationPdf(data) {
             total: `Rs. ${(anglePattiCostPerUnit * quantity).toLocaleString()}/-`,
           },
         ]
+      : []),
+    ...(customHardwareList && customHardwareList.length > 0
+      ? customHardwareList.map((item) => ({
+          desc: item.name || "Custom Hardware / Fitting",
+          spec: "Manual hardware / service charge",
+          total: `Rs. ${Number(item.price || 0).toLocaleString()}/-`,
+        }))
       : []),
   ];
 
