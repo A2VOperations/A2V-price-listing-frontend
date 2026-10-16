@@ -16,10 +16,10 @@ export const categories = [
   {
     id: "flex-board",
     slug: "flex-board",
-    name: "Flex Board",
+    name: "Flex Board & Standee",
     image: flexBoard,
     description:
-      "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods & installation.",
+      "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods, plus Portable Roll-Up Standees.",
   },
   {
     id: "visiting-cards",

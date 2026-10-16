@@ -10,10 +10,15 @@ import { FiSearch, FiLayers, FiGrid, FiList } from "react-icons/fi";
 export default function CategoryPage() {
   const { slug } = useParams();
   const { getCategoryBySlug, getProductsByCategory } = useData();
-  const category = getCategoryBySlug(slug);
+  const category =
+    getCategoryBySlug(slug) ||
+    (slug === "standie" || slug === "standee" ? getCategoryBySlug("flex-board") : null);
   const allProducts = category ? getProductsByCategory(category.id) : [];
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState(
+    slug === "standie" || slug === "standee" ? "STANDIE" : "all"
+  );
   const isStickerCategory =
     category?.id === "stickers-labels" ||
     category?.slug === "stickers-labels" ||
@@ -54,7 +59,8 @@ export default function CategoryPage() {
     groupedProducts[subCat].push(product);
   });
 
-  const hasSubCategories = Object.keys(groupedProducts).some(
+  const subCategoryKeys = Object.keys(groupedProducts);
+  const hasSubCategories = subCategoryKeys.some(
     (key) => key !== "General Products",
   );
 
@@ -131,9 +137,52 @@ export default function CategoryPage() {
         />
       ) : hasSubCategories ? (
         // Grouped Layout (Sample Board Style with Color-Coded Sub-Headings)
-        <div className="space-y-10">
+        <div className="space-y-8">
+          {/* Subcategory Pills Navigation Filter */}
+          {subCategoryKeys.length > 1 && (
+            <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => setSelectedSubCategory("all")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  selectedSubCategory === "all"
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                All Displays &amp; Products ({filteredProducts.length})
+              </button>
+              {subCategoryKeys.map((subName) => (
+                <button
+                  key={subName}
+                  type="button"
+                  onClick={() => setSelectedSubCategory(subName)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    selectedSubCategory === subName
+                      ? "bg-orange-600 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  <span>{subName}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                      selectedSubCategory === subName
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {groupedProducts[subName].length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {(() => {
             const preferredOrder = [
+              "FLEX BOARD PRINTING",
+              "STANDIE",
+              "STANDIE (ROLL-UP STANDEES)",
               "500 GSM CARDS (QTY. 500 CARDS)",
               "400 GSM CARDS (QTY. 1000 CARDS)",
               "350 GSM CARDS (QTY. 1000 CARDS)",
@@ -142,7 +191,10 @@ export default function CategoryPage() {
               "METAL VISITING CARDS (QTY. 10 CARDS)",
             ];
 
-            const entries = Object.entries(groupedProducts);
+            const entries = Object.entries(groupedProducts).filter(
+              ([subName]) => selectedSubCategory === "all" || subName === selectedSubCategory
+            );
+
             entries.sort((a, b) => {
               const indexA = preferredOrder.indexOf(a[0]);
               const indexB = preferredOrder.indexOf(b[0]);
@@ -155,10 +207,22 @@ export default function CategoryPage() {
             return entries.map(([subCategoryName, prods]) => {
               let titleColor = "text-orange-800";
               let borderColor = "border-orange-600";
+              let subtitle = "";
+              let badgeColor = "bg-orange-100 text-orange-800";
               let gridCols =
                 "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5";
 
-              if (subCategoryName.includes("500 GSM")) {
+              if (subCategoryName.toUpperCase().includes("STANDIE")) {
+                titleColor = "text-[#1D4ED8]";
+                borderColor = "border-[#2563EB]";
+                subtitle = "Portable aluminium roll-up standees with carry bags for exhibitions, retail counters, events & promotions.";
+                badgeColor = "bg-blue-100 text-blue-800";
+              } else if (subCategoryName.toUpperCase().includes("FLEX BOARD")) {
+                titleColor = "text-[#C2410C]";
+                borderColor = "border-[#EA580C]";
+                subtitle = "Custom outdoor flex board printing with iron/wooden structure framing, support rods & on-site fitting.";
+                badgeColor = "bg-orange-100 text-orange-800";
+              } else if (subCategoryName.includes("500 GSM")) {
                 titleColor = "text-[#D97706]";
                 borderColor = "border-[#D97706]";
               } else if (subCategoryName.includes("400 GSM")) {
@@ -180,12 +244,22 @@ export default function CategoryPage() {
 
               return (
                 <div key={subCategoryName} className="space-y-4">
-                  <div className={`border-b-2 ${borderColor} pb-1.5`}>
-                    <h2
-                      className={`text-base sm:text-lg font-black tracking-tight ${titleColor} uppercase flex items-center gap-2`}
-                    >
-                      {subCategoryName}
-                    </h2>
+                  <div className={`border-b-2 ${borderColor} pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1`}>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2
+                          className={`text-base sm:text-lg font-black tracking-tight ${titleColor} uppercase flex items-center gap-2`}
+                        >
+                          {subCategoryName}
+                        </h2>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${badgeColor}`}>
+                          {prods.length} {prods.length === 1 ? "Product" : "Products"}
+                        </span>
+                      </div>
+                      {subtitle && (
+                        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className={`grid ${gridCols} gap-4`}>

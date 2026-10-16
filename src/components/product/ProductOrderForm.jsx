@@ -3,6 +3,7 @@ import { FiPackage, FiLayers, FiCheck } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import { calculateProductPrice } from "@/lib/priceCalculator";
 import FlexBoardOrderForm from "./FlexBoardOrderForm";
+import StandieOrderForm from "./StandieOrderForm";
 import StickerCalculator from "./StickerCalculator";
 
 export default function ProductOrderForm({
@@ -10,6 +11,13 @@ export default function ProductOrderForm({
   customBasePrice,
   onVariantSelect,
 }) {
+  if (
+    product?.isStandie ||
+    product?.subCategory?.toUpperCase().includes("STANDIE") ||
+    product?.slug?.includes("standie")
+  ) {
+    return <StandieOrderForm product={product} onVariantSelect={onVariantSelect} />;
+  }
   if (product?.isFlexBoard || product?.categoryId === "flex-board") {
     return <FlexBoardOrderForm product={product} onVariantSelect={onVariantSelect} />;
   }

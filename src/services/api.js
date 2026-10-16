@@ -1,7 +1,13 @@
 const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 export async function fetchCategoriesApi() {
-  const res = await fetch(`${API_BASE}/api/categories`);
+  const res = await fetch(`${API_BASE}/api/categories?_t=${Date.now()}`, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
+  });
   if (!res.ok) throw new Error("Failed to fetch categories");
   const data = await res.json();
   return data.data;
@@ -39,15 +45,27 @@ export async function deleteCategoryApi(id) {
 }
 
 export async function fetchProductsApi(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  const res = await fetch(`${API_BASE}/api/products${query ? `?${query}` : ""}`);
+  const queryParams = new URLSearchParams({ ...params, _t: Date.now().toString() }).toString();
+  const res = await fetch(`${API_BASE}/api/products?${queryParams}`, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
+  });
   if (!res.ok) throw new Error("Failed to fetch products");
   const data = await res.json();
   return data.data;
 }
 
 export async function fetchProductBySlugApi(slug) {
-  const res = await fetch(`${API_BASE}/api/products/${slug}`);
+  const res = await fetch(`${API_BASE}/api/products/${slug}?_t=${Date.now()}`, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
+  });
   if (!res.ok) throw new Error("Failed to fetch product");
   const data = await res.json();
   return data.data;

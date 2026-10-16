@@ -4444,6 +4444,88 @@
     ]
   },
   {
+    "_id": "6ad201bd3234a1276a4d6c46",
+    "id": "STD-001",
+    "code": "STD-001",
+    "categoryId": "flex-board",
+    "subCategory": "STANDIE",
+    "name": "Roll-Up Standie Printing & Mechanism Calculator",
+    "slug": "rollup-standie",
+    "isStandie": true,
+    "image": "/products/standie/rollup-standie.jpg",
+    "standeeSize": "2.5 x 6 Ft",
+    "standType": "Standard Aluminium Roll-Up Stand",
+    "widthFt": 2.5,
+    "heightFt": 6,
+    "basePrice": 850,
+    "description": "Complete Roll-Up Standee display calculator: select standard sizes (2.5x6ft, 3x6ft, 2x5ft, 4x6ft) or custom dimensions, aluminium mechanisms, Star Flex/Non-Tearable matte prints & instant quote.",
+    "minQuantity": 1,
+    "quantityStep": 1,
+    "unitName": "Standie(s)",
+    "productionTime": "24 Hours",
+    "variantCombinations": [
+      "2.5 × 6 Ft Standard Stand + Star Flex - ₹850",
+      "2.5 × 6 Ft Standard Stand + Non-Tearable Matte - ₹1,150",
+      "3 × 6 Ft Wide Base Stand + Star Flex - ₹1,050",
+      "2 × 5 Ft Compact Stand + Star Flex - ₹700",
+      "2.5 × 6 Ft Luxury Teardrop Stand + Non-Tearable - ₹1,750",
+      "Only Roll-up Stand Mechanism (No Print) - ₹450"
+    ],
+    "variantDetails": {
+      "2.5 × 6 Ft Standard Stand + Star Flex - ₹850": {
+        "code": "STD-101",
+        "basePrice": 850,
+        "mediaType": "Star Flex",
+        "description": "Standard 2.5x6ft Aluminium Roll-Up Standee complete unit with Star Flex printing @ ₹850"
+      },
+      "2.5 × 6 Ft Standard Stand + Non-Tearable Matte - ₹1,150": {
+        "code": "STD-102",
+        "basePrice": 1150,
+        "mediaType": "Non-Tearable Matte Film",
+        "description": "2.5x6ft Roll-Up Standee with premium curl-free Non-Tearable Matte Film @ ₹1,150"
+      },
+      "3 × 6 Ft Wide Base Stand + Star Flex - ₹1,050": {
+        "code": "STD-103",
+        "basePrice": 1050,
+        "mediaType": "Star Flex",
+        "description": "Wide 3x6ft Roll-Up Standee complete unit with Star Flex printing @ ₹1,050"
+      },
+      "2 × 5 Ft Compact Stand + Star Flex - ₹700": {
+        "code": "STD-104",
+        "basePrice": 700,
+        "mediaType": "Star Flex",
+        "description": "Compact 2x5ft Roll-Up Standee complete unit with Star Flex printing @ ₹700"
+      },
+      "2.5 × 6 Ft Luxury Teardrop Stand + Non-Tearable - ₹1,750": {
+        "code": "STD-105",
+        "basePrice": 1750,
+        "mediaType": "Non-Tearable Matte Film",
+        "description": "2.5x6ft Luxury Teardrop Chrome Broad Base Standee @ ₹1,750"
+      },
+      "Only Roll-up Stand Mechanism (No Print) - ₹450": {
+        "code": "STD-106",
+        "basePrice": 450,
+        "mediaType": "Hardware Only",
+        "description": "2.5x6ft Aluminium Roll-up Stand mechanism with support rod & carry bag @ ₹450"
+      }
+    },
+    "specifications": {
+      "Product Category": "Roll-Up Standie Display & Frame Calculator",
+      "Supported Sizes": "2.5x6 Ft (Standard), 3x6 Ft, 2x5 Ft, 4x6 Ft & Custom Dimensions",
+      "Stand Mechanism": "Anodized Silver Aluminium Roll-Up Casing with twin fold-out feet / Luxury Teardrop / X-Stand",
+      "Printing Media": "Star Flex (₹25/sqft), Non-Tearable Matte Film (₹45/sqft), Normal Flex (₹15/sqft), Satin Fabric (₹55/sqft)",
+      "Protective Lamination": "None (₹0), Matte Lamination (+₹5/sqft), Gloss Lamination (+₹5/sqft)",
+      "Accessories Included": "3-Piece Bungee Support Rod & Padded Nylon Carry Bag",
+      "Production Time": "24 Hours from design approval"
+    },
+    "ourSpecialization": [
+      "All-in-one customizable Roll-Up Standee calculator",
+      "High resolution vivid Eco-Solvent / UV printing",
+      "Durable lightweight aluminium mechanism with tension spring",
+      "Includes padded zippered travel bag for easy portability"
+    ]
+  },
+  {
     "id": "LH-001",
     "code": "LH-1",
     "categoryId": "letter-heads",

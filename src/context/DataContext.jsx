@@ -28,8 +28,31 @@ export function DataProvider({ children }) {
         fetchCategoriesApi(),
         fetchProductsApi(),
       ]);
-      setCategories(fetchedCats);
-      setProducts(fetchedProds);
+
+      // Merge fetched categories with initial fallback so newly added static items are never dropped
+      const catsMap = new Map();
+      initialCategories.forEach((c) => catsMap.set(c.id, c));
+      if (Array.isArray(fetchedCats)) {
+        fetchedCats.forEach((c) => {
+          const existing = catsMap.get(c.id);
+          catsMap.set(c.id, existing ? { ...existing, ...c } : c);
+        });
+      }
+      const finalCats = Array.from(catsMap.values());
+
+      // Merge fetched products with initial fallback so standee and any newly registered items are preserved
+      const prodsMap = new Map();
+      initialProducts.forEach((p) => prodsMap.set(p.id, p));
+      if (Array.isArray(fetchedProds)) {
+        fetchedProds.forEach((p) => {
+          const existing = prodsMap.get(p.id);
+          prodsMap.set(p.id, existing ? { ...existing, ...p } : p);
+        });
+      }
+      const finalProds = Array.from(prodsMap.values());
+
+      setCategories(finalCats);
+      setProducts(finalProds);
       setIsBackendConnected(true);
       setError(null);
     } catch (err) {
