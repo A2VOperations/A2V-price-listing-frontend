@@ -7,7 +7,7 @@ export default function Breadcrumb({ items = [] }) {
     <nav className="flex items-center text-xs text-slate-500 mb-4 overflow-x-auto py-1">
       <Link
         to="/"
-        className="flex items-center hover:text-blue-600 transition-colors font-medium"
+        className="flex items-center hover:text-orange-600 transition-colors font-medium"
       >
         <FiHome className="w-3.5 h-3.5 mr-1 text-slate-400" />
         Dashboard
@@ -18,7 +18,7 @@ export default function Breadcrumb({ items = [] }) {
           {item.href ? (
             <Link
               to={item.href}
-              className="hover:text-blue-600 transition-colors font-medium truncate max-w-[150px]"
+              className="hover:text-orange-600 transition-colors font-medium truncate max-w-[150px]"
             >
               {item.label}
             </Link>

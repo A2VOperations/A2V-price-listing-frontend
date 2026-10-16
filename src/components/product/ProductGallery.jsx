@@ -58,14 +58,14 @@ export default function ProductGallery({ product }) {
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md text-slate-700 hover:text-orange-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
               title="Previous image"
             >
               <FiChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 shadow-md text-slate-700 hover:text-orange-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
               title="Next image"
             >
               <FiChevronRight className="w-4 h-4" />
@@ -87,7 +87,7 @@ export default function ProductGallery({ product }) {
                 onClick={() => setActiveImage(thumbSrc)}
                 className={`w-16 h-16 rounded-xl border-2 overflow-hidden bg-slate-50 transition-all shrink-0 cursor-pointer ${
                   isSelected
-                    ? "border-blue-600 ring-2 ring-blue-600/30 scale-105 shadow-xs"
+                    ? "border-orange-600 ring-2 ring-orange-600/30 scale-105 shadow-xs"
                     : "border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100"
                 }`}
               >

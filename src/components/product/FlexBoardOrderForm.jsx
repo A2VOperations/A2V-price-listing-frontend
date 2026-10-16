@@ -259,7 +259,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             setSelectedMaterialLabel(e.target.value);
             if (onVariantSelect) onVariantSelect(e.target.value);
           }}
-          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-bold focus:ring-2 focus:ring-blue-600 focus:outline-none cursor-pointer"
+          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-bold focus:ring-2 focus:ring-orange-600 focus:outline-none cursor-pointer"
         >
           {FLEX_MATERIALS.map((mat) => (
             <option key={mat.label} value={mat.label}>
@@ -273,10 +273,10 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
       <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <FiSliders className="w-4 h-4 text-blue-600" />
+            <FiSliders className="w-4 h-4 text-orange-600" />
             2. Flex Board Size (In Feet)
           </span>
-          <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+          <span className="text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
             {flexAreaSqFt} sq. ft.
           </span>
         </div>
@@ -348,14 +348,14 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         </div>
 
         {/* Live Flex Price Summary Banner */}
-        <div className="bg-blue-50/80 rounded-lg p-3 border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-          <div className="flex items-center space-x-2 text-blue-950 font-medium">
-            <FiInfo className="w-4 h-4 text-blue-600 flex-shrink-0" />
+        <div className="bg-orange-50/80 rounded-lg p-3 border border-orange-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+          <div className="flex items-center space-x-2 text-orange-950 font-medium">
+            <FiInfo className="w-4 h-4 text-orange-600 flex-shrink-0" />
             <span>
               Flex Price ({flexAreaSqFt} sqft × ₹{activeMaterial.pricePerSqFt}):
             </span>
           </div>
-          <span className="font-extrabold text-blue-700 text-sm">
+          <span className="font-extrabold text-orange-700 text-sm">
             Rs. {flexPrintingPricePerUnit.toLocaleString()}/-
           </span>
         </div>
@@ -365,7 +365,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
       <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
           <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <FiTool className="w-4 h-4 text-blue-600" />
+            <FiTool className="w-4 h-4 text-orange-600" />
             3. Board Frame & Support Structure
           </span>
           <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 self-start sm:self-auto">
@@ -386,7 +386,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                 onClick={() => setBoardType(b.name)}
                 className={`py-2 px-2 text-center rounded-lg text-xs font-bold transition-all border ${
                   boardType === b.name
-                    ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                    ? "bg-orange-600 text-white border-orange-600 shadow-xs"
                     : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -420,7 +420,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                   onClick={() => setHasSupportRod("Yes")}
                   className={`px-3 py-1 text-[11px] font-bold rounded ${
                     hasSupportRod === "Yes"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-orange-600 text-white"
                       : "bg-white text-slate-600 border border-slate-300"
                   }`}
                 >
@@ -438,7 +438,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                   <select
                     value={supportRodType}
                     onChange={(e) => setSupportRodType(e.target.value)}
-                    className="w-full px-2 py-1.5 text-xs bg-white border border-slate-300 rounded font-medium focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-xs bg-white border border-slate-300 rounded font-medium focus:ring-1 focus:ring-orange-500"
                   >
                     <option value="Horizontal">Horizontal ({validWidth} ft)</option>
                     <option value="Vertical">Vertical ({validHeight} ft)</option>
@@ -558,7 +558,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                 onClick={() => setHasFitting("Yes")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${
                   hasFitting === "Yes"
-                    ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                    ? "bg-orange-600 text-white border-orange-600 shadow-xs"
                     : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -570,23 +570,23 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
 
           {/* Manual Fitting Price Input */}
           {hasFitting === "Yes" && (
-            <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-3 bg-orange-50/70 rounded-lg border border-orange-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
-                <div className="flex items-center space-x-1.5 text-blue-950 font-bold text-xs">
-                  <FiEdit3 className="w-3.5 h-3.5 text-blue-600" />
+                <div className="flex items-center space-x-1.5 text-orange-950 font-bold text-xs">
+                  <FiEdit3 className="w-3.5 h-3.5 text-orange-600" />
                   <span>Enter Fitting Charges (₹):</span>
                 </div>
-                <p className="text-[10px] text-blue-700">
+                <p className="text-[10px] text-orange-700">
                   Type any custom fitting amount or use +/- buttons
                 </p>
               </div>
 
               <div className="flex items-center space-x-2">
-                <div className="flex items-center border border-blue-300 rounded-lg overflow-hidden bg-white shadow-2xs">
+                <div className="flex items-center border border-orange-300 rounded-lg overflow-hidden bg-white shadow-2xs">
                   <button
                     type="button"
                     onClick={() => setManualFittingPrice((prev) => Math.max(0, (Number(prev) || 0) - 50))}
-                    className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 font-extrabold text-xs border-r border-blue-200 select-none active:bg-blue-200"
+                    className="px-2.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-900 font-extrabold text-xs border-r border-orange-200 select-none active:bg-orange-200"
                     aria-label="Decrease fitting charges"
                   >
                     -
@@ -606,7 +606,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                   <button
                     type="button"
                     onClick={() => setManualFittingPrice((prev) => (Number(prev) || 0) + 50)}
-                    className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 font-extrabold text-xs border-l border-blue-200 select-none active:bg-blue-200"
+                    className="px-2.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-900 font-extrabold text-xs border-l border-orange-200 select-none active:bg-orange-200"
                     aria-label="Increase fitting charges"
                   >
                     +
@@ -642,7 +642,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
               onClick={() => setHasAngle("Yes")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                 hasAngle === "Yes"
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-orange-600 text-white border-orange-600"
                   : "bg-slate-50 text-slate-700 border-slate-200"
               }`}
             >
@@ -704,7 +704,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
               onClick={() => setHasAnglePatti("Yes")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                 hasAnglePatti === "Yes"
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-orange-600 text-white border-orange-600"
                   : "bg-slate-50 text-slate-700 border-slate-200"
               }`}
             >
@@ -736,7 +736,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
                     +
                   </button>
                 </div>
-                <span className="text-[11px] font-bold text-blue-600">Unit(s)</span>
+                <span className="text-[11px] font-bold text-orange-600">Unit(s)</span>
               </div>
             )}
           </div>
@@ -745,7 +745,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         {/* Quantity Row */}
         <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2 font-bold text-slate-900">
-            <FiPackage className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            <FiPackage className="w-4 h-4 text-orange-600 flex-shrink-0" />
             <span>Total Boards Quantity</span>
           </div>
           <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
@@ -780,7 +780,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
       <div className="bg-white rounded-xl border border-slate-300 overflow-hidden shadow-xs divide-y divide-slate-200 text-xs">
         <div className="px-4 py-3 bg-slate-900 text-white font-black text-xs uppercase tracking-wider flex justify-between items-center">
           <span>Cost Calculation Summary</span>
-          <span className="text-blue-400 font-normal text-[11px]">
+          <span className="text-orange-400 font-normal text-[11px]">
             {quantity} {quantity === 1 ? "Board" : "Boards"}
           </span>
         </div>
@@ -897,7 +897,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         </div>
 
         {/* Total Amount Payable */}
-        <div className="p-4 flex justify-between items-center bg-blue-50/80">
+        <div className="p-4 flex justify-between items-center bg-orange-50/80">
           <div>
             <span className="font-extrabold text-slate-900 text-sm block">
               Total Amount Payable
@@ -908,7 +908,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
               </span>
             )}
           </div>
-          <span className="font-black text-blue-700 text-base sm:text-lg">
+          <span className="font-black text-orange-700 text-base sm:text-lg">
             Rs. {totalAmount.toLocaleString()}/-
           </span>
         </div>
@@ -934,7 +934,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
               </>
             ) : (
               <>
-                <FiFileText className="w-4 h-4 text-blue-600" />
+                <FiFileText className="w-4 h-4 text-orange-600" />
                 <span>{isGeneratingPdf ? "Generating PDF..." : "Download Quotation (PDF)"}</span>
               </>
             )}
@@ -945,7 +945,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             className={`w-full py-3.5 px-4 rounded-xl font-extrabold text-xs shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer ${
               addedSuccess
                 ? "bg-emerald-600 text-white"
-                : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.99]"
+                : "bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.99]"
             }`}
           >
             {addedSuccess ? (

@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 
 /**
  * Generates an official, beautifully styled PDF quotation for Flex Board order.
- * Matches the exact design specification provided.
+ * Uses a refined Orange accent theme matching user preference.
  *
  * @param {Object} data Order specifications and pricing details
  * @returns {string} Blob URL of the generated PDF document
@@ -56,16 +56,16 @@ export function generateFlexQuotationPdf(data) {
   doc.setLineWidth(0.6);
   doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
 
-  // 1. TOP HEADER BANNER (Deep Navy with right blue accent)
+  // 1. TOP HEADER BANNER (Deep Navy with right Orange accent)
   const headerY = 14;
   const headerHeight = 25;
 
-  // Base Dark Blue
+  // Base Dark Blue / Navy
   doc.setFillColor(11, 25, 44); // #0B192C deep navy
   doc.rect(margin, headerY, contentWidth, headerHeight, "F");
 
-  // Subtle right-angle accent polygon
-  doc.setFillColor(30, 64, 175); // blue-800
+  // Warm Orange Accent Triangle on the right
+  doc.setFillColor(194, 65, 12); // #C2410C orange-700
   doc.triangle(
     rightEdge - 30, headerY,
     rightEdge, headerY,
@@ -73,18 +73,18 @@ export function generateFlexQuotationPdf(data) {
     "F"
   );
 
-  // Logo: "A2V" in bold White, "PRINTS" in Sky Blue
+  // Logo: "A2V" in bold White, "PRINTS" in Orange
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
   doc.text("A2V", margin + 7, headerY + 12);
 
   const a2vWidth = doc.getTextWidth("A2V ");
-  doc.setTextColor(56, 189, 248); // #38BDF8 cyan / sky blue
+  doc.setTextColor(249, 115, 22); // #F97316 orange-500
   doc.text("PRINTS", margin + 7 + a2vWidth, headerY + 12);
 
-  // Cyan underline accent beneath A2V
-  doc.setDrawColor(14, 165, 233); // sky-500
+  // Orange underline accent beneath A2V
+  doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(1.2);
   doc.line(margin + 7, headerY + 14.5, margin + 7 + a2vWidth + 4, headerY + 14.5);
 
@@ -94,10 +94,10 @@ export function generateFlexQuotationPdf(data) {
   doc.setTextColor(226, 232, 240); // slate-200
   doc.text("Premium Flex Board Printing & Framing Solutions", margin + 7, headerY + 20);
 
-  // Right Header: Document icon
+  // Right Header: Document icon in orange
   const iconX = rightEdge - 78;
   const iconY = headerY + 5;
-  doc.setDrawColor(56, 189, 248);
+  doc.setDrawColor(249, 115, 22); // orange-500
   doc.setLineWidth(0.8);
   doc.roundedRect(iconX, iconY, 8.5, 11, 1, 1, "D");
   doc.line(iconX + 2, iconY + 3.2, iconX + 6.5, iconY + 3.2);
@@ -112,28 +112,28 @@ export function generateFlexQuotationPdf(data) {
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(203, 213, 225);
+  doc.setTextColor(254, 215, 170); // orange-200
   doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
 
   // 2. CLIENT & SPECIFICATIONS SUMMARY CARD
   const cardY = headerY + 30;
   const cardHeight = 26;
 
-  doc.setFillColor(240, 247, 255); // #F0F7FF light blue tint
-  doc.setDrawColor(219, 234, 254); // #DBEAFE
+  doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
+  doc.setDrawColor(254, 215, 170); // #FED7AA orange-200
   doc.setLineWidth(0.5);
   doc.roundedRect(margin, cardY, contentWidth, cardHeight, 2, 2, "FD");
 
   // Left Section: QUOTATION PREPARED FOR
-  // User Outline Icon
-  doc.setDrawColor(29, 78, 216); // blue-700
+  // User Outline Icon (Orange)
+  doc.setDrawColor(234, 88, 12); // orange-600
   doc.setLineWidth(0.7);
   doc.circle(margin + 8, cardY + 7, 2, "D");
   doc.line(margin + 5.5, cardY + 12.5, margin + 10.5, cardY + 12.5);
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8.5);
-  doc.setTextColor(29, 78, 216); // blue-700
+  doc.setTextColor(194, 65, 12); // orange-700
   doc.text("QUOTATION PREPARED FOR:", margin + 14, cardY + 7.5);
 
   doc.setFont("helvetica", "bold");
@@ -150,8 +150,8 @@ export function generateFlexQuotationPdf(data) {
 
   // Right Section: SPECIFICATION SUMMARY
   const rightColX = margin + 95;
-  // Document Outline Icon
-  doc.setDrawColor(29, 78, 216);
+  // Document Outline Icon (Orange)
+  doc.setDrawColor(234, 88, 12); // orange-600
   doc.setLineWidth(0.7);
   doc.roundedRect(rightColX, cardY + 4.5, 5, 6.5, 0.6, 0.6, "D");
   doc.line(rightColX + 1.2, cardY + 6.8, rightColX + 3.8, cardY + 6.8);
@@ -159,7 +159,7 @@ export function generateFlexQuotationPdf(data) {
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8.5);
-  doc.setTextColor(29, 78, 216); // blue-700
+  doc.setTextColor(194, 65, 12); // orange-700
   doc.text("SPECIFICATION SUMMARY:", rightColX + 8, cardY + 7.5);
 
   doc.setFont("helvetica", "bold");
@@ -261,7 +261,7 @@ export function generateFlexQuotationPdf(data) {
 
   rows.forEach((row, idx) => {
     const isEven = idx % 2 === 0;
-    doc.setFillColor(isEven ? 255 : 248, isEven ? 255 : 250, isEven ? 255 : 252);
+    doc.setFillColor(isEven ? 255 : 255, isEven ? 255 : 250, isEven ? 255 : 245); // alternating white / soft cream
     doc.rect(margin, currentY, contentWidth, rowHeight, "F");
 
     // Grid Borders
@@ -302,15 +302,15 @@ export function generateFlexQuotationPdf(data) {
   if (activeBoard && activeBoard.name !== "None" && runningFeetDetails) {
     const frameBoxW = 76;
     const frameBoxH = 36;
-    doc.setFillColor(240, 247, 255); // #F0F7FF
-    doc.setDrawColor(191, 219, 254); // #BFDBFE
+    doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
+    doc.setDrawColor(254, 215, 170); // #FED7AA orange-200
     doc.setLineWidth(0.5);
     doc.roundedRect(margin, bottomSectionY, frameBoxW, frameBoxH, 2, 2, "FD");
 
-    // Gear Icon
+    // Gear Icon (Orange)
     const gearX = margin + 8;
     const gearY = bottomSectionY + 7;
-    doc.setDrawColor(29, 78, 216);
+    doc.setDrawColor(234, 88, 12); // orange-600
     doc.setLineWidth(0.7);
     doc.circle(gearX, gearY, 2.5, "D");
     doc.circle(gearX, gearY, 1.1, "D");
@@ -318,11 +318,11 @@ export function generateFlexQuotationPdf(data) {
     // Title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
-    doc.setTextColor(29, 78, 216); // blue-700
+    doc.setTextColor(194, 65, 12); // orange-700
     doc.text("FRAME TECHNICAL DETAILS:", margin + 14, bottomSectionY + 8);
 
     // Light line divider
-    doc.setDrawColor(219, 234, 254);
+    doc.setDrawColor(254, 215, 170); // orange-200
     doc.setLineWidth(0.4);
     doc.line(margin + 14, bottomSectionY + 11, margin + frameBoxW - 4, bottomSectionY + 11);
 
@@ -359,27 +359,27 @@ export function generateFlexQuotationPdf(data) {
   if (validDiscount > 0) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
-    doc.setTextColor(234, 88, 12); // #EA580C orange / amber
+    doc.setTextColor(234, 88, 12); // #EA580C orange-600
     doc.text("Special Discount Deducted:", totalsBoxX + 2, bottomSectionY + 14);
     doc.setFontSize(9);
     doc.text(`- Rs. ${validDiscount.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 14, { align: "right" });
     totalsPayableY = bottomSectionY + 20;
   }
 
-  // Row: TOTAL AMOUNT PAYABLE Box (Rounded Blue)
+  // Row: TOTAL AMOUNT PAYABLE Box (Rounded Orange)
   const payableBoxH = 13;
-  doc.setFillColor(239, 246, 255); // #EFF6FF blue-50
-  doc.setDrawColor(37, 99, 235); // #2563EB blue-600
+  doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
+  doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(0.8);
   doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  doc.setTextColor(29, 78, 216); // blue-700
+  doc.setTextColor(194, 65, 12); // orange-700
   doc.text("TOTAL AMOUNT PAYABLE:", totalsBoxX + 4, totalsPayableY + 8);
 
   doc.setFontSize(11.5);
-  doc.setTextColor(29, 78, 216); // blue-700
+  doc.setTextColor(194, 65, 12); // orange-700
   doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
 
   // 5. SAVE & DOWNLOAD FILE

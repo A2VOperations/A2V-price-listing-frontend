@@ -492,7 +492,7 @@ export default function ProductManager() {
 
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors whitespace-nowrap shadow-xs"
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap shadow-xs"
             >
               <FiPlus className="w-4 h-4" /> Create New Product / Variation
             </button>
@@ -510,7 +510,7 @@ export default function ProductManager() {
                   setSelectedCategory(e.target.value);
                   setSelectedSubCategory("");
                 }}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium"
               >
                 <option value="">All Categories ({categories.length})</option>
                 {categories.map((c) => (
@@ -528,7 +528,7 @@ export default function ProductManager() {
               <select
                 value={selectedSubCategory}
                 onChange={(e) => setSelectedSubCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium"
               >
                 <option value="">All Sub-Categories ({allSubCategories.length})</option>
                 {allSubCategories.map((sub) => (
@@ -549,7 +549,7 @@ export default function ProductManager() {
                   placeholder="Search code, name, subcategory..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
                 <FiSearch className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
               </div>
@@ -593,7 +593,7 @@ export default function ProductManager() {
                           />
                         </div>
                       </td>
-                      <td className="p-3 font-mono font-bold text-blue-600">#{p.code}</td>
+                      <td className="p-3 font-mono font-bold text-orange-600">#{p.code}</td>
                       <td className="p-3 font-bold text-slate-900">{p.name}</td>
                       <td className="p-3 text-slate-500">{p.categoryId}</td>
                       <td className="p-3">
@@ -611,7 +611,7 @@ export default function ProductManager() {
                         )}
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-semibold">
+                        <span className="px-2 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200 text-[11px] font-semibold">
                           {p.options?.length || 0} custom dropdowns
                         </span>
                       </td>
@@ -622,7 +622,7 @@ export default function ProductManager() {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => openEditModal(p)}
-                            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded flex items-center gap-1 transition-colors"
+                            className="px-2.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold rounded flex items-center gap-1 transition-colors"
                             title="Edit Product, Sub-subs & Individual Prices/Descriptions"
                           >
                             <FiEdit2 className="w-3.5 h-3.5" /> Edit
@@ -652,7 +652,7 @@ export default function ProductManager() {
               <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-900 text-white">
                 <div>
                   <h3 className="text-sm font-bold flex items-center gap-2">
-                    <FiEdit2 className="w-4 h-4 text-blue-400" />
+                    <FiEdit2 className="w-4 h-4 text-orange-400" />
                     {editingProduct ? `Edit Product: ${editingProduct.name}` : "Create New Product"}
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
@@ -674,7 +674,7 @@ export default function ProductManager() {
                   onClick={() => setActiveTab("general")}
                   className={`px-3.5 py-2 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
                     activeTab === "general"
-                      ? "border-blue-600 text-blue-600 bg-white rounded-t-lg"
+                      ? "border-orange-600 text-orange-600 bg-white rounded-t-lg"
                       : "border-transparent text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -699,7 +699,7 @@ export default function ProductManager() {
                   onClick={() => setActiveTab("options")}
                   className={`px-3.5 py-2 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 ${
                     activeTab === "options"
-                      ? "border-blue-600 text-blue-600 bg-white rounded-t-lg"
+                      ? "border-orange-600 text-orange-600 bg-white rounded-t-lg"
                       : "border-transparent text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -736,7 +736,7 @@ export default function ProductManager() {
                             value={formData.code}
                             onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                             placeholder="e.g. VC-001"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
 
@@ -758,7 +758,7 @@ export default function ProductManager() {
                               })
                             }
                             placeholder="e.g. 500 GSM + Velvet Card"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold"
                           />
                         </div>
 
@@ -771,7 +771,7 @@ export default function ProductManager() {
                             value={formData.slug}
                             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                             placeholder="e.g. 500-gsm-velvet-card"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -784,7 +784,7 @@ export default function ProductManager() {
                           <select
                             value={formData.categoryId}
                             onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           >
                             {categories.map((c) => (
                               <option key={c.id} value={c.id}>
@@ -804,7 +804,7 @@ export default function ProductManager() {
                             value={formData.subCategory}
                             onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
                             placeholder="e.g. 500 GSM CARDS (QTY. 500 CARDS)"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-amber-800"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-semibold text-amber-800"
                           />
                           <p className="text-[10px] text-slate-400 mt-1">
                             Matches sub-headings on Category Page (e.g., 500 GSM, 400 GSM CARDS).
@@ -823,7 +823,7 @@ export default function ProductManager() {
                             onChange={(e) =>
                               setFormData({ ...formData, basePrice: Number(e.target.value) })
                             }
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-slate-900"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-900"
                           />
                         </div>
 
@@ -836,7 +836,7 @@ export default function ProductManager() {
                             value={formData.unitName}
                             onChange={(e) => setFormData({ ...formData, unitName: e.target.value })}
                             placeholder="Cards / Pouches / Pcs"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
 
@@ -850,7 +850,7 @@ export default function ProductManager() {
                             onChange={(e) =>
                               setFormData({ ...formData, minQuantity: Number(e.target.value) })
                             }
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
 
@@ -865,7 +865,7 @@ export default function ProductManager() {
                               setFormData({ ...formData, productionTime: e.target.value })
                             }
                             placeholder="e.g. 3 days"
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -879,7 +879,7 @@ export default function ProductManager() {
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           placeholder="Enter product description..."
-                          className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         />
                       </div>
 
@@ -888,7 +888,7 @@ export default function ProductManager() {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                           <div>
                             <label className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-                              <FiImage className="w-4 h-4 text-blue-600" />
+                              <FiImage className="w-4 h-4 text-orange-600" />
                               Product Images & Media Gallery ({formData.images?.length || (formData.image ? 1 : 0)})
                             </label>
                             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -896,7 +896,7 @@ export default function ProductManager() {
                             </p>
                           </div>
 
-                          <label className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer transition-colors shadow-xs">
+                          <label className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg cursor-pointer transition-colors shadow-xs">
                             <FiUploadCloud className="w-4 h-4" />
                             <span>
                               {uploadingImage ? "Uploading to Cloudinary..." : "Upload Multiple Images"}
@@ -925,7 +925,7 @@ export default function ProductManager() {
                               }
                             }}
                             placeholder="Or paste direct image URL (e.g. Cloudinary, WebP, JPG) and press Enter"
-                            className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                           <button
                             type="button"
@@ -955,7 +955,7 @@ export default function ProductManager() {
                                     key={idx}
                                     className={`relative group rounded-xl overflow-hidden border-2 bg-white transition-all shadow-xs ${
                                       isPrimary
-                                        ? "border-blue-600 ring-2 ring-blue-500/20"
+                                        ? "border-orange-600 ring-2 ring-orange-500/20"
                                         : "border-slate-200 hover:border-slate-300"
                                     }`}
                                   >
@@ -969,14 +969,14 @@ export default function ProductManager() {
 
                                     {/* Primary Badge */}
                                     {isPrimary ? (
-                                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-blue-600 text-white text-[9px] font-extrabold uppercase rounded shadow-xs flex items-center gap-0.5">
+                                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-orange-600 text-white text-[9px] font-extrabold uppercase rounded shadow-xs flex items-center gap-0.5">
                                         <FiStar className="w-2.5 h-2.5 fill-current" /> Primary
                                       </span>
                                     ) : (
                                       <button
                                         type="button"
                                         onClick={() => handleSetPrimaryImage(imgUrl)}
-                                        className="absolute top-1.5 left-1.5 opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 bg-slate-900/80 hover:bg-blue-600 text-white text-[9px] font-bold rounded shadow-xs"
+                                        className="absolute top-1.5 left-1.5 opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 bg-slate-900/80 hover:bg-orange-600 text-white text-[9px] font-bold rounded shadow-xs"
                                         title="Make this the primary display image"
                                       >
                                         Set Primary
@@ -1435,11 +1435,11 @@ export default function ProductManager() {
                   {/* TAB 3: Main Select Detail Options */}
                   {activeTab === "options" && (
                     <div className="space-y-6">
-                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-                        <h4 className="text-xs font-bold text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                      <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-3">
+                        <h4 className="text-xs font-bold text-orange-950 uppercase tracking-wider flex items-center gap-2">
                           <FiLayers className="w-4 h-4" /> Manage Custom Select Detail Options
                         </h4>
-                        <p className="text-xs text-blue-700 leading-relaxed">
+                        <p className="text-xs text-orange-700 leading-relaxed">
                           These options appear under the <strong>"SELECT DETAIL"</strong> section on the
                           product page (e.g. <em>Printing Side</em>, <em>Corner Finishing</em>, <em>Foil Color</em>).
                         </p>
@@ -1450,12 +1450,12 @@ export default function ProductManager() {
                             value={newMainOptionName}
                             onChange={(e) => setNewMainOptionName(e.target.value)}
                             placeholder="e.g. Corner Type, Foil Color, Printing"
-                            className="flex-1 px-3 py-2 text-xs border border-blue-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 text-xs border border-orange-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                           />
                           <button
                             type="button"
                             onClick={handleAddMainOption}
-                            className="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors flex items-center gap-1"
+                            className="px-4 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors flex items-center gap-1"
                           >
                             <FiPlus className="w-4 h-4" /> Add Option Group
                           </button>
@@ -1565,7 +1565,7 @@ export default function ProductManager() {
                                 <button
                                   type="button"
                                   onClick={() => handleAddMainOptionValue(optionIdx)}
-                                  className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1 pt-1"
+                                  className="text-xs font-bold text-orange-600 hover:underline inline-flex items-center gap-1 pt-1"
                                 >
                                   <FiPlus className="w-3.5 h-3.5" /> Add Dropdown Choice
                                 </button>
@@ -1624,7 +1624,7 @@ export default function ProductManager() {
                               importantNotes: e.target.value.split("\n").filter(Boolean),
                             }))
                           }
-                          className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1647,7 +1647,7 @@ export default function ProductManager() {
                     <button
                       type="submit"
                       disabled={isSubmitting || uploadingImage}
-                      className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
+                      className="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
                     >
                       <FiCheck className="w-4 h-4" />
                       {editingProduct ? "Save Product Changes" : "Create Product"}

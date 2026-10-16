@@ -43,10 +43,10 @@ export default function ProductPage() {
           activeVariantDetails.images && activeVariantDetails.images.length > 0
             ? activeVariantDetails.images
             : rawProduct.images && rawProduct.images.length > 0
-            ? rawProduct.images
-            : rawProduct.image
-            ? [rawProduct.image]
-            : [],
+              ? rawProduct.images
+              : rawProduct.image
+                ? [rawProduct.image]
+                : [],
         code: activeVariantDetails.code || rawProduct.code,
         basePrice:
           activeVariantDetails.basePrice !== undefined
@@ -80,8 +80,8 @@ export default function ProductPage() {
           rawProduct.images && rawProduct.images.length > 0
             ? rawProduct.images
             : rawProduct.image
-            ? [rawProduct.image]
-            : [],
+              ? [rawProduct.image]
+              : [],
       };
 
   const breadcrumbItems = [
@@ -113,13 +113,23 @@ export default function ProductPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Left Column: Gallery & Info */}
-        <div className="xl:col-span-7 space-y-6 min-w-0">
+         <div className="xl:col-span-7 space-y-6 min-w-0">
+          <ProductOrderForm
+            product={product}
+            onVariantSelect={(variantName) =>
+              setSelectedVariantName(variantName)
+            }
+          />
+        </div>
+
+        {/* Right Column: Complete Screenshot-Matching Order Form */}
+        <div className="xl:col-span-5 space-y-6 min-w-0">
           <ProductGallery product={product} />
 
           {/* Product Code & Basic Overview Card */}
           <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3 shadow-xs">
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-wide">
+              <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100 uppercase tracking-wide">
                 Code: #{product.code}
               </span>
             </div>
@@ -131,37 +141,9 @@ export default function ProductPage() {
             <p className="text-xs text-slate-500 leading-relaxed">
               {product.description}
             </p>
-
-            <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-slate-100">
-              <div className="flex items-center space-x-2 text-slate-600">
-                <FiLayers className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                <span>
-                  Min Order:{" "}
-                  <strong>
-                    {product.minQuantity} {product.unitName || "Units"}
-                  </strong>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 text-slate-600">
-                <FiClock className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                <span>
-                  Production: <strong>{product.productionTime}</strong>
-                </span>
-              </div>
-            </div>
           </div>
 
           <ProductInfo product={product} />
-        </div>
-
-        {/* Right Column: Complete Screenshot-Matching Order Form */}
-        <div className="xl:col-span-5 space-y-6 min-w-0">
-          <ProductOrderForm
-            product={product}
-            onVariantSelect={(variantName) =>
-              setSelectedVariantName(variantName)
-            }
-          />
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ export default function QuotesPage() {
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <FiFileText className="w-5 h-5 text-blue-600" />
+            <FiFileText className="w-5 h-5 text-orange-600" />
             Client Quotation Cart ({itemCount} {itemCount === 1 ? "Item" : "Items"})
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -51,7 +51,7 @@ export default function QuotesPage() {
 
         <Link
           to="/"
-          className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
+          className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-lg shadow-xs transition-colors"
         >
           <FiPlus className="w-4 h-4 mr-1.5" />
           Add More Products

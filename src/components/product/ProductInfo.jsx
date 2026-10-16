@@ -26,7 +26,7 @@ export default function ProductInfo({ product }) {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-3 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
                 isActive
-                  ? "border-blue-600 text-blue-600 bg-white"
+                  ? "border-orange-600 text-orange-600 bg-white"
                   : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/60"
               }`}
             >
@@ -62,7 +62,7 @@ export default function ProductInfo({ product }) {
                 <>
                   <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100">
                     <span className="text-slate-500 font-medium">Production Lead Time</span>
-                    <span className="font-bold text-blue-600">{product.productionTime}</span>
+                    <span className="font-bold text-orange-600">{product.productionTime}</span>
                   </div>
                   <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100">
                     <span className="text-slate-500 font-medium">Minimum Order Qty</span>
@@ -93,7 +93,7 @@ export default function ProductInfo({ product }) {
                 <ul className="space-y-1.5 text-slate-700">
                   {product.productSpecialization.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
+                      <span className="text-orange-600 font-bold">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -103,14 +103,14 @@ export default function ProductInfo({ product }) {
 
             {/* Our Specialization */}
             {product.ourSpecialization && product.ourSpecialization.length > 0 && (
-              <div className="bg-blue-50/60 p-3.5 rounded-lg border border-blue-100">
-                <h5 className="font-bold text-blue-900 mb-2 text-xs flex items-center gap-1.5">
-                  <FiAward className="w-3.5 h-3.5 text-blue-600" /> Our Specialization
+              <div className="bg-orange-50/60 p-3.5 rounded-lg border border-orange-100">
+                <h5 className="font-bold text-orange-950 mb-2 text-xs flex items-center gap-1.5">
+                  <FiAward className="w-3.5 h-3.5 text-orange-600" /> Our Specialization
                 </h5>
-                <ul className="space-y-1.5 text-blue-950">
+                <ul className="space-y-1.5 text-orange-950">
                   {product.ourSpecialization.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
+                      <span className="text-orange-600 font-bold">•</span>
                       <span>{item}</span>
                     </li>
                   ))}

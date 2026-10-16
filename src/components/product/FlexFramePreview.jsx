@@ -79,12 +79,12 @@ export default function FlexFramePreview({
     <div className="bg-slate-900 text-white rounded-xl p-4 shadow-md border border-slate-800 space-y-3">
       <div className="flex items-center justify-between border-b border-slate-800 pb-2">
         <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
             Frame Diagram Preview
           </h4>
         </div>
-        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-orange-950/60 text-orange-300 border border-orange-800/80">
           {h} ft × {w} ft ({h * w} sqft)
         </span>
       </div>
@@ -118,7 +118,7 @@ export default function FlexFramePreview({
             y={startY}
             width={rectWidth}
             height={rectHeight}
-            className="fill-blue-600/10 stroke-blue-500/30"
+            className="fill-orange-600/10 stroke-orange-500/30"
             strokeWidth="1"
           />
 
@@ -130,7 +130,7 @@ export default function FlexFramePreview({
               width={rectWidth}
               height={rectHeight}
               fill="none"
-              stroke={boardType === "Iron Board" ? "#38bdf8" : "#f59e0b"}
+              stroke={boardType === "Iron Board" ? "#f97316" : "#f59e0b"}
               strokeWidth="3"
               strokeDasharray="0"
             />
@@ -155,7 +155,7 @@ export default function FlexFramePreview({
                 y1={line.y1}
                 x2={line.x2}
                 y2={line.y2}
-                stroke={boardType === "Iron Board" ? "#0284c7" : "#d97706"}
+                stroke={boardType === "Iron Board" ? "#ea580c" : "#d97706"}
                 strokeWidth="2.5"
                 strokeDasharray="2 2"
               />
@@ -179,7 +179,7 @@ export default function FlexFramePreview({
             x={startX + rectWidth / 2}
             y={Math.max(16, startY - 8)}
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#fb923c"
             fontSize="11"
             fontWeight="bold"
             className="select-none font-mono"
@@ -192,7 +192,7 @@ export default function FlexFramePreview({
             x={startX + rectWidth / 2}
             y={Math.min(maxCanvasHeight - 6, startY + rectHeight + 16)}
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#fb923c"
             fontSize="11"
             fontWeight="bold"
             className="select-none font-mono"
@@ -205,7 +205,7 @@ export default function FlexFramePreview({
             x={Math.max(12, startX - 12)}
             y={startY + rectHeight / 2 + 4}
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#fb923c"
             fontSize="11"
             fontWeight="bold"
             className="select-none font-mono"
@@ -218,7 +218,7 @@ export default function FlexFramePreview({
             x={Math.min(maxCanvasWidth - 12, startX + rectWidth + 12)}
             y={startY + rectHeight / 2 + 4}
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#fb923c"
             fontSize="11"
             fontWeight="bold"
             className="select-none font-mono"
@@ -227,10 +227,10 @@ export default function FlexFramePreview({
           </text>
 
           {/* Outer Corner Nodes */}
-          <circle cx={startX} cy={startY} r="3" fill="#38bdf8" />
-          <circle cx={startX + rectWidth} cy={startY} r="3" fill="#38bdf8" />
-          <circle cx={startX} cy={startY + rectHeight} r="3" fill="#38bdf8" />
-          <circle cx={startX + rectWidth} cy={startY + rectHeight} r="3" fill="#38bdf8" />
+          <circle cx={startX} cy={startY} r="3" fill="#f97316" />
+          <circle cx={startX + rectWidth} cy={startY} r="3" fill="#f97316" />
+          <circle cx={startX} cy={startY + rectHeight} r="3" fill="#f97316" />
+          <circle cx={startX + rectWidth} cy={startY + rectHeight} r="3" fill="#f97316" />
         </svg>
       </div>
 
@@ -243,7 +243,7 @@ export default function FlexFramePreview({
               {runningFeetDetails.totalRunningFeet} Running Feet
             </span>
           </div>
-          <div className="text-blue-300 font-bold tracking-tight">
+          <div className="text-orange-300 font-bold tracking-tight">
             {runningFeetDetails.formula} = {runningFeetDetails.totalRunningFeet} ft
           </div>
         </div>

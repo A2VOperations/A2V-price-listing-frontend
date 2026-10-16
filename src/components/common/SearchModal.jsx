@@ -84,17 +84,17 @@ export default function SearchModal({ isOpen, onClose }) {
                   key={product.id}
                   to={`/product/${product.slug}`}
                   onClick={onClose}
-                  className="flex items-center p-3 rounded-lg hover:bg-blue-50/70 border border-transparent hover:border-blue-100 transition-all group"
+                  className="flex items-center p-3 rounded-lg hover:bg-orange-50/70 border border-transparent hover:border-orange-100 transition-all group"
                 >
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 mr-3 border border-slate-200">
                     <ProductImage src={product.image} alt={product.name} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                      <span className="text-xs font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
                         {product.code}
                       </span>
-                      <span className="text-sm font-semibold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
+                      <span className="text-sm font-semibold text-slate-800 truncate group-hover:text-orange-600 transition-colors">
                         {product.name}
                       </span>
                     </div>
@@ -112,7 +112,7 @@ export default function SearchModal({ isOpen, onClose }) {
                       ₹{product.basePrice.toLocaleString()}
                     </div>
                   </div>
-                  <FiArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 ml-3 transition-colors" />
+                  <FiArrowRight className="w-4 h-4 text-slate-300 group-hover:text-orange-600 ml-3 transition-colors" />
                 </Link>
               ))}
             </div>

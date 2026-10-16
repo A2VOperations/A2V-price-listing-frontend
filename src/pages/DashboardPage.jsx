@@ -28,7 +28,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <FiGrid className="w-5 h-5 text-blue-600" />
+              <FiGrid className="w-5 h-5 text-orange-600" />
               Product Categories
             </h2>
             <p className="text-xs text-slate-500">
@@ -43,7 +43,7 @@ export default function DashboardPage() {
               placeholder="Filter categories..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
             <FiSearch className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           </div>

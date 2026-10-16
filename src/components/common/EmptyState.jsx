@@ -18,7 +18,7 @@ export default function EmptyState({
       {actionHref && (
         <Link
           to={actionHref}
-          className="inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors border border-blue-100"
+          className="inline-flex items-center text-xs font-semibold text-orange-600 bg-orange-50 px-4 py-2 rounded-lg hover:bg-orange-100 transition-colors border border-orange-200"
         >
           <FiArrowLeft className="w-3.5 h-3.5 mr-1.5" />
           {actionText}

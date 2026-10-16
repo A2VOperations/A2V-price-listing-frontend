@@ -48,7 +48,7 @@ export default function Sidebar({ isOpen, onClose }) {
               onClick={onClose}
               className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-blue-600 text-white font-semibold shadow-sm"
+                  ? "bg-orange-600 text-white font-semibold shadow-sm"
                   : "text-slate-300 hover:bg-slate-800 hover:text-white"
               }`}
             >

@@ -25,7 +25,7 @@ export default function PriceBreakdown({
     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-md sticky top-20 space-y-4">
       <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
         <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-          <FiFileText className="w-4 h-4 text-blue-600" />
+          <FiFileText className="w-4 h-4 text-orange-600" />
           Price Summary
         </h3>
         {isConfigComplete ? (
@@ -72,7 +72,7 @@ export default function PriceBreakdown({
                     <span className="text-slate-500 truncate max-w-[170px]">
                       + {opt.optionName} ({opt.valueLabel})
                     </span>
-                    <span className="font-semibold text-blue-600">
+                    <span className="font-semibold text-orange-600">
                       +₹{opt.adjustment.toLocaleString()}
                     </span>
                   </div>
@@ -86,7 +86,7 @@ export default function PriceBreakdown({
               <span className="text-xs uppercase font-bold text-slate-300 tracking-wider">
                 Total Payable
               </span>
-              <span className="text-xl font-extrabold text-blue-400">
+              <span className="text-xl font-extrabold text-orange-400">
                 ₹{calculation.totalAmount.toLocaleString()}
               </span>
             </div>
@@ -109,7 +109,7 @@ export default function PriceBreakdown({
             ? "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
             : addedSuccess
             ? "bg-emerald-600 text-white"
-            : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.99]"
+            : "bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.99]"
         }`}
       >
         {addedSuccess ? (

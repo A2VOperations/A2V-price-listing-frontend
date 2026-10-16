@@ -39,12 +39,12 @@ export default function AdminDashboard() {
               <h3 className="text-2xl font-black text-slate-900 mt-1">{categories.length}</h3>
               <Link
                 to="/admin/categories"
-                className="text-[11px] font-bold text-blue-600 hover:underline mt-2 inline-block"
+                className="text-[11px] font-bold text-orange-600 hover:underline mt-2 inline-block"
               >
                 Manage Categories &rarr;
               </Link>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold">
               <FiFolder className="w-6 h-6" />
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
               <h3 className="text-2xl font-black text-slate-900 mt-1">{products.length}</h3>
               <Link
                 to="/admin/products"
-                className="text-[11px] font-bold text-blue-600 hover:underline mt-2 inline-block"
+                className="text-[11px] font-bold text-orange-600 hover:underline mt-2 inline-block"
               >
                 Manage Products &rarr;
               </Link>
@@ -105,13 +105,13 @@ export default function AdminDashboard() {
         {/* System Hierarchy Overview */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
           <div className="flex items-center space-x-2 text-slate-900 font-bold text-base">
-            <FiHelpCircle className="w-5 h-5 text-blue-600" />
+            <FiHelpCircle className="w-5 h-5 text-orange-600" />
             <h2>Catalog Structure & Editing Guide</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700">
                 1. Category Level
               </span>
               <h3 className="font-bold text-xs text-slate-800">Main Categories</h3>
@@ -146,11 +146,11 @@ export default function AdminDashboard() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/admin/categories"
-            className="flex-1 p-5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all flex items-center justify-between text-blue-900 group"
+            className="flex-1 p-5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 transition-all flex items-center justify-between text-orange-950 group"
           >
             <div>
               <h3 className="font-bold text-sm">Manage Main Categories</h3>
-              <p className="text-xs text-blue-700 mt-1">Add, edit category names, descriptions, and thumbnails.</p>
+              <p className="text-xs text-orange-700 mt-1">Add, edit category names, descriptions, and thumbnails.</p>
             </div>
             <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
           </Link>

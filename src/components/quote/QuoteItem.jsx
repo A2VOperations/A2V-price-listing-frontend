@@ -18,7 +18,7 @@ export default function QuoteItem({ item, index, onRemove }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-[10px] font-extrabold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.2 rounded">
+              <span className="text-[10px] font-extrabold text-orange-600 bg-orange-50 border border-orange-100 px-1.5 py-0.2 rounded">
                 #{item.productCode}
               </span>
               <h4 className="text-sm font-bold text-slate-900 truncate">
@@ -60,7 +60,7 @@ export default function QuoteItem({ item, index, onRemove }) {
         <div className="flex items-center space-x-4 pt-1 text-xs">
           <Link
             to={`/product/${item.productSlug}`}
-            className="flex items-center text-blue-600 hover:text-blue-800 font-semibold"
+            className="flex items-center text-orange-600 hover:text-orange-800 font-semibold"
           >
             <FiEdit3 className="w-3.5 h-3.5 mr-1" />
             Edit Specs

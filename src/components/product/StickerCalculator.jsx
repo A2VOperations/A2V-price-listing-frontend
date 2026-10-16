@@ -331,30 +331,30 @@ export default function StickerCalculator({ product }) {
   return (
     <div className="space-y-8">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-blue-100 border border-white/20">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-orange-100 border border-white/20">
               <FiGrid className="w-3.5 h-3.5" /> Interactive Sticker Layout & Sheet Calculator
             </span>
             <h2 className="text-2xl font-black tracking-tight text-white">
               Sticker Sheet Optimizer (12×18 &amp; 13×19)
             </h2>
-            <p className="text-xs text-blue-100/80 max-w-2xl">
+            <p className="text-xs text-orange-100/80 max-w-2xl">
               Enter the size of your single sticker to automatically generate the optimal sheet layout, bleed boundaries, total stickers per sheet, and instant pricing.
             </p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/20 flex items-center gap-4 text-center">
             <div>
-              <span className="text-[11px] text-blue-200 block">Stickers / Sheet</span>
+              <span className="text-[11px] text-orange-200 block">Stickers / Sheet</span>
               <span className="text-2xl font-black text-emerald-300">
                 {currentYield.total} <span className="text-xs font-normal text-white">pcs</span>
               </span>
             </div>
             <div className="h-8 w-px bg-white/20" />
             <div>
-              <span className="text-[11px] text-blue-200 block">Grid Layout</span>
+              <span className="text-[11px] text-orange-200 block">Grid Layout</span>
               <span className="text-base font-bold text-white">
                 {currentYield.cols} × {currentYield.rows}
               </span>
@@ -371,7 +371,7 @@ export default function StickerCalculator({ product }) {
           <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                <span className="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs">
                   1
                 </span>
                 Select Sheet Size &amp; Sticker Dimensions
@@ -393,16 +393,16 @@ export default function StickerCalculator({ product }) {
                       onClick={() => setSelectedSheetId(sheet.id)}
                       className={`p-3.5 rounded-xl border-2 text-left transition-all relative ${
                         isSelected
-                          ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                          ? "border-orange-600 bg-orange-50/50 shadow-sm"
                           : "border-slate-200 hover:border-slate-300 bg-slate-50/50"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`text-base font-black ${isSelected ? "text-blue-900" : "text-slate-800"}`}>
+                        <span className={`text-base font-black ${isSelected ? "text-orange-950" : "text-slate-800"}`}>
                           {sheet.shortName}
                         </span>
                         {isSelected && (
-                          <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">
+                          <span className="w-4 h-4 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px]">
                             <FiCheck />
                           </span>
                         )}
@@ -428,7 +428,7 @@ export default function StickerCalculator({ product }) {
                   onClick={() => setOrientation("landscape")}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                     orientation === "landscape"
-                      ? "bg-blue-600 text-white shadow-xs"
+                      ? "bg-orange-600 text-white shadow-xs"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
                   }`}
                 >
@@ -439,7 +439,7 @@ export default function StickerCalculator({ product }) {
                   onClick={() => setOrientation("portrait")}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                     orientation === "portrait"
-                      ? "bg-blue-600 text-white shadow-xs"
+                      ? "bg-orange-600 text-white shadow-xs"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
                   }`}
                 >
@@ -463,12 +463,12 @@ export default function StickerCalculator({ product }) {
                     <span className="text-[11px] font-semibold text-slate-600">Width</span>
                     <span className="text-[10px] text-slate-400 font-medium">Inches</span>
                   </div>
-                  <div className="flex items-center bg-slate-50 border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <div className="flex items-center bg-slate-50 border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-orange-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 transition-all">
                     <button
                       type="button"
                       onClick={() => handleStepWidth(-0.25)}
                       disabled={stickerWidth <= 0.5}
-                      className="p-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="p-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Decrease width by 0.25 inch"
                       aria-label="Decrease width"
                     >
@@ -492,7 +492,7 @@ export default function StickerCalculator({ product }) {
                       type="button"
                       onClick={() => handleStepWidth(0.25)}
                       disabled={stickerWidth >= 18}
-                      className="p-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="p-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Increase width by 0.25 inch"
                       aria-label="Increase width"
                     >
@@ -506,12 +506,12 @@ export default function StickerCalculator({ product }) {
                     <span className="text-[11px] font-semibold text-slate-600">Height</span>
                     <span className="text-[10px] text-slate-400 font-medium">Inches</span>
                   </div>
-                  <div className="flex items-center bg-slate-50 border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <div className="flex items-center bg-slate-50 border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-orange-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 transition-all">
                     <button
                       type="button"
                       onClick={() => handleStepHeight(-0.25)}
                       disabled={stickerHeight <= 0.5}
-                      className="p-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="p-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Decrease height by 0.25 inch"
                       aria-label="Decrease height"
                     >
@@ -535,7 +535,7 @@ export default function StickerCalculator({ product }) {
                       type="button"
                       onClick={() => handleStepHeight(0.25)}
                       disabled={stickerHeight >= 18}
-                      className="p-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="p-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-200 active:bg-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Increase height by 0.25 inch"
                       aria-label="Increase height"
                     >
@@ -558,7 +558,7 @@ export default function StickerCalculator({ product }) {
                         onClick={() => handleSelectPreset(preset)}
                         className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all ${
                           isSelected
-                            ? "bg-blue-600 text-white shadow-xs font-bold"
+                            ? "bg-orange-600 text-white shadow-xs font-bold"
                             : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"
                         }`}
                       >
@@ -586,7 +586,7 @@ export default function StickerCalculator({ product }) {
                     onClick={() => setShape(s.id)}
                     className={`py-2 px-1 text-center rounded-xl border text-xs font-bold transition-all ${
                       shape === s.id
-                        ? "border-blue-600 bg-blue-50 text-blue-800"
+                        ? "border-orange-600 bg-orange-50 text-orange-900"
                         : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                     }`}
                   >
@@ -601,7 +601,7 @@ export default function StickerCalculator({ product }) {
               <button
                 type="button"
                 onClick={() => setShowAdvancedMargins(!showAdvancedMargins)}
-                className="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center justify-between w-full"
+                className="text-xs text-orange-600 hover:text-orange-800 font-bold flex items-center justify-between w-full"
               >
                 <span className="flex items-center gap-1.5">
                   <FiSliders className="w-3.5 h-3.5" /> Bleed &amp; Margin Settings (Gaps)
@@ -618,7 +618,7 @@ export default function StickerCalculator({ product }) {
                       <span className="text-[11px] font-semibold text-slate-700">
                         Side Margin / Gripper (Inch)
                       </span>
-                      <div className="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-blue-500">
+                      <div className="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-orange-500">
                         <button
                           type="button"
                           onClick={() => handleStepMargin(-0.05)}
@@ -654,7 +654,7 @@ export default function StickerCalculator({ product }) {
                       <span className="text-[11px] font-semibold text-slate-700">
                         Gap between Stickers (Inch)
                       </span>
-                      <div className="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-blue-500">
+                      <div className="flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-orange-500">
                         <button
                           type="button"
                           onClick={() => handleStepGap(-0.025)}
@@ -695,7 +695,7 @@ export default function StickerCalculator({ product }) {
           <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                <span className="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs">
                   2
                 </span>
                 Material, Cutting &amp; Quantity
@@ -715,19 +715,19 @@ export default function StickerCalculator({ product }) {
                       onClick={() => setSelectedMaterialId(mat.id)}
                       className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
                         isSelected
-                          ? "border-blue-600 bg-blue-50/50 shadow-xs"
+                          ? "border-orange-600 bg-orange-50/50 shadow-xs"
                           : "border-slate-200 hover:border-slate-300 bg-slate-50/40"
                       }`}
                     >
                       <div>
-                        <span className={`text-xs font-bold block ${isSelected ? "text-blue-900" : "text-slate-800"}`}>
+                        <span className={`text-xs font-bold block ${isSelected ? "text-orange-950" : "text-slate-800"}`}>
                           {mat.name}
                         </span>
                         <span className="text-[11px] text-slate-500 leading-tight block">
                           {mat.desc}
                         </span>
                       </div>
-                      <span className="text-xs font-extrabold text-blue-700 whitespace-nowrap ml-2">
+                      <span className="text-xs font-extrabold text-orange-700 whitespace-nowrap ml-2">
                         ₹{mat.ratePerSheet}/sheet
                       </span>
                     </button>
@@ -749,7 +749,7 @@ export default function StickerCalculator({ product }) {
                       onClick={() => setSelectedCutId(cut.id)}
                       className={`p-2.5 rounded-xl border text-left transition-all ${
                         isSelected
-                          ? "border-blue-600 bg-blue-50 text-blue-900 font-bold"
+                          ? "border-orange-600 bg-orange-50 text-orange-900 font-bold"
                           : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 text-xs"
                       }`}
                     >
@@ -773,7 +773,7 @@ export default function StickerCalculator({ product }) {
                       onClick={() => setSelectedLaminationId(lam.id)}
                       className={`p-2 rounded-xl border text-center transition-all ${
                         isSelected
-                          ? "border-blue-600 bg-blue-50 text-blue-900 font-bold"
+                          ? "border-orange-600 bg-orange-50 text-orange-900 font-bold"
                           : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 text-xs"
                       }`}
                     >
@@ -793,7 +793,7 @@ export default function StickerCalculator({ product }) {
                     type="button"
                     onClick={() => setCalcMode("stickers")}
                     className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                      calcMode === "stickers" ? "bg-white text-blue-700 shadow-xs" : "text-slate-600"
+                      calcMode === "stickers" ? "bg-white text-orange-700 shadow-xs" : "text-slate-600"
                     }`}
                   >
                     By Sticker Qty
@@ -802,7 +802,7 @@ export default function StickerCalculator({ product }) {
                     type="button"
                     onClick={() => setCalcMode("sheets")}
                     className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                      calcMode === "sheets" ? "bg-white text-blue-700 shadow-xs" : "text-slate-600"
+                      calcMode === "sheets" ? "bg-white text-orange-700 shadow-xs" : "text-slate-600"
                     }`}
                   >
                     By Sheet Qty
@@ -813,12 +813,12 @@ export default function StickerCalculator({ product }) {
               {calcMode === "stickers" ? (
                 <div className="space-y-1.5">
                   <span className="text-xs text-slate-600">Enter Required Number of Stickers:</span>
-                  <div className="flex items-center bg-white border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <div className="flex items-center bg-white border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-orange-600 focus-within:ring-2 focus-within:ring-orange-100 transition-all">
                     <button
                       type="button"
                       onClick={() => handleStepStickerCount(-100)}
                       disabled={targetStickerCount <= 50}
-                      className="px-3.5 py-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 active:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="px-3.5 py-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-100 active:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Decrease by 100 stickers"
                       aria-label="Decrease stickers"
                     >
@@ -841,7 +841,7 @@ export default function StickerCalculator({ product }) {
                     <button
                       type="button"
                       onClick={() => handleStepStickerCount(100)}
-                      className="px-3.5 py-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+                      className="px-3.5 py-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
                       title="Increase by 100 stickers"
                       aria-label="Increase stickers"
                     >
@@ -856,12 +856,12 @@ export default function StickerCalculator({ product }) {
               ) : (
                 <div className="space-y-1.5">
                   <span className="text-xs text-slate-600">Enter Number of Sheets to Print:</span>
-                  <div className="flex items-center bg-white border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <div className="flex items-center bg-white border-2 border-slate-300 rounded-xl overflow-hidden focus-within:border-orange-600 focus-within:ring-2 focus-within:ring-orange-100 transition-all">
                     <button
                       type="button"
                       onClick={() => handleStepSheetCount(-5)}
                       disabled={targetSheetCount <= 1}
-                      className="px-3.5 py-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 active:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      className="px-3.5 py-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-100 active:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                       title="Decrease by 5 sheets"
                       aria-label="Decrease sheets"
                     >
@@ -884,7 +884,7 @@ export default function StickerCalculator({ product }) {
                     <button
                       type="button"
                       onClick={() => handleStepSheetCount(5)}
-                      className="px-3.5 py-2.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+                      className="px-3.5 py-2.5 text-slate-600 hover:text-orange-700 hover:bg-slate-100 active:bg-slate-200 transition-colors"
                       title="Increase by 5 sheets"
                       aria-label="Increase sheets"
                     >
@@ -942,7 +942,7 @@ export default function StickerCalculator({ product }) {
               <button
                 type="button"
                 onClick={handleAddToQuote}
-                className="w-full py-3 px-4 rounded-xl font-black text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-xl font-black text-sm bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 {addedSuccess ? (
                   <>
@@ -975,7 +975,7 @@ export default function StickerCalculator({ product }) {
           {/* Quick Specifications Guide */}
           <div className="bg-white rounded-xl border border-slate-200 p-4 text-xs space-y-2 text-slate-600">
             <h4 className="font-bold text-slate-900 flex items-center gap-1.5">
-              <FiInfo className="text-blue-600" /> Sheet &amp; Bleed Guidelines
+              <FiInfo className="text-orange-600" /> Sheet &amp; Bleed Guidelines
             </h4>
             <ul className="list-disc list-inside space-y-1 text-slate-500 leading-relaxed">
               <li>

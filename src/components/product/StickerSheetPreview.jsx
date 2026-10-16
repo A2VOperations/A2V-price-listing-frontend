@@ -92,7 +92,7 @@ export default function StickerSheetPreview({
       {/* Header Info Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
         <div className="flex items-center space-x-2.5">
-          <span className="p-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+          <span className="p-2 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
             <FiGrid className="w-4 h-4" />
           </span>
           <div>
@@ -111,7 +111,7 @@ export default function StickerSheetPreview({
         {/* Badges */}
         <div className="flex items-center gap-2 text-xs">
           <span className="bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700 text-slate-300">
-            Efficiency: <strong className="text-blue-400">{layout.utilizationPct}%</strong>
+            Efficiency: <strong className="text-orange-400">{layout.utilizationPct}%</strong>
           </span>
           <span className="bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700 text-slate-300">
             Gap / Bleed: <strong className="text-amber-400">{bleedGap}"</strong>
@@ -220,7 +220,7 @@ export default function StickerSheetPreview({
                     fill="#FFFFFF"
                     stroke="#1E293B"
                     strokeWidth="1"
-                    className="transition-colors duration-150 group-hover:fill-blue-50"
+                    className="transition-colors duration-150 group-hover:fill-orange-50"
                   />
 
                   {/* Specific shape cut line if selected */}
@@ -230,7 +230,7 @@ export default function StickerSheetPreview({
                       cy={cy}
                       r={r - 1.5}
                       fill="none"
-                      stroke="#2563EB"
+                      stroke="#EA580C"
                       strokeWidth="1.2"
                       strokeDasharray="3 2"
                     />
@@ -243,7 +243,7 @@ export default function StickerSheetPreview({
                       height={hPos - 4}
                       rx="6"
                       fill="none"
-                      stroke="#2563EB"
+                      stroke="#EA580C"
                       strokeWidth="1.2"
                       strokeDasharray="3 2"
                     />
@@ -255,7 +255,7 @@ export default function StickerSheetPreview({
                       rx={wPos / 2 - 2}
                       ry={hPos / 2 - 2}
                       fill="none"
-                      stroke="#2563EB"
+                      stroke="#EA580C"
                       strokeWidth="1.2"
                       strokeDasharray="3 2"
                     />
@@ -280,7 +280,7 @@ export default function StickerSheetPreview({
                       fill="#64748B"
                       fontSize="9"
                       fontWeight="600"
-                      className="select-none pointer-events-none group-hover:fill-blue-700"
+                      className="select-none pointer-events-none group-hover:fill-orange-700"
                     >
                       {item.id}
                     </text>
@@ -369,7 +369,7 @@ export default function StickerSheetPreview({
         </div>
         <div className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60">
           <span className="text-slate-400 block text-[11px]">Total Area Used</span>
-          <span className="text-blue-400 font-bold text-base">
+          <span className="text-orange-400 font-bold text-base">
             {layout.usedW.toFixed(2)}" × {layout.usedH.toFixed(2)}"
           </span>
         </div>

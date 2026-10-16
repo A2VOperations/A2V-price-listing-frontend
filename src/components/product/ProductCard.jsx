@@ -31,9 +31,9 @@ export default function ProductCard({ product }) {
         code: "text-[#B45309]",
       },
       blue: {
-        header: "bg-[#1E40AF] text-white border-[#1E3A8A]",
+        header: "bg-[#EA580C] text-white border-[#C2410C]",
         badge: "bg-red-600 text-white",
-        code: "text-[#1E40AF]",
+        code: "text-[#EA580C]",
       },
       cyan: {
         header: "bg-[#0284C7] text-white border-[#0369A1]",
@@ -127,7 +127,7 @@ export default function ProductCard({ product }) {
 
   // Standard Product Card layout for other catalog items
   return (
-    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-blue-400 transition-all duration-200 flex flex-col overflow-hidden group">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-orange-400 transition-all duration-200 flex flex-col overflow-hidden group">
       {/* Image & Code Badge Header */}
       <div className="h-44 w-full bg-slate-50 relative overflow-hidden">
         <ProductImage
@@ -137,7 +137,7 @@ export default function ProductCard({ product }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-2.5 left-2.5 bg-slate-900/90 backdrop-blur-xs text-white text-[11px] font-bold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
-          <span className="text-blue-400">#</span>
+          <span className="text-orange-400">#</span>
           {product.code}
         </div>
         {product.badge ? (
@@ -154,38 +154,19 @@ export default function ProductCard({ product }) {
       {/* Card Details */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+          <h4 className="text-sm font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
             {product.name}
           </h4>
           <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
             {product.description}
           </p>
-
-          {/* Key Quick Metadata */}
-          <div className="mt-3 grid grid-cols-2 gap-2 py-2 px-2.5 bg-slate-50 rounded-lg text-[11px] text-slate-600 border border-slate-100">
-            <div className="flex items-center space-x-1.5">
-              <FiLayers className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-              <span className="truncate">
-                Min:{" "}
-                <strong>
-                  {product.minQuantity} {product.unitName || "Units"}
-                </strong>
-              </span>
-            </div>
-            <div className="flex items-center space-x-1.5">
-              <FiClock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-              <span className="truncate">
-                Time: <strong>{product.productionTime}</strong>
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Pricing & CTA Footer */}
         <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
           <Link
             to={`/product/${product.slug}`}
-            className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-xs group-hover:shadow-sm"
+            className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 transition-colors shadow-xs group-hover:shadow-sm"
           >
             <span>Configure</span>
             <FiArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />

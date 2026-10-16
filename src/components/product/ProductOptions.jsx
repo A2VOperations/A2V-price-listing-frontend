@@ -101,7 +101,7 @@ export default function ProductOptions({
                     {optionGroup.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
                   {currentValue && (
-                    <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                    <span className="text-[11px] font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
                       Selected: {currentValue}
                     </span>
                   )}
@@ -112,7 +112,7 @@ export default function ProductOptions({
                   <select
                     value={currentValue}
                     onChange={(e) => onOptionsChange(optionGroup.id, e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition-colors"
                   >
                     <option value="" disabled>
                       -- Select {optionGroup.name} --
@@ -142,13 +142,13 @@ export default function ProductOptions({
                           onClick={() => onOptionsChange(optionGroup.id, valObj.label)}
                           className={`p-3 rounded-lg border text-left flex justify-between items-center transition-all ${
                             isSelected
-                              ? "border-blue-600 bg-blue-50/80 text-blue-900 font-bold shadow-xs ring-1 ring-blue-600/30"
+                              ? "border-orange-600 bg-orange-50/80 text-orange-950 font-bold shadow-xs ring-1 ring-orange-600/30"
                               : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                           }`}
                         >
                           <span className="text-xs">{valObj.label}</span>
                           {(valObj.priceAdjustment > 0 || valObj.percentageAdjustment > 0) && (
-                            <span className="text-[10px] font-bold text-blue-600 bg-white px-1.5 py-0.5 rounded border border-blue-100 ml-2">
+                            <span className="text-[10px] font-bold text-orange-600 bg-white px-1.5 py-0.5 rounded border border-orange-100 ml-2">
                               {valObj.priceAdjustment
                                 ? `+₹${valObj.priceAdjustment}`
                                 : `+${valObj.percentageAdjustment}%`}

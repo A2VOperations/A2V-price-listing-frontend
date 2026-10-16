@@ -141,14 +141,14 @@ export default function CategoryManager() {
                 placeholder="Search categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
               <FiSearch className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             </div>
 
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap"
             >
               <FiPlus className="w-4 h-4" /> Add Category
             </button>
@@ -188,7 +188,7 @@ export default function CategoryManager() {
                         </div>
                       </td>
                       <td className="p-3 font-bold text-slate-900">{cat.name}</td>
-                      <td className="p-3 font-mono text-[11px] text-blue-600">{cat.slug}</td>
+                      <td className="p-3 font-mono text-[11px] text-orange-600">{cat.slug}</td>
                       <td className="p-3 max-w-md line-clamp-2 text-slate-500">
                         {cat.description || "No description set"}
                       </td>
@@ -196,7 +196,7 @@ export default function CategoryManager() {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => openEditModal(cat)}
-                            className="p-1.5 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 rounded transition-colors"
+                            className="p-1.5 bg-slate-100 hover:bg-orange-50 text-slate-700 hover:text-orange-600 rounded transition-colors"
                             title="Edit Category"
                           >
                             <FiEdit2 className="w-4 h-4" />
@@ -252,7 +252,7 @@ export default function CategoryManager() {
                       })
                     }
                     placeholder="e.g. Flex Board, Letter Heads"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
@@ -265,7 +265,7 @@ export default function CategoryManager() {
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="e.g. flex-board"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
@@ -276,7 +276,7 @@ export default function CategoryManager() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Enter category description..."
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
@@ -298,10 +298,10 @@ export default function CategoryManager() {
                         value={formData.image}
                         onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                         placeholder="Image URL or Path (/src/assets/images/...)"
-                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono"
+                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-mono"
                       />
                       <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg cursor-pointer transition-colors border border-slate-300">
-                        <FiUploadCloud className="w-4 h-4 text-blue-600" />
+                        <FiUploadCloud className="w-4 h-4 text-orange-600" />
                         <span>{uploadingImage ? "Uploading..." : "Upload Local Image File"}</span>
                         <input
                           type="file"
@@ -326,7 +326,7 @@ export default function CategoryManager() {
                   <button
                     type="submit"
                     disabled={isSubmitting || uploadingImage}
-                    className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
+                    className="px-4 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
                   >
                     <FiCheck className="w-4 h-4" />
                     {editingCategory ? "Save Changes" : "Create Category"}

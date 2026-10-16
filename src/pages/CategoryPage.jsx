@@ -65,7 +65,7 @@ export default function CategoryPage() {
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="p-2 rounded-lg bg-blue-50 text-blue-600 font-bold">
+            <span className="p-2 rounded-lg bg-orange-50 text-orange-600 font-bold">
               <FiLayers className="w-5 h-5" />
             </span>
             <h1 className="text-xl font-bold text-slate-900">
@@ -84,7 +84,7 @@ export default function CategoryPage() {
             placeholder={`Search in ${category.name}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none"
+            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:bg-white focus:outline-none"
           />
           <FiSearch className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
@@ -98,7 +98,7 @@ export default function CategoryPage() {
             onClick={() => setActiveTab("calculator")}
             className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === "calculator"
-                ? "border-blue-600 text-blue-600"
+                ? "border-orange-600 text-orange-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -110,7 +110,7 @@ export default function CategoryPage() {
             onClick={() => setActiveTab("products")}
             className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === "products"
-                ? "border-blue-600 text-blue-600"
+                ? "border-orange-600 text-orange-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -153,8 +153,8 @@ export default function CategoryPage() {
             });
 
             return entries.map(([subCategoryName, prods]) => {
-              let titleColor = "text-blue-800";
-              let borderColor = "border-blue-600";
+              let titleColor = "text-orange-800";
+              let borderColor = "border-orange-600";
               let gridCols =
                 "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5";
 

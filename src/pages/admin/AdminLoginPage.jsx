@@ -68,10 +68,10 @@ export default function AdminLoginPage() {
           {/* Header Banner */}
           <div className="bg-slate-900 px-6 py-8 text-white text-center relative overflow-hidden">
             {/* Background Glow */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-600/30 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-600/30 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-600/30 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-amber-600/30 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg mb-3">
+            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-600 text-white shadow-lg mb-3">
               <FiShield className="w-7 h-7" />
             </div>
 
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter Admin Login ID"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-medium transition-all"
                   />
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter Admin Password"
-                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all"
+                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-medium transition-all"
                   />
                   <button
                     type="button"
@@ -150,14 +150,14 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={fillDefaultCredentials}
-                  className="w-full flex items-center justify-between p-2.5 bg-blue-50/70 hover:bg-blue-100/70 border border-blue-200 rounded-xl text-[11px] text-blue-800 transition-colors group cursor-pointer"
+                  className="w-full flex items-center justify-between p-2.5 bg-orange-50/70 hover:bg-orange-100/70 border border-orange-200 rounded-xl text-[11px] text-orange-800 transition-colors group cursor-pointer"
                   title="Click to auto-fill default admin credentials"
                 >
                   <div className="flex items-center gap-1.5 font-semibold">
-                    <FiKey className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Default Login ID: <code className="bg-white px-1.5 py-0.5 rounded font-mono text-blue-900">admin</code></span>
+                    <FiKey className="w-3.5 h-3.5 text-orange-600" />
+                    <span>Default Login ID: <code className="bg-white px-1.5 py-0.5 rounded font-mono text-orange-900">admin</code></span>
                   </div>
-                  <span className="text-[10px] font-bold text-blue-600 group-hover:underline">
+                  <span className="text-[10px] font-bold text-orange-600 group-hover:underline">
                     Auto Fill
                   </span>
                 </button>
@@ -167,7 +167,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-md shadow-orange-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -187,7 +187,7 @@ export default function AdminLoginPage() {
             <div className="pt-2 border-t border-slate-100 text-center">
               <Link
                 to="/"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-orange-600 transition-colors"
               >
                 <FiArrowLeft className="w-3.5 h-3.5" /> Back to Storefront
               </Link>

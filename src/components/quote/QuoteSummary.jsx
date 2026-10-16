@@ -25,7 +25,7 @@ export default function QuoteSummary() {
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
         <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <FiUser className="w-4 h-4 text-blue-600" />
+            <FiUser className="w-4 h-4 text-orange-600" />
             Client & Quotation Details
           </h3>
         </div>
@@ -41,7 +41,7 @@ export default function QuoteSummary() {
                 placeholder="e.g. Rajesh Kumar"
                 value={clientInfo.clientName}
                 onChange={(e) => updateClientInfo({ clientName: e.target.value })}
-                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <FiUser className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             </div>
@@ -57,7 +57,7 @@ export default function QuoteSummary() {
                 placeholder="e.g. Apex Enterprises"
                 value={clientInfo.companyName}
                 onChange={(e) => updateClientInfo({ companyName: e.target.value })}
-                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <FiBriefcase className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             </div>
@@ -73,7 +73,7 @@ export default function QuoteSummary() {
                 placeholder="e.g. +91 98765 43210"
                 value={clientInfo.phone}
                 onChange={(e) => updateClientInfo({ phone: e.target.value })}
-                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <FiPhone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             </div>
@@ -89,7 +89,7 @@ export default function QuoteSummary() {
                 placeholder="e.g. client@company.com"
                 value={clientInfo.email}
                 onChange={(e) => updateClientInfo({ email: e.target.value })}
-                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <FiMail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             </div>
@@ -104,7 +104,7 @@ export default function QuoteSummary() {
               placeholder="e.g. Client requested 50% advance before production."
               value={clientInfo.notes}
               onChange={(e) => updateClientInfo({ notes: e.target.value })}
-              className="w-full p-2.5 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+              className="w-full p-2.5 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none resize-none"
             />
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function QuoteSummary() {
             </div>
             <div className="text-[11px] text-slate-400">Net price including all option fees</div>
           </div>
-          <div className="text-2xl font-black text-blue-400">
+          <div className="text-2xl font-black text-orange-400">
             ₹{totalQuoteAmount.toLocaleString()}
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function QuoteSummary() {
           <button
             onClick={handlePrint}
             disabled={itemCount === 0}
-            className="py-2.5 px-3 rounded-lg font-bold text-xs bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 transition-colors flex items-center justify-center space-x-1.5 shadow-xs"
+            className="py-2.5 px-3 rounded-lg font-bold text-xs bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-40 transition-colors flex items-center justify-center space-x-1.5 shadow-xs"
           >
             <FiPrinter className="w-4 h-4" />
             <span>Print Quote</span>

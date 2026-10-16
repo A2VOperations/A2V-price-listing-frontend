@@ -39,7 +39,7 @@ export default function AdminLayout({ children }) {
       {/* Admin Top Header Banner */}
       <div className="bg-slate-900 text-white rounded-xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <div className="p-3 bg-blue-600 rounded-lg text-white font-bold">
+          <div className="p-3 bg-orange-600 rounded-lg text-white font-bold">
             <FiGrid className="w-6 h-6" />
           </div>
           <div>
@@ -57,7 +57,7 @@ export default function AdminLayout({ children }) {
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="inline-flex items-center gap-1 text-[11px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                <FiUser className="w-3 h-3 text-blue-400" /> Logged in: <strong className="text-white">{adminUsername}</strong>
+                <FiUser className="w-3 h-3 text-orange-400" /> Logged in: <strong className="text-white">{adminUsername}</strong>
               </span>
               <p className="text-xs text-slate-400 hidden sm:inline">
                 • Manage categories, products, variants, prices, and images.
@@ -107,7 +107,7 @@ export default function AdminLayout({ children }) {
               to={item.href}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-xs"
+                  ? "bg-orange-600 text-white shadow-xs"
                   : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200"
               }`}
             >

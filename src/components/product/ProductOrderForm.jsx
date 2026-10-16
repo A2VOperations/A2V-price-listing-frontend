@@ -138,7 +138,7 @@ export default function ProductOrderForm({
             setSelectedVariant(val);
             if (onVariantSelect) onVariantSelect(val);
           }}
-          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-blue-600 focus:outline-none cursor-pointer"
+          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-orange-600 focus:outline-none cursor-pointer"
         >
           <option value="">--Select Product--</option>
           {variantsList.map((v, idx) => (
@@ -164,8 +164,8 @@ export default function ProductOrderForm({
 
           {/* Quantity Row */}
           <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center space-x-2 font-bold text-blue-900">
-              <FiPackage className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            <div className="flex items-center space-x-2 font-bold text-orange-950">
+              <FiPackage className="w-4 h-4 text-orange-600 flex-shrink-0" />
               <span>Quantity</span>
             </div>
             <div className="flex items-center space-x-3">
@@ -210,7 +210,7 @@ export default function ProductOrderForm({
                   +
                 </button>
               </div>
-              <span className="text-xs font-semibold text-blue-600">
+              <span className="text-xs font-semibold text-orange-600">
                 (Min Qty. : {minQty})
               </span>
             </div>
@@ -225,14 +225,14 @@ export default function ProductOrderForm({
                 key={key}
                 className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
               >
-                <div className="flex items-center space-x-2 font-bold text-blue-900">
-                  <FiLayers className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                <div className="flex items-center space-x-2 font-bold text-orange-950">
+                  <FiLayers className="w-4 h-4 text-orange-600 flex-shrink-0" />
                   <span>{group.name || group.id}</span>
                 </div>
                 <select
                   value={currentVal}
                   onChange={(e) => handleOptionChange(key, e.target.value)}
-                  className="w-full sm:w-72 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded text-slate-800 focus:ring-2 focus:ring-blue-600 focus:outline-none font-medium cursor-pointer"
+                  className="w-full sm:w-72 px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded text-slate-800 focus:ring-2 focus:ring-orange-600 focus:outline-none font-medium cursor-pointer"
                 >
                   {(group.required === false || !currentVal) && (
                     <option value="">--Select--</option>
@@ -265,7 +265,7 @@ export default function ProductOrderForm({
 
             <div className="p-3.5 sm:px-4 flex justify-between items-center bg-slate-50/60">
               <span className="font-bold text-slate-900">Amount Payable</span>
-              <span className="font-extrabold text-blue-600 text-sm">
+              <span className="font-extrabold text-orange-600 text-sm">
                 Rs. {applicableCost.toLocaleString()}/-
               </span>
             </div>
@@ -282,7 +282,7 @@ export default function ProductOrderForm({
             ? "bg-slate-300 text-slate-500 cursor-not-allowed"
             : addedSuccess
               ? "bg-emerald-600 text-white"
-              : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.99]"
+              : "bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.99]"
         }`}
       >
         {addedSuccess ? (
