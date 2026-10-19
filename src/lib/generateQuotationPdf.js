@@ -418,7 +418,7 @@ export function generateStandieQuotationPdf(data) {
     flexWidth = 3,
     flexArea = 12,
     isDoubleSided = true,
-    mediaName = "Normal Frontlit Flex",
+    mediaName = "Star Flex",
     flexRate = 25,
     flexCost = 600,
     ironRunningFt = 16,
@@ -788,26 +788,26 @@ export function generateStandieQuotationPdf(data) {
 }
 
 /**
- * Generate Quotation PDF for Roll-Up Standees (STD-002)
+ * Generate Quotation PDF for Roll-Up Standees (STD-001)
  */
 export function generateRollUpStandieQuotationPdf(data) {
   const {
-    machineWidth = 2.6,
+    machineWidth = 2.5,
     customHeight = 6,
-    totalAreaSqFt = 15.6,
+    totalAreaSqFt = 15.0,
     machineType = "standard",
     machineName = "Standard Aluminium Roll-Up Standee Machine Base",
     machineCost = 550,
     includeMachine = true,
     includeBanner = true,
-    mediaName = "Non-Tearable Matte Media (Anti-Curl)",
-    flexRate = 35,
-    flexCost = 546,
-    unitPrice = 1096,
+    mediaName = "Star Flex",
+    flexRate = 25,
+    flexCost = 375,
+    unitPrice = 925,
     quantity = 1,
-    grossSubtotal = 1096,
+    grossSubtotal = 925,
     validDiscount = 0,
-    totalAmount = 1096,
+    totalAmount = 925,
     clientInfo = {},
     productName = "Roll-Up Standee System (Hardware Machine + Custom Height Banner)",
   } = data;
@@ -927,7 +927,7 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85);
-  doc.text(`Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.6 ? '31.2"' : '43.2"'})`, rightColX + 8, cardY + 13);
+  doc.text(`Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.5 ? '30"' : '42"'})`, rightColX + 8, cardY + 13);
   doc.text(`Standee Display Size: ${machineWidth}ft (W) × ${customHeight}ft (H) (${totalAreaSqFt} Sq.Ft.)`, rightColX + 8, cardY + 18);
   doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`, rightColX + 8, cardY + 23);
 

@@ -10,26 +10,26 @@ import {
 } from "react-icons/fi";
 
 export default function RollUpStandiePreview({
-  machineWidth = 2.6,
+  machineWidth = 2.5,
   customHeight = 6,
   machineType = "standard", // "standard" | "luxury"
   includeMachine = true,
   includeBanner = true,
-  mediaName = "Non-Tearable Matte Media",
-  flexRate = 35,
+  mediaName = "Star Flex - High Gloss Finish",
+  flexRate = 25,
   machineCost = 550,
-  flexCost = 546,
-  totalAreaSqFt = 15.6,
-  totalPrice = 1096,
+  flexCost = 375,
+  totalAreaSqFt = 15.0,
+  totalPrice = 925,
 }) {
-  const numWidth = parseFloat(machineWidth) || 2.6;
-  const numHeight = Math.max(1, parseFloat(customHeight) || 6);
+  const numWidth = parseFloat(machineWidth) || 2.5;
+  const numHeight = Math.min(6, Math.max(1, parseFloat(customHeight) || 6));
 
   // Dynamic visual container proportions based on height and width
-  const aspectRatio = numWidth / numHeight; // typically 2.6 / 6 ≈ 0.43, or 3.6 / 6 = 0.6
+  const aspectRatio = numWidth / numHeight; // typically 2.5 / 6 ≈ 0.42, or 3.5 / 6 ≈ 0.58
   // Set width in pixels adapted to aspect ratio
   const visualBannerWidth = Math.round(
-    Math.max(170, Math.min(270, 190 * (numWidth / 2.6)))
+    Math.max(170, Math.min(270, 190 * (numWidth / 2.5)))
   );
   // Banner height clamped for preview box
   const visualBannerHeight = 290;
@@ -53,7 +53,7 @@ export default function RollUpStandiePreview({
             <span className="font-bold text-slate-100 flex items-center gap-1.5">
               Roll-Up Standee Visualizer
               <span className="px-1.5 py-0.2 bg-blue-500/30 text-blue-300 text-[9px] rounded font-mono font-semibold">
-                STD-002
+                STD-001
               </span>
             </span>
             <span className="text-[10px] text-slate-400 block font-mono">
@@ -279,7 +279,7 @@ export default function RollUpStandiePreview({
             <div className="h-2 w-0.5 bg-blue-500" />
             <div className="w-full border-t-2 border-dashed border-blue-500/60 relative flex items-center justify-center">
               <span className="bg-slate-900 px-2 py-0.5 rounded text-[9px] text-blue-400 font-black whitespace-nowrap shadow-xs border border-blue-500/30">
-                Fixed Width: {numWidth} Ft ({numWidth === 2.6 ? '31.2"' : '43.2"'})
+                Fixed Width: {numWidth} Ft ({numWidth === 2.5 ? '30"' : '42"'})
               </span>
             </div>
             <div className="h-2 w-0.5 bg-blue-500" />
@@ -287,25 +287,6 @@ export default function RollUpStandiePreview({
         </div>
       </div>
 
-      {/* Feature & Spec Pills */}
-      <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-800 text-[10px] text-slate-300">
-        <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-          <FiZap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span className="truncate">Spring Retraction</span>
-        </div>
-        <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-          <FiShield className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-          <span className="truncate">Anti-Curl Media</span>
-        </div>
-        <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-          <FiShoppingBag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span className="truncate">Carry Bag Included</span>
-        </div>
-        <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-          <FiPackage className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-          <span className="truncate">30-Sec Fast Setup</span>
-        </div>
-      </div>
 
       {/* Unit Price Summary Bar */}
       <div className="w-full mt-3 p-2.5 rounded-xl bg-gradient-to-r from-blue-950/40 via-slate-800/60 to-indigo-950/40 border border-blue-500/20 flex items-center justify-between">

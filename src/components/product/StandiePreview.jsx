@@ -9,7 +9,7 @@ export default function StandiePreview({
   flexWidth = 3,
   flexArea = 12,
   isDoubleSided = true,
-  mediaName = "Normal Frontlit Flex",
+  mediaName = "Star Flex",
   flexRate = 25,
   ironRunningFt = 16,
   ironRate = 35,

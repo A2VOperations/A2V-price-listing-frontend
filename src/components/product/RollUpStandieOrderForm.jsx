@@ -19,39 +19,11 @@ import { generateRollUpStandieQuotationPdf } from "@/lib/generateQuotationPdf";
 
 const ROLLUP_MEDIA_TYPES = [
   {
-    id: "non-tearable",
-    name: "Non-Tearable Matte Media (Anti-Curl)",
-    defaultRate: 35,
-    tag: "Recommended for Roll-Up",
-    description: "Premium synthetic PP banner with anti-curl edges. 1440 DPI photo-quality indoor/outdoor finish.",
-  },
-  {
     id: "star-flex",
-    name: "Star Flex - High Gloss Finish",
-    defaultRate: 28,
+    name: "Star Flex",
+    defaultRate: 25,
     tag: "High Gloss",
-    description: "Durable high-gloss flex with vivid color contrast and rich ink saturation.",
-  },
-  {
-    id: "normal-flex",
-    name: "Normal Frontlit Flex (Economy)",
-    defaultRate: 22,
-    tag: "Budget Friendly",
-    description: "Standard frontlit weather-resistant flex banner for short-term events and promotions.",
-  },
-  {
-    id: "blackout-flex",
-    name: "Blackout / Blockout Flex",
-    defaultRate: 40,
-    tag: "Zero Show-Through",
-    description: "Heavy blockout flex with dark interlayer preventing backlight penetration in bright areas.",
-  },
-  {
-    id: "custom-media",
-    name: "Custom Flex Media Rate",
-    defaultRate: 35,
-    tag: "Custom Rate",
-    description: "Manually specify the printing rate per square foot.",
+    description: "High durability glossy flex with vivid color contrast and rich ink saturation.",
   },
 ];
 
@@ -62,8 +34,8 @@ const MACHINE_OPTIONS = {
     tag: "Standard Base",
     description: "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
     defaultRates: {
-      2.6: 550,
-      3.6: 750,
+      2.5: 550,
+      3.5: 750,
     },
   },
   luxury: {
@@ -72,8 +44,8 @@ const MACHINE_OPTIONS = {
     tag: "Luxury Broad Base",
     description: "Heavy-duty teardrop wide-footprint cassette with chrome mirror endcaps, superior stability without swivel feet, and deluxe padded travel bag.",
     defaultRates: {
-      2.6: 1200,
-      3.6: 1500,
+      2.5: 1200,
+      3.5: 1500,
     },
   },
 };
@@ -84,8 +56,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Order mode: "complete" | "machine-only" | "banner-only"
   const [orderMode, setOrderMode] = useState("complete");
 
-  // Core Requirement: Fixed Machine & Flex Width: 2.6 ft or 3.6 ft
-  const [fixedWidth, setFixedWidth] = useState(2.6);
+  // Core Requirement: Fixed Machine & Flex Width: 2.5 ft or 3.5 ft
+  const [fixedWidth, setFixedWidth] = useState(2.5);
 
   // Core Requirement: Customizable Height in Feet (default: standard 6 ft)
   const [customHeight, setCustomHeight] = useState(6);
@@ -94,9 +66,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const [machineType, setMachineType] = useState("standard");
   const [customMachineRate, setCustomMachineRate] = useState(550);
 
-  // Flex Banner Media Configuration
-  const [selectedMediaId, setSelectedMediaId] = useState("non-tearable");
-  const [customFlexRate, setCustomFlexRate] = useState(35);
+  // Flex Banner Media Configuration (Star Flex @ ₹25/sqft)
+  const [selectedMediaId, setSelectedMediaId] = useState("star-flex");
+  const [customFlexRate, setCustomFlexRate] = useState(25);
 
   // Quantity & Discount
   const [quantity, setQuantity] = useState(1);
@@ -114,8 +86,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const includeBanner = orderMode === "complete" || orderMode === "banner-only";
 
   // Calculations
-  const validWidth = fixedWidth === 3.6 ? 3.6 : 2.6;
-  const validHeight = Math.max(1, parseFloat(customHeight) || 6);
+  const validWidth = fixedWidth === 3.5 ? 3.5 : 2.5;
+  const validHeight = Math.min(6, Math.max(1, parseFloat(customHeight) || 6));
 
   // Display Area in Square Feet = Fixed Width × Customizable Height
   const totalAreaSqFt = parseFloat((validWidth * validHeight).toFixed(2));
@@ -141,7 +113,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Handle Fixed Width change (updates machine default rate)
   const handleWidthChange = (newWidth) => {
     setFixedWidth(newWidth);
-    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3.6 ? 750 : 550);
+    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3.5 ? 750 : 550);
     setCustomMachineRate(newRate);
   };
 
@@ -162,8 +134,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Handle Add to Quote Cart
   const handleAddToQuote = () => {
     const quoteItem = {
-      productId: product?.id || "STD-002",
-      code: product?.code || "STD-002",
+      productId: product?.id || "STD-001",
+      code: product?.code || "STD-001",
       name: `Roll-Up Standee (${validWidth}×${validHeight} Ft, ${
         includeMachine && includeBanner
           ? "Machine + Banner"
@@ -179,7 +151,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
       discount: validDiscount,
       total: netAmountPayable,
       specifications: {
-        "Fixed Machine Width": `${validWidth} Ft (${validWidth === 2.6 ? '31.2"' : '43.2"'})`,
+        "Fixed Machine Width": `${validWidth} Ft (${validWidth === 2.5 ? '30"' : '42"'})`,
         "Custom Standee Height": `${validHeight} Ft (${Math.round(validHeight * 12)}")`,
         "Total Banner Area": `${totalAreaSqFt} Sq.Ft.`,
         "Roll-Up Standee Machine": includeMachine
@@ -240,7 +212,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold uppercase tracking-wider font-mono">
-                Code: #{product?.code || "STD-002"}
+                Code: #{product?.code || "STD-001"}
               </span>
               <span className="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold">
                 SUBCATEGORY: STANDIE
@@ -256,7 +228,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
             Roll-Up Standee Machine & Banner System
           </h1>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Professional aluminium roll-up standee with fixed width base (<strong>2.6 Ft</strong> or <strong>3.6 Ft</strong>), customizable display height, heavy-duty spring roller mechanism, 1440 DPI anti-curl banner printing, and padded shoulder travel bag.
+            Professional aluminium roll-up standee with fixed width base (<strong>2.5 Ft</strong> or <strong>3.5 Ft</strong>), customizable display height, heavy-duty spring roller mechanism, 1440 DPI anti-curl banner printing, and padded shoulder travel bag.
           </p>
 
           {/* Quick Order Mode Selector */}
@@ -319,11 +291,11 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Option A: 2.6 Ft Fixed Width */}
+            {/* Option A: 2.5 Ft Fixed Width */}
             <div
-              onClick={() => handleWidthChange(2.6)}
+              onClick={() => handleWidthChange(2.5)}
               className={`cursor-pointer rounded-xl p-4 border-2 transition-all relative ${
-                fixedWidth === 2.6
+                fixedWidth === 2.5
                   ? "border-blue-600 bg-blue-50/40 shadow-sm ring-2 ring-blue-500/20"
                   : "border-slate-200 hover:border-slate-300 bg-white"
               }`}
@@ -334,34 +306,34 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                     Most Popular
                   </span>
                   <h3 className="text-lg font-black text-slate-900">
-                    2.6 Ft Machine Base
+                    2.5 Ft Machine Base
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Width: <strong>2.6 Ft (31.2 Inches / 79 cm)</strong>
+                    Width: <strong>2.5 Ft (30 Inches / 76 cm)</strong>
                   </p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    fixedWidth === 2.6
+                    fixedWidth === 2.5
                       ? "border-blue-600 bg-blue-600 text-white"
                       : "border-slate-300"
                   }`}
                 >
-                  {fixedWidth === 2.6 && <FiCheckCircle className="w-3.5 h-3.5" />}
+                  {fixedWidth === 2.5 && <FiCheckCircle className="w-3.5 h-3.5" />}
                 </div>
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs">
                 <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                <span className="font-bold text-slate-800 font-mono">Fixed 2.6 Ft</span>
+                <span className="font-bold text-slate-800 font-mono">Fixed 2.5 Ft</span>
               </div>
             </div>
 
-            {/* Option B: 3.6 Ft Fixed Width */}
+            {/* Option B: 3.5 Ft Fixed Width */}
             <div
-              onClick={() => handleWidthChange(3.6)}
+              onClick={() => handleWidthChange(3.5)}
               className={`cursor-pointer rounded-xl p-4 border-2 transition-all relative ${
-                fixedWidth === 3.6
+                fixedWidth === 3.5
                   ? "border-blue-600 bg-blue-50/40 shadow-sm ring-2 ring-blue-500/20"
                   : "border-slate-200 hover:border-slate-300 bg-white"
               }`}
@@ -372,26 +344,26 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                     Wide Display
                   </span>
                   <h3 className="text-lg font-black text-slate-900">
-                    3.6 Ft Machine Base
+                    3.5 Ft Machine Base
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Width: <strong>3.6 Ft (43.2 Inches / 110 cm)</strong>
+                    Width: <strong>3.5 Ft (42 Inches / 106 cm)</strong>
                   </p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    fixedWidth === 3.6
+                    fixedWidth === 3.5
                       ? "border-blue-600 bg-blue-600 text-white"
                       : "border-slate-300"
                   }`}
                 >
-                  {fixedWidth === 3.6 && <FiCheckCircle className="w-3.5 h-3.5" />}
+                  {fixedWidth === 3.5 && <FiCheckCircle className="w-3.5 h-3.5" />}
                 </div>
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs">
                 <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                <span className="font-bold text-slate-800 font-mono">Fixed 3.6 Ft</span>
+                <span className="font-bold text-slate-800 font-mono">Fixed 3.5 Ft</span>
               </div>
             </div>
           </div>
@@ -409,13 +381,13 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               </h2>
             </div>
             <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-              Height is Fully Customizable
+              Customizable (Max 6 Ft)
             </span>
           </div>
 
           <div className="space-y-3">
             <label className="text-xs font-bold text-slate-700 block">
-              Enter Custom Height (in Feet):
+              Enter Custom Height (in Feet, up to 6 Ft):
             </label>
 
             <div className="flex items-center gap-3">
@@ -423,12 +395,24 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 <input
                   type="number"
                   step="0.5"
-                  min="2"
-                  max="10"
+                  min="1"
+                  max="6"
                   value={customHeight}
-                  onChange={(e) => setCustomHeight(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || parseFloat(val) <= 6) {
+                      setCustomHeight(val);
+                    } else {
+                      setCustomHeight(6);
+                    }
+                  }}
+                  onBlur={() => {
+                    const val = parseFloat(customHeight);
+                    if (!val || val < 1) setCustomHeight(3);
+                    else if (val > 6) setCustomHeight(6);
+                  }}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-bold text-slate-900 text-base font-mono outline-hidden"
-                  placeholder="e.g. 6"
+                  placeholder="e.g. 6 (Max 6 Ft)"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
                   Feet ({Math.round(validHeight * 12)}")
@@ -439,14 +423,14 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               <div className="flex gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setCustomHeight((prev) => Math.max(2, (parseFloat(prev) || 6) - 0.5))}
+                  onClick={() => setCustomHeight((prev) => Math.max(1, (parseFloat(prev) || 6) - 0.5))}
                   className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-lg flex items-center justify-center transition-colors"
                 >
                   -
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCustomHeight((prev) => Math.min(10, (parseFloat(prev) || 6) + 0.5))}
+                  onClick={() => setCustomHeight((prev) => Math.min(6, (parseFloat(prev) || 6) + 0.5))}
                   className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-lg flex items-center justify-center transition-colors"
                 >
                   +
@@ -460,7 +444,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 Quick Height Presets:
               </span>
               <div className="flex flex-wrap gap-2">
-                {[5, 5.5, 6, 6.5, 7, 8].map((h) => (
+                {[3, 5, 6].map((h) => (
                   <button
                     key={h}
                     type="button"
@@ -471,7 +455,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                         : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
-                    {h} Ft {h === 6 ? "(Standard)" : ""}
+                    {h} Ft {h === 6 ? "(Max / Standard)" : ""}
                   </button>
                 ))}
               </div>
@@ -495,8 +479,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
           </div>
         </div>
 
-        {/* STEP 3: ROLL-UP STANDIE MACHINE HARDWARE (When Machine is Included) */}
-        {includeMachine && (
+        {/* STEP 3: FLEX PRINTING MEDIA (Star Flex @ ₹25/sqft) */}
+        {includeBanner && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2">
@@ -504,171 +488,53 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                   3
                 </span>
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Roll-Up Standee Machine Hardware
-                </h2>
-              </div>
-              <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                Base Cassette & Bag
-              </span>
-            </div>
-
-            {/* Machine Type Selection Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {Object.values(MACHINE_OPTIONS).map((opt) => {
-                const isSelected = machineType === opt.id;
-                const defaultPrice = opt.defaultRates[validWidth];
-                return (
-                  <div
-                    key={opt.id}
-                    onClick={() => handleMachineTypeChange(opt.id)}
-                    className={`cursor-pointer rounded-xl p-3.5 border-2 transition-all relative ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50/30 ring-2 ring-blue-500/10 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
-                          {opt.tag}
-                        </span>
-                        <h4 className="text-xs font-bold text-slate-900 mt-1">
-                          {opt.name}
-                        </h4>
-                      </div>
-                      <span className="text-xs font-black text-blue-600 font-mono">
-                        ₹{defaultPrice}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-2 leading-tight">
-                      {opt.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Machine Cost Custom Adjustment */}
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
-              <span className="text-xs font-semibold text-slate-600">
-                Machine Hardware Price ({validWidth} Ft Base):
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">₹</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={customMachineRate}
-                  onChange={(e) => setCustomMachineRate(e.target.value)}
-                  className="w-28 px-3 py-1.5 rounded-lg border border-slate-300 font-bold text-slate-900 text-sm font-mono text-right focus:border-blue-500 focus:ring-1 focus:ring-blue-100 outline-hidden"
-                />
-                <span className="text-xs text-slate-500">per machine</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 4: FLEX PRINTING MEDIA (Inside the Machine) */}
-        {includeBanner && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-                  {includeMachine ? "4" : "3"}
-                </span>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
                   Flex Banner Printing Inside Machine
                 </h2>
               </div>
-              <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                Width: {validWidth} Ft Fixed • Height: {validHeight} Ft
+              <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                Star Flex @ ₹25/Sq.Ft.
               </span>
             </div>
 
-            {/* Media Selector Radio Cards */}
-            <div className="space-y-2.5">
-              {ROLLUP_MEDIA_TYPES.map((media) => {
-                const isSelected = selectedMediaId === media.id;
-                return (
-                  <div
-                    key={media.id}
-                    onClick={() => handleMediaChange(media)}
-                    className={`cursor-pointer rounded-xl p-3 border-2 transition-all flex items-center justify-between ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50/40 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          isSelected
-                            ? "border-blue-600 bg-blue-600 text-white"
-                            : "border-slate-300"
-                        }`}
-                      >
-                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-900">
-                            {media.name}
-                          </span>
-                          <span className="text-[9.5px] font-semibold px-2 py-0.2 rounded-full bg-slate-100 text-slate-600">
-                            {media.tag}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          {media.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="text-right shrink-0 ml-3">
-                      <span className="text-xs font-extrabold text-blue-700 font-mono">
-                        ₹{media.defaultRate}/sqft
-                      </span>
-                    </div>
+            <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
+                  <FiCheckCircle className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Star Flex - High Gloss Finish
+                    </h3>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                      ₹25 / Sq.Ft.
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Custom Flex Rate Field & Cost Calculation */}
-            <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-600">
-                  Flex Rate per Sq.Ft.:
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-slate-400">₹</span>
-                  <input
-                    type="number"
-                    min="1"
-                    value={customFlexRate}
-                    onChange={(e) => setCustomFlexRate(e.target.value)}
-                    className="w-20 px-2.5 py-1 rounded-lg border border-slate-300 font-bold text-slate-900 text-xs font-mono text-right focus:border-blue-500 outline-hidden"
-                  />
-                  <span className="text-xs text-slate-400">/sqft</span>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Fixed {validWidth} Ft (W) × {validHeight} Ft (H) = <strong className="text-slate-800 font-mono">{totalAreaSqFt} Sq.Ft.</strong> (Durable high-gloss finish with vivid colors)
+                  </p>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="text-xs text-slate-500">Banner Print Total: </span>
-                <span className="text-xs font-black text-slate-900 font-mono">
-                  {totalAreaSqFt} sqft × ₹{validFlexRate} = ₹{bannerUnitCost}
+              <div className="text-right sm:border-l sm:border-blue-200 sm:pl-5 shrink-0">
+                <span className="text-xs text-slate-500 block">Banner Total:</span>
+                <span className="text-lg font-black text-blue-700 font-mono block">
+                  ₹{bannerUnitCost}
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {totalAreaSqFt} sqft × ₹{validFlexRate}
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 5: QUANTITY & DISCOUNT */}
+        {/* STEP 4: QUANTITY & DISCOUNT */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center space-x-2">
               <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-                {includeMachine && includeBanner ? "5" : "4"}
+                4
               </span>
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
                 Quantity & Pricing Adjustment

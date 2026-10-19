@@ -18,38 +18,16 @@ import { generateStandieQuotationPdf } from "@/lib/generateQuotationPdf";
 
 const FLEX_MEDIA_TYPES = [
   {
-    id: "normal-flex",
-    name: "Normal Frontlit Flex (Standard)",
-    defaultRate: 25,
-    tag: "Default Choice",
-    description: "Standard frontlit weather-resistant flex banner, vibrant colors for outdoor/indoor display.",
-  },
-  {
     id: "star-flex",
     name: "Star Flex - High Gloss Finish",
-    defaultRate: 35,
-    tag: "Premium Gloss",
-    description: "High durability glossy flex with vivid color contrast and rich ink saturation.",
-  },
-  {
-    id: "blackout-flex",
-    name: "Blackout / Blockout Flex",
-    defaultRate: 45,
-    tag: "Zero Show-Through",
-    description: "Heavy blockout flex preventing back light penetration, ideal for bright sunny outdoors.",
-  },
-  {
-    id: "custom-flex",
-    name: "Custom Flex Media Rate",
     defaultRate: 25,
-    tag: "Custom Rate",
-    description: "Manually specify flex substrate rate per sq. ft.",
+    tag: "High Gloss",
+    description: "High durability glossy Star Flex with vivid color contrast and rich ink saturation.",
   },
 ];
 
 export default function StandieOrderForm({ product, onVariantSelect }) {
   const { addToQuote } = useQuote();
-
 
   // Core Dimensions (Feet)
   const [standeeHeight, setStandeeHeight] = useState(5);
@@ -57,7 +35,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const [legClearance, setLegClearance] = useState(1);
 
   // Flex Printing Configurations
-  const [selectedMediaId, setSelectedMediaId] = useState("normal-flex");
+  const [selectedMediaId, setSelectedMediaId] = useState("star-flex");
   const [flexRatePerSqFt, setFlexRatePerSqFt] = useState(25);
   const [isDoubleSided, setIsDoubleSided] = useState(true);
 
@@ -136,8 +114,8 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   // Add to Quote Cart
   const handleAddToQuote = () => {
     const quoteItem = {
-      productId: product?.id || "STD-001",
-      code: product?.code || "STD-001",
+      productId: product?.id || "STD-002",
+      code: product?.code || "STD-002",
       name: `Iron Frame Standee (${validWidth}×${validHeight} Ft, ${isDoubleSided ? "Double-Sided" : "Single-Sided"})`,
       categoryId: "flex-board",
       subCategory: "STANDIE",
@@ -214,7 +192,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 uppercase tracking-wide">
               Iron Frame Standee Configurator
             </span>
-            <span className="text-xs text-slate-400 font-mono">#{product?.code || "STD-001"}</span>
+            <span className="text-xs text-slate-400 font-mono">#{product?.code || "STD-002"}</span>
           </div>
           <h2 className="text-xl font-black text-slate-900 mt-1">
             Iron Frame Standee &amp; Flex Display Calculator
@@ -520,60 +498,35 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               </button>
             </div>
 
-            {/* Media Substrate Choices */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              {FLEX_MEDIA_TYPES.map((media) => {
-                const isSelected = selectedMediaId === media.id;
-                return (
-                  <button
-                    key={media.id}
-                    type="button"
-                    onClick={() => handleMediaChange(media)}
-                    className={`p-3 rounded-xl text-left border transition-all flex flex-col justify-between ${
-                      isSelected
-                        ? "border-orange-500 bg-orange-50/50 ring-2 ring-orange-500/20 shadow-xs"
-                        : "border-slate-200 bg-white hover:bg-slate-50"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900">{media.name}</span>
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700">
-                          {media.tag}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{media.description}</p>
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="text-[11px] text-slate-600 font-semibold">
-                        Default ₹{media.defaultRate} / sqft
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Star Flex Dedicated Card with Editable Rate */}
+            <div className="p-4 rounded-xl border-2 border-orange-500 bg-orange-50/40 ring-2 ring-orange-500/20 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-slate-900">Star Flex - High Gloss Finish</span>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-200">
+                      High Gloss Flex
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    High durability glossy Star Flex with vivid color contrast and rich ink saturation.
+                  </p>
+                </div>
 
-            {/* Customizable Flex Price per sq ft */}
-            <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-200">
-              <div>
-                <span className="text-xs font-bold text-slate-800 block">
-                  Custom Flex Media Rate per sq. ft.:
-                </span>
-                <span className="text-[10px] text-slate-500">
-                  Default is ₹25 (automatically multiplied by {sidesMultiplier} for {isDoubleSided ? "both sides" : "single side"})
-                </span>
-              </div>
-              <div className="relative w-36 shrink-0">
-                <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">₹</span>
-                <input
-                  type="number"
-                  min="1"
-                  value={flexRatePerSqFt}
-                  onChange={(e) => setFlexRatePerSqFt(e.target.value)}
-                  className="w-full pl-6 pr-2 py-1 text-xs font-extrabold bg-white border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
-                />
-                <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">/sqft</span>
+                <div className="flex items-center gap-2.5 shrink-0 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-xs">
+                  <span className="text-xs font-bold text-slate-700 whitespace-nowrap">Star Flex Rate:</span>
+                  <div className="relative w-28">
+                    <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">₹</span>
+                    <input
+                      type="number"
+                      min="1"
+                      value={flexRatePerSqFt}
+                      onChange={(e) => setFlexRatePerSqFt(e.target.value)}
+                      className="w-full pl-6 pr-2 py-1 text-xs font-black bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    />
+                    <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">/sqft</span>
+                  </div>
+                </div>
               </div>
             </div>
 

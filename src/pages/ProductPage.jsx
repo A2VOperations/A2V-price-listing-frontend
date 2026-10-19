@@ -109,10 +109,9 @@ export default function ProductPage() {
   }
 
   const isRollUpStandie =
-    product.id === "STD-002" ||
-    product.id === "STD-001" ||
     product.isRollUpStandie ||
-    product.slug?.includes("rollup");
+    product.slug?.includes("rollup") ||
+    (product.id === "STD-001" && !product.isIronStandie);
 
   if (isRollUpStandie) {
     return (

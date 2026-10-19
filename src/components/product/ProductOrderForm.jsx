@@ -13,15 +13,15 @@ export default function ProductOrderForm({
   onVariantSelect,
 }) {
   if (
-    product?.id === "STD-002" ||
-    product?.id === "STD-001" ||
     product?.isRollUpStandie ||
-    product?.slug?.includes("rollup")
+    product?.slug?.includes("rollup") ||
+    (product?.id === "STD-001" && !product?.isIronStandie)
   ) {
     return <RollUpStandieOrderForm product={product} onVariantSelect={onVariantSelect} />;
   }
 
   if (
+    product?.id === "STD-002" ||
     product?.isStandie ||
     product?.subCategory?.toUpperCase().includes("STANDIE") ||
     product?.slug?.includes("standie")

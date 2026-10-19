@@ -1,12 +1,13 @@
 [
   {
+    "_id": "6a8d3f3e181ae861f1c381b6",
     "id": "AP-001",
     "code": "ATM",
     "categoryId": "atm-pouches",
     "subCategory": "ATM CARD SLEEVES & POUCHES",
     "name": "ATM Pouch",
     "slug": "atm-pouch",
-    "image": "/src/assets/images/categories (3).webp",
+    "image": "/uploads/upload-1788158044637-866736704.jpg",
     "description": "Branded custom printed ATM card sleeve pouches crafted from 210 GSM Art Paper with Smooth Matte & Gloss lamination finishes. Ideal for banking, card holders, and corporate branding applications.",
     "minQuantity": 1000,
     "quantityStep": 1000,
@@ -217,9 +218,17 @@
       "safeArea": "W: 74.00 mm X H: 46.00 mm",
       "finalSize": "W: 88.00 mm X H: 57.00 mm",
       "bleed": "3 mm"
-    }
+    },
+    "options": [],
+    "quantityPricingTiers": [],
+    "updatedAt": "2026-08-31T07:58:43.055Z",
+    "images": [
+      "/uploads/upload-1788158044637-866736704.jpg",
+      "https://res.cloudinary.com/dwbgco82p/image/upload/v1788163119/a2v_price_listing/s4odblx9j31gagt0xasr.png"
+    ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b7",
     "id": "BB-001",
     "code": "BB-1",
     "categoryId": "bill-books",
@@ -595,9 +604,15 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "quantityPricingTiers": [],
+    "updatedAt": "2026-08-31T07:40:18.963Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b8",
     "id": "CH-001",
     "code": "CH-001",
     "categoryId": "card-holders",
@@ -673,6 +688,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381b9",
     "id": "CH-002",
     "code": "CH-002",
     "categoryId": "card-holders",
@@ -748,6 +764,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ba",
     "id": "DPP-001",
     "code": "DPP-LH",
     "categoryId": "digital-paper-printing",
@@ -918,6 +935,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bb",
     "id": "DPP-002",
     "code": "DPP-ART",
     "categoryId": "digital-paper-printing",
@@ -1418,6 +1436,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bc",
     "id": "DPP-003",
     "code": "DPP-TEXTURE",
     "categoryId": "digital-paper-printing",
@@ -1901,6 +1920,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bd",
     "id": "DPP-004",
     "code": "DPP-METALLIC",
     "categoryId": "digital-paper-printing",
@@ -1984,6 +2004,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381be",
     "id": "DPP-005",
     "code": "DPP-NT-PVC",
     "categoryId": "digital-paper-printing",
@@ -2125,6 +2146,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381bf",
     "id": "DPP-006",
     "code": "DPP-PAPER-GUM",
     "categoryId": "digital-paper-printing",
@@ -2256,6 +2278,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c0",
     "id": "DPP-007",
     "code": "DPP-PVC-GUM",
     "categoryId": "digital-paper-printing",
@@ -2593,6 +2616,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c1",
     "id": "DPP-008",
     "code": "DPP-PRINT-ONLY",
     "categoryId": "digital-paper-printing",
@@ -2676,6 +2700,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c2",
     "id": "ENV-001",
     "code": "EN-1",
     "categoryId": "envelopes",
@@ -2823,6 +2848,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c3",
     "id": "ENV-002",
     "code": "EN-3",
     "categoryId": "envelopes",
@@ -2968,6 +2994,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c4",
     "id": "ENV-003",
     "code": "EN-2",
     "categoryId": "envelopes",
@@ -3105,6 +3132,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c5",
     "id": "ENV-004",
     "code": "EN-4",
     "categoryId": "envelopes",
@@ -3231,6 +3259,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c6",
     "id": "ENV-005",
     "code": "EN-5",
     "categoryId": "envelopes",
@@ -3350,6 +3379,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c7",
     "id": "ENV-006",
     "code": "EN-6",
     "categoryId": "envelopes",
@@ -3487,6 +3517,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c8",
     "id": "ENV-007",
     "code": "EN-7",
     "categoryId": "envelopes",
@@ -3632,6 +3663,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381c9",
     "id": "FL-001",
     "code": "FL-001",
     "categoryId": "files",
@@ -3774,6 +3806,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ca",
     "id": "FL-002",
     "code": "FL-002",
     "categoryId": "files",
@@ -3964,6 +3997,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cb",
     "id": "FL-003",
     "code": "FL-003",
     "categoryId": "files",
@@ -4103,6 +4137,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cc",
     "id": "FL-004",
     "code": "FL-004",
     "categoryId": "files",
@@ -4286,6 +4321,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cd",
     "id": "FL-005",
     "code": "FL-005",
     "categoryId": "files",
@@ -4381,6 +4417,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ce",
     "id": "FB-001",
     "code": "FB-001",
     "categoryId": "flex-board",
@@ -4444,172 +4481,96 @@
     ]
   },
   {
-    "_id": "6ad201bd3234a1276a4d6c46",
+    "_id": "6ad201bd3234a1276a4d6c47",
     "id": "STD-001",
     "code": "STD-001",
     "categoryId": "flex-board",
     "subCategory": "STANDIE",
-    "name": "Aluminium Roll-Up Standee (Machine + Banner)",
+    "name": "Roll-Up Standee (Machine + Custom Height Banner)",
     "slug": "rollup-standie",
     "isRollUpStandie": true,
     "isStandie": true,
     "image": "/products/standie/rollup-standie.jpg",
-    "standeeSize": "6 × 2.5 Ft",
-    "standType": "Aluminium Roll-Up Standee Machine with Spring Cassette & Carry Bag",
+    "standeeSize": "Custom Height × 2.5 / 3.5 Ft Fixed Width",
+    "standType": "Aluminium Roll-Up Standee Machine Base (2.5 & 3.5 Ft) with Custom Height Banner",
     "widthFt": 2.5,
     "heightFt": 6,
-    "basePrice": 1075,
-    "description": "Portable Aluminium Roll-Up Standee with spring cassette roll-up machine, 3-section support pole, snap hanger profile, premium anti-curl non-tearable synthetic banner printing (15 sqft @ ₹35 = ₹525), and padded carry bag. Standard machine ₹550 + print ₹525 = ₹1,075.",
-    "minQuantity": 1,
-    "quantityStep": 1,
-    "unitName": "Standee(s)",
-    "productionTime": "24-48 Hours",
-    "variantCombinations": [
-      "6 × 2.5 Ft Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,075",
-      "6 × 3 Ft Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,280",
-      "6 × 4 Ft Jumbo Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,690",
-      "6 × 2.5 Ft Luxury Broad Base Roll-Up Standee (Heavy Teardrop) - ₹1,725",
-      "6 × 2.5 Ft Roll-Up Standee (Machine + Star Flex Print) - ₹925"
-    ],
-    "variantDetails": {
-      "6 × 2.5 Ft Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,075": {
-        "code": "STD-101",
-        "basePrice": 1075,
-        "mediaType": "Non-Tearable Matte Media",
-        "description": "Standard 6×2.5ft Aluminium Roll-Up Machine (₹550) + 15 sqft Non-Tearable anti-curl print (₹525) @ ₹1,075"
-      },
-      "6 × 3 Ft Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,280": {
-        "code": "STD-102",
-        "basePrice": 1280,
-        "mediaType": "Non-Tearable Matte Media",
-        "description": "Wide 6×3ft Aluminium Roll-Up Machine (₹650) + 18 sqft Non-Tearable print (₹630) @ ₹1,280"
-      },
-      "6 × 4 Ft Jumbo Roll-Up Standee (Machine + Non-Tearable Print) - ₹1,690": {
-        "code": "STD-103",
-        "basePrice": 1690,
-        "mediaType": "Non-Tearable Matte Media",
-        "description": "Jumbo 6×4ft Aluminium Roll-Up Machine (₹850) + 24 sqft Non-Tearable print (₹840) @ ₹1,690"
-      },
-      "6 × 2.5 Ft Luxury Broad Base Roll-Up Standee (Heavy Teardrop) - ₹1,725": {
-        "code": "STD-104",
-        "basePrice": 1725,
-        "mediaType": "Non-Tearable Matte Media",
-        "description": "Luxury Broad Base Teardrop Machine (₹1,200) + 15 sqft Non-Tearable print (₹525) @ ₹1,725"
-      },
-      "6 × 2.5 Ft Roll-Up Standee (Machine + Star Flex Print) - ₹925": {
-        "code": "STD-105",
-        "basePrice": 925,
-        "mediaType": "Star Flex",
-        "description": "Standard 6×2.5ft Aluminium Machine (₹550) + 15 sqft Star Flex print (₹375) @ ₹925"
-      }
-    },
-    "specifications": {
-      "Product Category": "Aluminium Roll-Up Standee Display",
-      "Standard Standee Size": "6 × 2.5 Ft (72\" H × 30\" W / 15 Sq.Ft)",
-      "Roll-Up Standee Machine": "Aluminium spring roller cassette base with twin swivel feet",
-      "Support System": "3-Section foldable bungee rear support pole & top aluminium snap profile",
-      "Carry Bag": "Protective padded zippered canvas carry bag included complimentary",
-      "Printing Media": "Non-Tearable Matte Synthetic PP / Star Flex (1440 DPI HD print)",
-      "Turnaround Time": "24 to 48 Hours"
-    },
-    "ourSpecialization": [
-      "High-tension internal spring roller retraction mechanism",
-      "Anti-curling non-tearable synthetic media prevents edge rolls",
-      "Lightweight portable aluminium alloy body with padded shoulder travel bag",
-      "Fast 30-second setup for exhibitions, trade shows, retail stores, and events"
-    ]
-  },
-  {
-    "_id": "6ad201bd3234a1276a4d6c47",
-    "id": "STD-002",
-    "code": "STD-002",
-    "categoryId": "flex-board",
-    "subCategory": "STANDIE",
-    "name": "Roll-Up Standee (Machine + Custom Height Banner)",
-    "slug": "rollup-standie-machine",
-    "isRollUpStandie": true,
-    "isStandie": true,
-    "image": "/products/standie/rollup-standie.jpg",
-    "standeeSize": "Custom Height × 2.6 / 3.6 Ft Fixed Width",
-    "standType": "Aluminium Roll-Up Standee Machine Base (2.6 & 3.6 Ft) with Custom Height Banner",
-    "widthFt": 2.6,
-    "heightFt": 6,
-    "fixedWidths": [2.6, 3.6],
+    "fixedWidths": [2.5, 3.5],
     "basePrice": 550,
-    "description": "Roll-Up Standee system featuring fixed width base machines in 2.6 Ft (31\") and 3.6 Ft (43\") with matching fixed flex banner width and customizable height. Includes high-tension spring cassette, 3-section support pole, top snap rail, anti-curl 1440 DPI media, and padded travel bag. Standard 2.6 ft machine @ ₹550.",
+    "description": "Roll-Up Standee system featuring fixed width base machines in 2.5 Ft (30\") and 3.5 Ft (42\") with matching fixed flex banner width and customizable height (up to 6 Ft). Includes high-tension spring cassette, 3-section support pole, top snap rail, Star Flex printing @ ₹25/sqft, and padded travel bag. Standard 2.5 ft machine @ ₹550.",
     "minQuantity": 1,
     "quantityStep": 1,
     "unitName": "Standee(s)",
     "productionTime": "Same Day / Ready Stock",
     "variantCombinations": [
-      "2.6 Ft Standard Roll-Up Machine + Banner (Custom Height) - ₹1,096",
-      "3.6 Ft Standard Roll-Up Machine + Banner (Custom Height) - ₹1,506",
-      "2.6 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,746",
-      "3.6 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,256",
-      "2.6 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹550",
-      "3.6 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹750"
+      "2.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹925",
+      "3.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,275",
+      "2.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,575",
+      "3.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,025",
+      "2.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹550",
+      "3.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹750"
     ],
     "variantDetails": {
-      "2.6 Ft Standard Roll-Up Machine + Banner (Custom Height) - ₹1,096": {
-        "code": "STDM-101",
-        "basePrice": 1096,
-        "widthFt": 2.6,
-        "description": "2.6 Ft fixed width standard roll-up machine (₹550) + 15.6 sqft anti-curl banner (₹546) @ ₹1,096"
+      "2.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹925": {
+        "code": "STD-101",
+        "basePrice": 925,
+        "widthFt": 2.5,
+        "description": "2.5 Ft fixed width standard roll-up machine (₹550) + 15 sqft Star Flex banner (₹375) @ ₹925"
       },
-      "3.6 Ft Standard Roll-Up Machine + Banner (Custom Height) - ₹1,506": {
-        "code": "STDM-102",
-        "basePrice": 1506,
-        "widthFt": 3.6,
-        "description": "3.6 Ft wide fixed width standard roll-up machine (₹750) + 21.6 sqft anti-curl banner (₹756) @ ₹1,506"
+      "3.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,275": {
+        "code": "STD-102",
+        "basePrice": 1275,
+        "widthFt": 3.5,
+        "description": "3.5 Ft wide fixed width standard roll-up machine (₹750) + 21 sqft Star Flex banner (₹525) @ ₹1,275"
       },
-      "2.6 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,746": {
-        "code": "STDM-103",
-        "basePrice": 1746,
-        "widthFt": 2.6,
-        "description": "Luxury teardrop broad base 2.6 ft machine (₹1,200) + 15.6 sqft anti-curl banner (₹546) @ ₹1,746"
+      "2.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,575": {
+        "code": "STD-103",
+        "basePrice": 1575,
+        "widthFt": 2.5,
+        "description": "Luxury teardrop broad base 2.5 ft machine (₹1,200) + 15 sqft Star Flex banner (₹375) @ ₹1,575"
       },
-      "3.6 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,256": {
-        "code": "STDM-104",
-        "basePrice": 2256,
-        "widthFt": 3.6,
-        "description": "Luxury teardrop broad base 3.6 ft machine (₹1,500) + 21.6 sqft anti-curl banner (₹756) @ ₹2,256"
+      "3.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,025": {
+        "code": "STD-104",
+        "basePrice": 2025,
+        "widthFt": 3.5,
+        "description": "Luxury teardrop broad base 3.5 ft machine (₹1,500) + 21 sqft Star Flex banner (₹525) @ ₹2,025"
       },
-      "2.6 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹550": {
-        "code": "STDM-105",
+      "2.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹550": {
+        "code": "STD-105",
         "basePrice": 550,
-        "widthFt": 2.6,
-        "description": "2.6 Ft standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹550"
+        "widthFt": 2.5,
+        "description": "2.5 Ft standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹550"
       },
-      "3.6 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹750": {
-        "code": "STDM-106",
+      "3.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹750": {
+        "code": "STD-106",
         "basePrice": 750,
-        "widthFt": 3.6,
-        "description": "3.6 Ft wide standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹750"
+        "widthFt": 3.5,
+        "description": "3.5 Ft wide standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹750"
       }
     },
     "specifications": {
       "Product Category": "Aluminium Roll-Up Standee Machine & Banner System",
-      "Fixed Machine Widths": "2.6 Ft (31.2\") and 3.6 Ft (43.2\")",
-      "Flex Banner Width": "Fixed 2.6 Ft or 3.6 Ft (Matches Machine)",
-      "Display Height": "Customizable (Standard 6 Ft / 5 to 10 Ft)",
+      "Fixed Machine Widths": "2.5 Ft (30\") and 3.5 Ft (42\")",
+      "Flex Banner Width": "Fixed 2.5 Ft or 3.5 Ft (Matches Machine)",
+      "Display Height": "Customizable up to 6 Ft (Quick Presets: 3 Ft, 5 Ft, 6 Ft)",
       "Cassette Body": "Anodized aluminium alloy with internal spring tension cartridge",
       "Support Pole": "3-piece bungee corded vertical aluminium support pole",
       "Top Rail": "Aluminium snap profile hanger with clip hook",
       "Carry Bag": "Heavy-duty padded nylon carry bag with shoulder strap included",
-      "Banner Printing": "Anti-Curl Non-Tearable Matte Synthetic PP / Star Flex (1440 DPI HD)"
+      "Banner Printing": "Star Flex High Gloss (1440 DPI HD print @ ₹25/sqft)"
     },
     "ourSpecialization": [
-      "Fixed 2.6 Ft and 3.6 Ft width aluminium roll-up machine cassettes with matching fixed width flex",
+      "Fixed 2.5 Ft and 3.5 Ft width aluminium roll-up machine cassettes with matching fixed width flex",
       "Fully customizable display height for conferences, retail stores, backdrops, and exhibitions",
       "High-tension internal spring roller retraction mechanism ensures effortless banner pull-up",
-      "Anti-curling non-tearable synthetic media prevents side curl and wrinkling over time",
+      "High durability glossy Star Flex media ensures vibrant visuals",
       "Complete with protective padded zippered shoulder travel bag"
     ]
   },
   {
     "_id": "6ad201bd3234a1276a4d6c48",
-    "id": "STD-003",
-    "code": "STD-003",
+    "id": "STD-002",
+    "code": "STD-002",
     "categoryId": "flex-board",
     "subCategory": "STANDIE",
     "name": "Iron Frame Standee & Flex Display Calculator",
@@ -4622,45 +4583,45 @@
     "widthFt": 3,
     "heightFt": 5,
     "basePrice": 1580,
-    "description": "Double-sided Iron Frame Standee display calculator: customizable total height & width, 1 ft stand legs, MS iron rod running feet (5+5+3+3 = 16 ft @ ₹35 = ₹560), angle base stand (2 ft @ ₹50 = ₹100), 4x corner support stays (4 @ ₹80 = ₹320), and double-sided flex printing (12 sqft × 2 @ ₹25 = ₹600). Total ₹1,580.",
+    "description": "Double-sided Iron Frame Standee display calculator: customizable total height & width, 1 ft stand legs, MS iron rod running feet (5+5+3+3 = 16 ft @ ₹35 = ₹560), angle base stand (2 ft @ ₹50 = ₹100), 4x corner support stays (4 @ ₹80 = ₹320), and double-sided Star Flex printing (12 sqft × 2 @ ₹25 = ₹600). Total ₹1,580.",
     "minQuantity": 1,
     "quantityStep": 1,
-    "unitName": "Standie(s)",
+    "unitName": "Standee(s)",
     "productionTime": "24-48 Hours",
     "variantCombinations": [
-      "5 × 3 Ft Iron Frame Standee (Double Sided Flex) - ₹1,580",
-      "6 × 3 Ft Iron Frame Standee (Double Sided Flex) - ₹1,855",
-      "6 × 4 Ft Iron Frame Standee (Double Sided Flex) - ₹2,220",
-      "4 × 2.5 Ft Compact Iron Standee (Double Sided Flex) - ₹1,295",
+      "5 × 3 Ft Iron Frame Standee (Double Sided Star Flex) - ₹1,580",
+      "6 × 3 Ft Iron Frame Standee (Double Sided Star Flex) - ₹1,855",
+      "6 × 4 Ft Iron Frame Standee (Double Sided Star Flex) - ₹2,220",
+      "4 × 2.5 Ft Compact Iron Standee (Double Sided Star Flex) - ₹1,295",
       "5 × 3 Ft Iron Frame Hardware Only (No Flex) - ₹980"
     ],
     "variantDetails": {
-      "5 × 3 Ft Iron Frame Standee (Double Sided Flex) - ₹1,580": {
-        "code": "STD-301",
+      "5 × 3 Ft Iron Frame Standee (Double Sided Star Flex) - ₹1,580": {
+        "code": "STD-201",
         "basePrice": 1580,
-        "mediaType": "Normal Flex (Double-Sided)",
-        "description": "Standard 5×3ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 4×3ft double-sided flex @ ₹1,580"
+        "mediaType": "Star Flex (Double-Sided)",
+        "description": "Standard 5×3ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 4×3ft double-sided Star Flex @ ₹1,580"
       },
-      "6 × 3 Ft Iron Frame Standee (Double Sided Flex) - ₹1,855": {
-        "code": "STD-302",
+      "6 × 3 Ft Iron Frame Standee (Double Sided Star Flex) - ₹1,855": {
+        "code": "STD-202",
         "basePrice": 1855,
-        "mediaType": "Normal Flex (Double-Sided)",
-        "description": "Tall 6×3ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 5×3ft double-sided flex @ ₹1,855"
+        "mediaType": "Star Flex (Double-Sided)",
+        "description": "Tall 6×3ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 5×3ft double-sided Star Flex @ ₹1,855"
       },
-      "6 × 4 Ft Iron Frame Standee (Double Sided Flex) - ₹2,220": {
-        "code": "STD-303",
+      "6 × 4 Ft Iron Frame Standee (Double Sided Star Flex) - ₹2,220": {
+        "code": "STD-203",
         "basePrice": 2220,
-        "mediaType": "Normal Flex (Double-Sided)",
-        "description": "Jumbo 6×4ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 5×4ft double-sided flex @ ₹2,220"
+        "mediaType": "Star Flex (Double-Sided)",
+        "description": "Jumbo 6×4ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 5×4ft double-sided Star Flex @ ₹2,220"
       },
-      "4 × 2.5 Ft Compact Iron Standee (Double Sided Flex) - ₹1,295": {
-        "code": "STD-304",
+      "4 × 2.5 Ft Compact Iron Standee (Double Sided Star Flex) - ₹1,295": {
+        "code": "STD-204",
         "basePrice": 1295,
-        "mediaType": "Normal Flex (Double-Sided)",
-        "description": "Compact 4×2.5ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 3×2.5ft double-sided flex @ ₹1,295"
+        "mediaType": "Star Flex (Double-Sided)",
+        "description": "Compact 4×2.5ft MS Iron Frame Standee with 1ft legs, angle base stand, 4 supports, and 3×2.5ft double-sided Star Flex @ ₹1,295"
       },
       "5 × 3 Ft Iron Frame Hardware Only (No Flex) - ₹980": {
-        "code": "STD-305",
+        "code": "STD-205",
         "basePrice": 980,
         "mediaType": "Frame Only",
         "description": "5×3ft Welded MS Iron Frame with angle base stand & 4 support stays (without flex printing) @ ₹980"
@@ -4674,17 +4635,18 @@
       "MS Iron Frame": "16 Running Feet Square Pipe (5+5+3+3 ft) @ ₹35/ft",
       "Angle Base Stand": "2 Base Feet (2 ft running) @ ₹50/ft",
       "Support Stays": "4 Corner Welded Support Rods @ ₹80/pc",
-      "Printing Media": "Double-Sided High-Resolution Flex @ ₹25/sqft",
+      "Printing Media": "Double-Sided High-Resolution Star Flex @ ₹25/sqft",
       "Production Time": "24 to 48 Hours"
     },
     "ourSpecialization": [
       "Customizable running feet iron pipe fabrication calculator",
       "Sturdy angle iron base stand with 4 welded corner stays",
-      "High resolution vivid double-sided weather-resistant flex printing",
+      "High resolution vivid double-sided weather-resistant Star Flex printing",
       "All-weather durable outdoor and indoor freestanding display"
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381cf",
     "id": "LH-001",
     "code": "LH-1",
     "categoryId": "letter-heads",
@@ -4916,6 +4878,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d0",
     "id": "LH-002",
     "code": "LH-2",
     "categoryId": "letter-heads",
@@ -5147,6 +5110,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d1",
     "id": "LH-003",
     "code": "LH-3",
     "categoryId": "letter-heads",
@@ -5378,6 +5342,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d2",
     "id": "LH-004",
     "code": "LH-4",
     "categoryId": "letter-heads",
@@ -6107,6 +6072,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d3",
     "id": "LH-005",
     "code": "LH-5",
     "categoryId": "letter-heads",
@@ -6370,6 +6336,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d4",
     "id": "PP-001",
     "code": "PP-001",
     "categoryId": "pamphlets-posters",
@@ -6809,6 +6776,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d5",
     "id": "PP-002",
     "code": "PP-002",
     "categoryId": "pamphlets-posters",
@@ -7109,6 +7077,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d6",
     "id": "PN-001",
     "code": "PN-LASER",
     "categoryId": "pens",
@@ -7227,6 +7196,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d7",
     "id": "PN-002",
     "code": "PN-SINGLE",
     "categoryId": "pens",
@@ -7345,6 +7315,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d8",
     "id": "PN-003",
     "code": "PN-BOX",
     "categoryId": "pens",
@@ -7426,6 +7397,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381d9",
     "id": "SL-001",
     "code": "STK",
     "categoryId": "stickers-labels",
@@ -7854,6 +7826,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381da",
     "id": "TG-001",
     "code": "TG-001",
     "categoryId": "tags",
@@ -8072,6 +8045,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381db",
     "id": "TG-002",
     "code": "TG-002",
     "categoryId": "tags",
@@ -8226,6 +8200,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dc",
     "id": "TG-003",
     "code": "TG-003",
     "categoryId": "tags",
@@ -8381,6 +8356,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381dd",
     "id": "TG-004",
     "code": "TG-004",
     "categoryId": "tags",
@@ -8840,6 +8816,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381de",
     "id": "VC-007",
     "code": "7",
     "categoryId": "visiting-cards",
@@ -9154,12 +9131,8 @@
                 "priceAdjustment": 0
               },
               {
-                "label": "Back Side",
+                "label": "Not Required",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "",
-                "priceAdjustment": 100
               }
             ]
           },
@@ -9618,12 +9591,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10185,10 +10158,10 @@
         ]
       }
     ],
-    "_id": "6a8d3f3e181ae861f1c381de",
-    "updatedAt": "2026-08-31T05:22:09.192Z"
+    "updatedAt": "2026-08-31T05:43:44.803Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381df",
     "id": "VC-008",
     "code": "8",
     "categoryId": "visiting-cards",
@@ -10252,17 +10225,17 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2280,
+        "basePrice": 2260,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 4.56
+            "pricePerUnit": 4.5
           },
           {
             "minQty": 1000,
-            "pricePerUnit": 4.26
+            "pricePerUnit": 4.25
           }
         ],
         "specifications": {
@@ -10289,12 +10262,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10309,12 +10282,8 @@
                 "priceAdjustment": 0
               },
               {
-                "label": "Back Side",
+                "label": "Not Required",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "Front & Back",
-                "priceAdjustment": 200
               }
             ]
           },
@@ -10479,13 +10448,13 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2760,
+        "basePrice": 2740,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 5.52
+            "pricePerUnit": 5.48
           },
           {
             "minQty": 1000,
@@ -10517,12 +10486,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10535,14 +10504,6 @@
               {
                 "label": "Front Side",
                 "priceAdjustment": 0
-              },
-              {
-                "label": "Back Side",
-                "priceAdjustment": 0
-              },
-              {
-                "label": "Front & Back",
-                "priceAdjustment": 200
               }
             ]
           },
@@ -10735,13 +10696,13 @@
         "minQuantity": 500,
         "quantityStep": 500,
         "productionTime": "3 Days",
-        "basePrice": 2760,
+        "basePrice": 2740,
         "unitName": "Cards",
         "pricingModel": "quantity_tiered",
         "quantityPricingTiers": [
           {
             "minQty": 500,
-            "pricePerUnit": 5.52
+            "pricePerUnit": 5.48
           },
           {
             "minQty": 1000,
@@ -10773,12 +10734,12 @@
             "required": true,
             "values": [
               {
-                "label": "Both Side",
-                "priceAdjustment": 200
-              },
-              {
                 "label": "Front Side",
                 "priceAdjustment": 0
+              },
+              {
+                "label": "Both Side",
+                "priceAdjustment": 200
               }
             ]
           },
@@ -10790,6 +10751,10 @@
             "values": [
               {
                 "label": "Front Side",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Not Required",
                 "priceAdjustment": 0
               }
             ]
@@ -10988,9 +10953,20 @@
           }
         ]
       }
-    }
+    },
+    "basePrice": 2230,
+    "minQuantity": 500,
+    "options": [],
+    "pricingModel": "quantity_tiered",
+    "productionTime": "4-5 days",
+    "quantityPricingTiers": [],
+    "quantityStep": 1000,
+    "specifications": {},
+    "unitName": "Units",
+    "updatedAt": "2026-08-31T05:51:59.892Z"
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e0",
     "id": "VC-014",
     "code": "14",
     "categoryId": "visiting-cards",
@@ -11654,6 +11630,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e1",
     "id": "VC-015",
     "code": "15",
     "categoryId": "visiting-cards",
@@ -11741,6 +11718,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e2",
     "id": "VC-016",
     "code": "16",
     "categoryId": "visiting-cards",
@@ -11868,13 +11846,14 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e3",
     "id": "VC-018",
     "code": "18",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss Lamination Card",
     "slug": "regular-gloss-lamination",
-    "image": "/products/visiting-cards/regular-gloss-lam.jpg",
+    "image": "",
     "description": "1000 qty standard high-gloss thermal film lamination.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nLAMINATION",
@@ -11892,7 +11871,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.72
+        "pricePerUnit": 0.72,
+        "_id": "6a9523c808f6f88a66277a79"
       }
     ],
     "ourSpecialization": [
@@ -11953,16 +11933,21 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:40.460Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e4",
     "id": "VC-019",
     "code": "19",
     "categoryId": "visiting-cards",
     "subCategory": "REGULAR VISITING CARDS (QTY. 1000 CARDS)",
     "name": "Gloss UV Coated Card",
     "slug": "regular-gloss-coated",
-    "image": "/products/visiting-cards/regular-gloss-coated.jpg",
+    "image": "",
     "description": "1000 qty express turnaround gloss UV coated cards ready in 12 hours.",
     "cardDisplay": {
       "headerTitle": "GLOSS\nUV COATED",
@@ -11980,7 +11965,8 @@
     "quantityPricingTiers": [
       {
         "minQty": 1000,
-        "pricePerUnit": 0.65
+        "pricePerUnit": 0.65,
+        "_id": "6a9523cd08f6f88a66277a7a"
       }
     ],
     "ourSpecialization": [
@@ -12041,9 +12027,14 @@
           }
         ]
       }
-    ]
+    ],
+    "images": [],
+    "updatedAt": "2026-08-31T06:48:45.187Z",
+    "variantCombinations": [],
+    "variantDetails": {}
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e5",
     "id": "VC-020",
     "code": "20",
     "categoryId": "visiting-cards",
@@ -12132,6 +12123,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e6",
     "id": "VC-017",
     "code": "17",
     "categoryId": "visiting-cards",
@@ -12257,6 +12249,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e7",
     "id": "VC-021",
     "code": "21",
     "categoryId": "visiting-cards",
@@ -12341,6 +12334,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e8",
     "id": "VC-022",
     "code": "22",
     "categoryId": "visiting-cards",
@@ -12425,6 +12419,7 @@
     ]
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381e9",
     "id": "VC-010",
     "code": "10",
     "categoryId": "visiting-cards",
@@ -12942,6 +12937,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381ea",
     "id": "VC-012",
     "code": "12",
     "categoryId": "visiting-cards",
@@ -13123,6 +13119,7 @@
     }
   },
   {
+    "_id": "6a8d3f3e181ae861f1c381eb",
     "id": "VC-011",
     "code": "11",
     "categoryId": "visiting-cards",
