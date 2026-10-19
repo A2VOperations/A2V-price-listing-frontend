@@ -795,7 +795,6 @@ export function generateRollUpStandieQuotationPdf(data) {
     machineWidth = 2.5,
     customHeight = 6,
     totalAreaSqFt = 15.0,
-    machineType = "standard",
     machineName = "Standard Aluminium Roll-Up Standee Machine Base",
     machineCost = 550,
     includeMachine = true,
@@ -803,13 +802,11 @@ export function generateRollUpStandieQuotationPdf(data) {
     mediaName = "Star Flex",
     flexRate = 25,
     flexCost = 375,
-    unitPrice = 925,
     quantity = 1,
     grossSubtotal = 925,
     validDiscount = 0,
     totalAmount = 925,
     clientInfo = {},
-    productName = "Roll-Up Standee System (Hardware Machine + Custom Height Banner)",
   } = data;
 
   const doc = new jsPDF({
@@ -818,7 +815,7 @@ export function generateRollUpStandieQuotationPdf(data) {
     format: "a4",
   });
 
-  const margin = 15;
+  const margin = 15;                  
   const contentWidth = 180;
   const rightEdge = margin + contentWidth;
   const quoteRef = `Q-RLP-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -1096,5 +1093,328 @@ export function generateRollUpStandieQuotationPdf(data) {
     return null;
   }
 }
+
+/**
+ * Generate Quotation PDF for Standee Hut (A-Frame Tent Display) (STD-003)
+ */
+export function generateStandieHutQuotationPdf(data) {
+  const {
+    standeeWidth = 2.5,
+    standeeHeight = 4,
+    legClearance = 0.5,
+    flexWidth = 2.5,
+    flexHeight = 3.5,
+    singleSideFlexArea = 8.75,
+    totalFlexArea = 17.5,
+    isDoubleSided = true,
+    frameType = "iron-3kg",
+    frameName = "Iron Frame - Light (3 kg)",
+    runningFt = 26,
+    frameRate = 35,
+    frameCost = 910,
+    hingesCount = 2,
+    hingeRate = 15,
+    hingesCost = 30,
+    mediaId = "star-flex",
+    mediaName = "Star Flex - High Gloss Finish",
+    flexRate = 25,
+    flexCost = 440,
+    unitPrice = 1350,
+    quantity = 1,
+    grossSubtotal = 1350,
+    validDiscount = 0,
+    totalAmount = 1350,
+    clientInfo = {},
+  } = data;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 15;
+  const contentWidth = 180;
+  const rightEdge = margin + contentWidth;
+  const quoteRef = `Q-HUT-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // Outer Page Border
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
+
+  // Top Header Banner (Deep Amber & Navy)
+  const headerY = 14;
+  const headerHeight = 26;
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.roundedRect(margin, headerY, contentWidth, headerHeight, 2, 2, "F");
+
+  // Left Color Accent
+  doc.setFillColor(217, 119, 6); // amber-600
+  doc.rect(margin, headerY, 4, headerHeight, "F");
+
+  // Company Branding
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A2V DIGI GRAPHICS", margin + 10, headerY + 11);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(251, 191, 36); // amber-300
+  doc.text("LARGE FORMAT PRINTING  |  FABRICATED STANDEES  |  SIGNAGE SOLUTIONS", margin + 10, headerY + 18);
+
+  // Right Header Text
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("STANDEE HUT QUOTATION", rightEdge - 5, headerY + 9, { align: "right" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(253, 230, 138); // amber-200
+  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+
+  // Client & Specs Summary Card
+  const cardY = headerY + 30;
+  const cardHeight = 30;
+
+  doc.setFillColor(254, 243, 199); // amber-50
+  doc.setDrawColor(252, 211, 77); // amber-300
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, cardY, contentWidth, cardHeight, 2, 2, "FD");
+
+  // Left Section: Prepared For
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(180, 83, 9); // amber-700
+  doc.text("QUOTATION PREPARED FOR:", margin + 6, cardY + 7);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  const clientNameStr = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  doc.text(clientNameStr, margin + 6, cardY + 14);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  doc.text(contactText, margin + 6, cardY + 21);
+
+  // Right Section: Specs
+  const rightColX = margin + 95;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(180, 83, 9);
+  doc.text("STANDEE HUT SPECIFICATIONS:", rightColX, cardY + 7);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Hut Geometry: A-Frame Double-Sided Tent`, rightColX, cardY + 13);
+  doc.text(`Total Size: ${standeeWidth}ft (W) × ${standeeHeight}ft (H) (${legClearance}ft Legs)`, rightColX, cardY + 18);
+  doc.text(`Flex Size: ${flexWidth}ft (W) × ${flexHeight}ft (H) (${totalFlexArea} Sq.Ft.)`, rightColX, cardY + 23);
+
+  // Table
+  const tableY = cardY + 35;
+  const col1W = 12;
+  const col2W = 76;
+  const col3W = 56;
+  const col4W = 36;
+
+  const x1 = margin;
+  const x2 = x1 + col1W;
+  const x3 = x2 + col2W;
+  const x4 = x3 + col3W;
+  const x5 = rightEdge;
+
+  const tableHeaderH = 8.5;
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.rect(margin, tableY, contentWidth, tableHeaderH, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text("#", (x1 + x2) / 2, tableY + 5.5, { align: "center" });
+  doc.text("ITEM DESCRIPTION", x2 + 3.5, tableY + 5.5);
+  doc.text("SPECIFICATIONS / RATE", x3 + 3.5, tableY + 5.5);
+  doc.text("TOTAL (Rs.)", x5 - 4, tableY + 5.5, { align: "right" });
+
+  const rows = [
+    {
+      num: "1",
+      title: "A-Frame Hut Structure Fabrication",
+      subtitle: `${frameName} (2 Faces / Tent Structure)`,
+      spec: `${runningFt} Running Ft @ Rs. ${frameRate}/ft`,
+      subSpec: `2 faces × (2×${standeeHeight} + 2×${standeeWidth} ft) = ${runningFt} ft`,
+      amount: `Rs. ${frameCost.toLocaleString()}`,
+    },
+    {
+      num: "2",
+      title: "Flex Banner Graphic Printing",
+      subtitle: `${mediaName} (${isDoubleSided ? "Double-Sided Tent" : "Single-Sided"})`,
+      spec: `${totalFlexArea} Sq.Ft. @ Rs. ${flexRate}/sqft`,
+      subSpec: `Flex display area: ${flexWidth}ft × ${flexHeight}ft per side`,
+      amount: `Rs. ${flexCost.toLocaleString()}`,
+    },
+    {
+      num: "3",
+      title: "Top Apex Hinges Hardware",
+      subtitle: "Heavy-duty folding hinges for A-frame apex joint",
+      spec: `${hingesCount} Pcs @ Rs. ${hingeRate}/pc`,
+      subSpec: "High stability metal folding hinges connecting front & back frames",
+      amount: `Rs. ${hingesCost.toLocaleString()}`,
+    },
+    {
+      num: "4",
+      title: "Safety Stay Chain & Leg Clearance",
+      subtitle: `Elevated 0.5 Ft (${Math.round(legClearance * 12)} Inches) feet clearance + limiting chain`,
+      spec: "Included Standard",
+      subSpec: "Ensures rigid A-frame stability and protects banner from dirt",
+      amount: "INCLUDED",
+    },
+  ];
+
+  let currentY = tableY + tableHeaderH;
+  const rowH = 15;
+
+  rows.forEach((row, i) => {
+    doc.setFillColor(i % 2 === 0 ? 255 : 248, i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 252);
+    doc.rect(margin, currentY, contentWidth, rowH, "F");
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(margin, currentY + rowH, rightEdge, currentY + rowH);
+
+    // Number
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text(row.num, (x1 + x2) / 2, currentY + 6.5, { align: "center" });
+
+    // Title & Subtitle
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(row.title, x2 + 3.5, currentY + 5.5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text(row.subtitle, x2 + 3.5, currentY + 10.5);
+
+    // Spec & SubSpec
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(30, 41, 59);
+    doc.text(row.spec, x3 + 3.5, currentY + 5.5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text(row.subSpec, x3 + 3.5, currentY + 10.5);
+
+    // Amount
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(row.amount === "INCLUDED" ? 16 : 15, row.amount === "INCLUDED" ? 185 : 23, row.amount === "INCLUDED" ? 129 : 42);
+    doc.text(row.amount, x5 - 4, currentY + 7, { align: "right" });
+
+    currentY += rowH;
+  });
+
+  // Table Outer Border
+  doc.setDrawColor(15, 23, 42);
+  doc.setLineWidth(0.5);
+  doc.rect(margin, tableY, contentWidth, currentY - tableY, "D");
+
+  // Summary Totals Box
+  const totalsY = currentY + 6;
+  const notesW = 95;
+  const totalsBoxX = margin + notesW + 5;
+  const totalsBoxW = contentWidth - notesW - 5;
+
+  // Left: Specifications & Bank Details
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(margin, totalsY, notesW, 46, 1.5, 1.5, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text("TERMS & SPECIAL NOTES:", margin + 4, totalsY + 6);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(6.8);
+  doc.setTextColor(71, 85, 105);
+  doc.text("• Foldable A-Frame Hut standee for effortless storage & transit.", margin + 4, totalsY + 11.5);
+  doc.text("• Dual-sided viewing maximizes pedestrian walk-by visibility.", margin + 4, totalsY + 16.5);
+  doc.text("• Weather-resistant solvent / eco-solvent UV-cure printing.", margin + 4, totalsY + 21.5);
+  doc.text("• 50% advance required for custom fabrication; balance on dispatch.", margin + 4, totalsY + 26.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.2);
+  doc.setTextColor(180, 83, 9);
+  doc.text("BANK TRANSFER / UPI:", margin + 4, totalsY + 34);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(6.8);
+  doc.setTextColor(71, 85, 105);
+  doc.text("A2V Digi Graphics  |  Bank: HDFC Bank  |  UPI: a2vgroups@upi", margin + 4, totalsY + 39.5);
+
+  // Right: Price Breakdown
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(totalsBoxX, totalsY, totalsBoxW, 30, 1.5, 1.5, "FD");
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`Subtotal (${quantity} ${quantity === 1 ? "Unit" : "Units"}):`, totalsBoxX + 4, totalsY + 8);
+  doc.text(`Rs. ${grossSubtotal.toLocaleString()}`, rightEdge - 4, totalsY + 8, { align: "right" });
+
+  doc.text("Special Discount:", totalsBoxX + 4, totalsY + 16);
+  doc.setTextColor(validDiscount > 0 ? 16 : 71, validDiscount > 0 ? 185 : 85, validDiscount > 0 ? 129 : 105);
+  doc.text(validDiscount > 0 ? `- Rs. ${validDiscount.toLocaleString()}` : "Rs. 0", rightEdge - 4, totalsY + 16, { align: "right" });
+
+  doc.setTextColor(71, 85, 105);
+  doc.text("GST / Taxes:", totalsBoxX + 4, totalsY + 24);
+  doc.text("Extra as applicable", rightEdge - 4, totalsY + 24, { align: "right" });
+
+  // Grand Total Payable Box
+  const totalsPayableY = totalsY + 33;
+  const payableBoxH = 13;
+
+  doc.setFillColor(254, 243, 199); // amber-100
+  doc.setDrawColor(245, 158, 11); // amber-500
+  doc.setLineWidth(0.8);
+  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(180, 83, 9);
+  doc.text("TOTAL AMOUNT PAYABLE:", totalsBoxX + 4, totalsPayableY + 8);
+
+  doc.setFontSize(11.5);
+  doc.setTextColor(180, 83, 9);
+  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+
+  // Save & Download
+  const filename = `A2V_Quotation_StandeeHut_${quoteRef}.pdf`;
+  doc.save(filename);
+
+  try {
+    return doc.output("bloburl");
+  } catch {
+    return null;
+  }
+}
+
 
 

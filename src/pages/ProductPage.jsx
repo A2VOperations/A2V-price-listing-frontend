@@ -8,6 +8,7 @@ import ProductInfo from "@/components/product/ProductInfo";
 import ProductOrderForm from "@/components/product/ProductOrderForm";
 import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
+import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
 
 export default function ProductPage() {
@@ -118,6 +119,22 @@ export default function ProductPage() {
       <div className="space-y-6">
         <Breadcrumb items={breadcrumbItems} />
         <RollUpStandieOrderForm product={product} />
+        <ProductInfo product={product} />
+      </div>
+    );
+  }
+
+  const isHutStandie =
+    product.isHutStandie ||
+    product.id === "STD-003" ||
+    product.slug?.includes("hut") ||
+    product.name?.toLowerCase().includes("hut");
+
+  if (isHutStandie) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        <StandieHutOrderForm product={product} />
         <ProductInfo product={product} />
       </div>
     );

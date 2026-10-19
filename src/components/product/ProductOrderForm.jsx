@@ -5,6 +5,7 @@ import { calculateProductPrice } from "@/lib/priceCalculator";
 import FlexBoardOrderForm from "./FlexBoardOrderForm";
 import StandieOrderForm from "./StandieOrderForm";
 import RollUpStandieOrderForm from "./RollUpStandieOrderForm";
+import StandieHutOrderForm from "./StandieHutOrderForm";
 import StickerCalculator from "./StickerCalculator";
 
 export default function ProductOrderForm({
@@ -18,6 +19,15 @@ export default function ProductOrderForm({
     (product?.id === "STD-001" && !product?.isIronStandie)
   ) {
     return <RollUpStandieOrderForm product={product} onVariantSelect={onVariantSelect} />;
+  }
+
+  if (
+    product?.isHutStandie ||
+    product?.id === "STD-003" ||
+    product?.slug?.includes("hut") ||
+    product?.name?.toLowerCase().includes("hut")
+  ) {
+    return <StandieHutOrderForm product={product} onVariantSelect={onVariantSelect} />;
   }
 
   if (
