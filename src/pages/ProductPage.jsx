@@ -7,8 +7,8 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
 import ProductOrderForm from "@/components/product/ProductOrderForm";
 import StandieOrderForm from "@/components/product/StandieOrderForm";
+import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
-import { FiClock, FiLayers } from "react-icons/fi";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -103,6 +103,22 @@ export default function ProductPage() {
       <div className="space-y-6">
         <Breadcrumb items={breadcrumbItems} />
         <StickerCalculator product={product} />
+        <ProductInfo product={product} />
+      </div>
+    );
+  }
+
+  const isRollUpStandie =
+    product.id === "STD-002" ||
+    product.id === "STD-001" ||
+    product.isRollUpStandie ||
+    product.slug?.includes("rollup");
+
+  if (isRollUpStandie) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        <RollUpStandieOrderForm product={product} />
         <ProductInfo product={product} />
       </div>
     );

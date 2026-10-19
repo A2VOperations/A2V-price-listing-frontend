@@ -4,6 +4,7 @@ import { useQuote } from "@/context/QuoteContext";
 import { calculateProductPrice } from "@/lib/priceCalculator";
 import FlexBoardOrderForm from "./FlexBoardOrderForm";
 import StandieOrderForm from "./StandieOrderForm";
+import RollUpStandieOrderForm from "./RollUpStandieOrderForm";
 import StickerCalculator from "./StickerCalculator";
 
 export default function ProductOrderForm({
@@ -11,6 +12,15 @@ export default function ProductOrderForm({
   customBasePrice,
   onVariantSelect,
 }) {
+  if (
+    product?.id === "STD-002" ||
+    product?.id === "STD-001" ||
+    product?.isRollUpStandie ||
+    product?.slug?.includes("rollup")
+  ) {
+    return <RollUpStandieOrderForm product={product} onVariantSelect={onVariantSelect} />;
+  }
+
   if (
     product?.isStandie ||
     product?.subCategory?.toUpperCase().includes("STANDIE") ||

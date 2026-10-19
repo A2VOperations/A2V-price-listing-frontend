@@ -787,3 +787,314 @@ export function generateStandieQuotationPdf(data) {
   }
 }
 
+/**
+ * Generate Quotation PDF for Roll-Up Standees (STD-002)
+ */
+export function generateRollUpStandieQuotationPdf(data) {
+  const {
+    machineWidth = 2.6,
+    customHeight = 6,
+    totalAreaSqFt = 15.6,
+    machineType = "standard",
+    machineName = "Standard Aluminium Roll-Up Standee Machine Base",
+    machineCost = 550,
+    includeMachine = true,
+    includeBanner = true,
+    mediaName = "Non-Tearable Matte Media (Anti-Curl)",
+    flexRate = 35,
+    flexCost = 546,
+    unitPrice = 1096,
+    quantity = 1,
+    grossSubtotal = 1096,
+    validDiscount = 0,
+    totalAmount = 1096,
+    clientInfo = {},
+    productName = "Roll-Up Standee System (Hardware Machine + Custom Height Banner)",
+  } = data;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 15;
+  const contentWidth = 180;
+  const rightEdge = margin + contentWidth;
+  const quoteRef = `Q-RLP-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // Outer Page Border
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
+
+  // Top Header Banner (Deep Navy with Blue Accent)
+  const headerY = 14;
+  const headerHeight = 25;
+
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.rect(margin, headerY, contentWidth, headerHeight, "F");
+
+  // Blue Accent Triangle on Right
+  doc.setFillColor(37, 99, 235); // blue-600
+  doc.triangle(
+    rightEdge - 30, headerY,
+    rightEdge, headerY,
+    rightEdge, headerY + headerHeight,
+    "F"
+  );
+
+  // Logo: "A2V" in bold White, "PRINTS" in Blue
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A2V", margin + 7, headerY + 12);
+
+  const a2vWidth = doc.getTextWidth("A2V ");
+  doc.setTextColor(59, 130, 246); // blue-500
+  doc.text("PRINTS", margin + 7 + a2vWidth, headerY + 12);
+
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(1.2);
+  doc.line(margin + 7, headerY + 14.5, margin + 7 + a2vWidth + 4, headerY + 14.5);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(226, 232, 240);
+  doc.text("Roll-Up Standee Systems & Display Solutions", margin + 7, headerY + 20);
+
+  // Right Header Text
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("ROLL-UP STANDEE QUOTATION", rightEdge - 5, headerY + 9, { align: "right" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(191, 219, 254); // blue-200
+  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+
+  // Client & Specifications Summary Card
+  const cardY = headerY + 30;
+  const cardHeight = 28;
+
+  doc.setFillColor(239, 246, 255); // blue-50
+  doc.setDrawColor(191, 219, 254); // blue-200
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, cardY, contentWidth, cardHeight, 2, 2, "FD");
+
+  // Left Section: Prepared For
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(0.7);
+  doc.circle(margin + 8, cardY + 7, 2, "D");
+  doc.line(margin + 5.5, cardY + 12.5, margin + 10.5, cardY + 12.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(29, 78, 216); // blue-700
+  doc.text("QUOTATION PREPARED FOR:", margin + 14, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  const clientName = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  doc.text(clientName, margin + 14, cardY + 14);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  doc.text(contactText, margin + 14, cardY + 20);
+
+  // Right Section: Specs Summary
+  const rightColX = margin + 95;
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(0.7);
+  doc.roundedRect(rightColX, cardY + 4.5, 5, 6.5, 0.6, 0.6, "D");
+  doc.line(rightColX + 1.2, cardY + 6.8, rightColX + 3.8, cardY + 6.8);
+  doc.line(rightColX + 1.2, cardY + 8.4, rightColX + 3.8, cardY + 8.4);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(29, 78, 216);
+  doc.text("ROLL-UP STANDEE SPECIFICATION:", rightColX + 8, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.6 ? '31.2"' : '43.2"'})`, rightColX + 8, cardY + 13);
+  doc.text(`Standee Display Size: ${machineWidth}ft (W) × ${customHeight}ft (H) (${totalAreaSqFt} Sq.Ft.)`, rightColX + 8, cardY + 18);
+  doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`, rightColX + 8, cardY + 23);
+
+  // Table
+  const tableY = cardY + 34;
+  const col1W = 12; // #
+  const col2W = 74; // Item Description
+  const col3W = 58; // Specifications / Rate
+  const col4W = 36; // Total
+
+  const x1 = margin;
+  const x2 = x1 + col1W;
+  const x3 = x2 + col2W;
+  const x4 = x3 + col3W;
+  const x5 = rightEdge;
+
+  const tableHeaderH = 8.5;
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.rect(margin, tableY, contentWidth, tableHeaderH, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text("#", (x1 + x2) / 2, tableY + 5.5, { align: "center" });
+  doc.text("ITEM DESCRIPTION", x2 + 3.5, tableY + 5.5);
+  doc.text("SPECIFICATIONS / RATE", x3 + 3.5, tableY + 5.5);
+  doc.text("TOTAL (Rs.)", x5 - 4, tableY + 5.5, { align: "right" });
+
+  const rows = [];
+
+  if (includeMachine) {
+    rows.push({
+      desc: machineName,
+      spec: `${machineWidth} Ft base with spring roller, 3-section pole & padded carry bag`,
+      total: `Rs. ${(machineCost * quantity).toLocaleString()}/-`,
+    });
+  }
+
+  if (includeBanner) {
+    rows.push({
+      desc: `High-Definition Banner Printing (${mediaName})`,
+      spec: `${machineWidth} Ft (W) × ${customHeight} Ft (H) = ${totalAreaSqFt} sqft @ Rs. ${flexRate}/sqft`,
+      total: `Rs. ${(flexCost * quantity).toLocaleString()}/-`,
+    });
+  }
+
+  rows.push({
+    desc: "Pre-Fitted Cassette Assembly & Quality Check",
+    spec: "Internal spring tensioned, banner snapped to top profile, tested & packed",
+    total: "INCLUDED",
+  });
+
+  let currentY = tableY + tableHeaderH;
+  const rowHeight = 11.5;
+
+  rows.forEach((row, idx) => {
+    const isAlt = idx % 2 === 1;
+    doc.setFillColor(isAlt ? 248 : 255, isAlt ? 250 : 255, isAlt ? 252 : 255);
+    doc.rect(margin, currentY, contentWidth, rowHeight, "F");
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(margin, currentY + rowHeight, rightEdge, currentY + rowHeight);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(String(idx + 1), (x1 + x2) / 2, currentY + 7, { align: "center" });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(row.desc, x2 + 3, currentY + 5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(row.spec, x3 + 3, currentY + 7);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.8);
+    doc.setTextColor(row.total === "INCLUDED" ? 16 : 15, row.total === "INCLUDED" ? 185 : 23, row.total === "INCLUDED" ? 129 : 42);
+    doc.text(row.total, x5 - 4, currentY + 7, { align: "right" });
+
+    currentY += rowHeight;
+  });
+
+  // Bottom Section: Terms & Totals
+  const bottomSectionY = currentY + 12;
+  const termsBoxW = 98;
+  const termsBoxH = 46;
+
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(margin, bottomSectionY, termsBoxW, termsBoxH, 1.5, 1.5, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.8);
+  doc.setTextColor(30, 41, 59);
+  doc.text("TERMS & CONDITIONS", margin + 5, bottomSectionY + 6.6);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.setTextColor(71, 85, 105);
+  const terms = [
+    "• Turnaround Time: Same Day / 24 Hours from print file approval.",
+    "• Machine Base: Anodized Aluminium alloy with high-tension spring roller.",
+    "• Graphic Substrate: Anti-curling synthetic media ensures flat display edges.",
+    "• Carry Bag: Complimentary protective padded shoulder travel bag included.",
+    "• Payment: 50% advance along with purchase confirmation.",
+    "• Courier / Dispatch: Extra at actuals for delivery outside city limits.",
+  ];
+
+  terms.forEach((line, i) => {
+    doc.text(line, margin + 4, bottomSectionY + 13 + i * 5);
+  });
+
+  // Right: Totals Box
+  const totalsBoxX = margin + 104;
+  const totalsBoxW = 76;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text("Gross Subtotal:", totalsBoxX + 2, bottomSectionY + 6);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(30, 41, 59);
+  doc.text(`Rs. ${grossSubtotal.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 6, { align: "right" });
+
+  let totalsPayableY = bottomSectionY + 14;
+
+  if (validDiscount > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(220, 38, 38);
+    doc.text("Special Discount:", totalsBoxX + 2, bottomSectionY + 14);
+    doc.setFontSize(9);
+    doc.text(`- Rs. ${validDiscount.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 14, { align: "right" });
+    totalsPayableY = bottomSectionY + 22;
+  }
+
+  // Row: TOTAL AMOUNT PAYABLE Box (Rounded Blue)
+  const payableBoxH = 13;
+  doc.setFillColor(239, 246, 255); // blue-50
+  doc.setDrawColor(37, 99, 235); // blue-600
+  doc.setLineWidth(0.8);
+  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(29, 78, 216); // blue-700
+  doc.text("TOTAL AMOUNT PAYABLE:", totalsBoxX + 4, totalsPayableY + 8);
+
+  doc.setFontSize(11.5);
+  doc.setTextColor(29, 78, 216);
+  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+
+  // Save & Download
+  const filename = `A2V_Quotation_RollUpStandee_${quoteRef}.pdf`;
+  doc.save(filename);
+
+  try {
+    return doc.output("bloburl");
+  } catch {
+    return null;
+  }
+}
+
+
