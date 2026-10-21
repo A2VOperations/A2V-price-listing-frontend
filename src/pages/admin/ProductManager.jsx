@@ -71,11 +71,21 @@ export default function ProductManager() {
     image: "/src/assets/images/categories (1).webp",
     images: [],
     description: "",
+    quantityType: "incremental",
     minQuantity: 1000,
     quantityStep: 1000,
     productionTime: "3-7 Days",
     basePrice: 1800,
     unitName: "Cards",
+    fixedQuantities: [
+      { qty: 1000, price: 1800 },
+      { qty: 2000, price: 3200 },
+      { qty: 3000, price: 4400 },
+      { qty: 4000, price: 5500 },
+      { qty: 8000, price: 9500 },
+      { qty: 12000, price: 13500 },
+      { qty: 16000, price: 17000 },
+    ],
     pricingModel: "quantity_tiered",
     variantCombinations: [],
     variantDetails: {},
@@ -131,6 +141,16 @@ export default function ProductManager() {
       categoryId: selectedCategory || categories[0]?.id || "visiting-cards",
       subCategory: selectedSubCategory || "General Products",
       images: [],
+      quantityType: "incremental",
+      fixedQuantities: [
+        { qty: 1000, price: 1800 },
+        { qty: 2000, price: 3200 },
+        { qty: 3000, price: 4400 },
+        { qty: 4000, price: 5500 },
+        { qty: 8000, price: 9500 },
+        { qty: 12000, price: 13500 },
+        { qty: 16000, price: 17000 },
+      ],
     });
     setManualImageUrl("");
     setActiveTab("general");
@@ -145,6 +165,60 @@ export default function ProductManager() {
       ? [product.image]
       : [];
 
+    const defaultFixedQuantities = [
+      { qty: 1000, price: product.basePrice || 1800 },
+      { qty: 2000, price: Math.round((product.basePrice || 1800) * 1.75) },
+      { qty: 3000, price: Math.round((product.basePrice || 1800) * 2.45) },
+      { qty: 4000, price: Math.round((product.basePrice || 1800) * 3.1) },
+      { qty: 8000, price: Math.round((product.basePrice || 1800) * 5.6) },
+      { qty: 12000, price: Math.round((product.basePrice || 1800) * 8.0) },
+      { qty: 16000, price: Math.round((product.basePrice || 1800) * 10.2) },
+    ];
+
+    const activeFixedQuantities =
+      Array.isArray(product.fixedQuantities) && product.fixedQuantities.length > 0
+        ? product.fixedQuantities
+        : defaultFixedQuantities;
+
+    const normalizedVariantDetails = {};
+    if (product.variantDetails && typeof product.variantDetails === "object") {
+      Object.entries(product.variantDetails).forEach(([vName, vData]) => {
+        let vFixed =
+          Array.isArray(vData.fixedQuantities) && vData.fixedQuantities.length > 0
+            ? vData.fixedQuantities
+            : null;
+
+        if (!vFixed && Array.isArray(vData.quantityPricingTiers) && vData.quantityPricingTiers.length > 0) {
+          vFixed = vData.quantityPricingTiers.map((tier) => ({
+            qty: Number(tier.minQty),
+            price: Math.round(Number(tier.minQty) * Number(tier.pricePerUnit)),
+          }));
+        }
+
+        if (!vFixed || vFixed.length === 0) {
+          const vBase = Number(vData.basePrice || product.basePrice || 1800);
+          vFixed = [
+            { qty: 1000, price: vBase },
+            { qty: 2000, price: Math.round(vBase * 1.75) },
+            { qty: 3000, price: Math.round(vBase * 2.45) },
+            { qty: 4000, price: Math.round(vBase * 3.1) },
+            { qty: 8000, price: Math.round(vBase * 5.6) },
+            { qty: 12000, price: Math.round(vBase * 8.0) },
+            { qty: 16000, price: Math.round(vBase * 10.2) },
+          ];
+        }
+
+        normalizedVariantDetails[vName] = {
+          ...vData,
+          quantityType:
+            vData.quantityType ||
+            product.quantityType ||
+            "incremental",
+          fixedQuantities: vFixed,
+        };
+      });
+    }
+
     setFormData({
       id: product.id || "",
       code: product.code || "",
@@ -155,6 +229,12 @@ export default function ProductManager() {
       image: product.image || existingImages[0] || "",
       images: existingImages,
       description: product.description || "",
+      quantityType:
+        product.quantityType ||
+        (Array.isArray(product.fixedQuantities) && product.fixedQuantities.length > 0
+          ? "select"
+          : "incremental"),
+      fixedQuantities: activeFixedQuantities,
       minQuantity: product.minQuantity ?? 1000,
       quantityStep: product.quantityStep ?? 1000,
       productionTime: product.productionTime || "",
@@ -162,7 +242,7 @@ export default function ProductManager() {
       unitName: product.unitName || "Units",
       pricingModel: product.pricingModel || "quantity_tiered",
       variantCombinations: product.variantCombinations || [],
-      variantDetails: product.variantDetails || {},
+      variantDetails: normalizedVariantDetails,
       quantityPricingTiers: product.quantityPricingTiers || [],
       specifications: product.specifications || {},
       ourSpecialization: product.ourSpecialization || [],
@@ -259,8 +339,10 @@ export default function ProductManager() {
         basePrice: formData.basePrice,
         description: `${name} featuring precision finishes and custom specifications.`,
         productionTime: formData.productionTime || "Within 3 days",
+        quantityType: formData.quantityType || "incremental",
         minQuantity: formData.minQuantity,
         quantityStep: formData.quantityStep,
+        fixedQuantities: JSON.parse(JSON.stringify(formData.fixedQuantities || [])),
         specifications: { ...formData.specifications },
         quantityPricingTiers: JSON.parse(JSON.stringify(formData.quantityPricingTiers || [])),
         options: [], // Custom options for this sub-sub category
@@ -283,6 +365,138 @@ export default function ProductManager() {
       variantCombinations: updatedCombos,
       variantDetails: updatedDetails,
     }));
+  };
+
+  // Main Product Fixed Quantity Handlers (Dropdown Selection Mode)
+  const handleAddFixedQuantity = () => {
+    const list = formData.fixedQuantities || [];
+    const lastItem = list[list.length - 1];
+    const nextQty = lastItem ? Number(lastItem.qty) + (formData.quantityStep || 1000) : (formData.minQuantity || 1000);
+    const nextPrice = lastItem
+      ? Math.round(Number(lastItem.price) * 1.5)
+      : (formData.basePrice || 1800);
+
+    setFormData((prev) => ({
+      ...prev,
+      fixedQuantities: [...(prev.fixedQuantities || []), { qty: nextQty, price: nextPrice }],
+    }));
+  };
+
+  const handleUpdateFixedQuantity = (index, field, value) => {
+    setFormData((prev) => {
+      const updated = [...(prev.fixedQuantities || [])];
+      updated[index] = {
+        ...updated[index],
+        [field]: Number(value) || 0,
+      };
+      return { ...prev, fixedQuantities: updated };
+    });
+  };
+
+  const handleRemoveFixedQuantity = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      fixedQuantities: (prev.fixedQuantities || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleLoadStandardQuantities = () => {
+    const baseP = Number(formData.basePrice) || 1800;
+    const standards = [
+      { qty: 1000, price: baseP },
+      { qty: 2000, price: Math.round(baseP * 1.75) },
+      { qty: 3000, price: Math.round(baseP * 2.45) },
+      { qty: 4000, price: Math.round(baseP * 3.1) },
+      { qty: 8000, price: Math.round(baseP * 5.6) },
+      { qty: 12000, price: Math.round(baseP * 8.0) },
+      { qty: 16000, price: Math.round(baseP * 10.2) },
+    ];
+    setFormData((prev) => ({
+      ...prev,
+      quantityType: "select",
+      fixedQuantities: standards,
+    }));
+  };
+
+  // Sub-Sub Variant Fixed Quantity Handlers
+  const handleAddVariantFixedQuantity = (variantName) => {
+    const details = formData.variantDetails[variantName] || {};
+    const list = details.fixedQuantities && details.fixedQuantities.length > 0
+      ? details.fixedQuantities
+      : formData.fixedQuantities || [];
+    const lastItem = list[list.length - 1];
+    const nextQty = lastItem ? Number(lastItem.qty) + 1000 : 1000;
+    const nextPrice = lastItem
+      ? Math.round(Number(lastItem.price) * 1.5)
+      : (details.basePrice || formData.basePrice || 1800);
+
+    const updated = [...list, { qty: nextQty, price: nextPrice }];
+    const updatedDetails = {
+      ...formData.variantDetails,
+      [variantName]: {
+        ...details,
+        quantityType: "select",
+        fixedQuantities: updated,
+      },
+    };
+    setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+  };
+
+  const handleUpdateVariantFixedQuantity = (variantName, index, field, value) => {
+    const details = formData.variantDetails[variantName] || {};
+    const updated = [...(details.fixedQuantities || [])];
+    updated[index] = { ...updated[index], [field]: Number(value) || 0 };
+    const updatedDetails = {
+      ...formData.variantDetails,
+      [variantName]: { ...details, fixedQuantities: updated },
+    };
+    setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+  };
+
+  const handleRemoveVariantFixedQuantity = (variantName, index) => {
+    const details = formData.variantDetails[variantName] || {};
+    const updated = (details.fixedQuantities || []).filter((_, i) => i !== index);
+    const updatedDetails = {
+      ...formData.variantDetails,
+      [variantName]: { ...details, fixedQuantities: updated },
+    };
+    setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+  };
+
+  const handleCopyProductQuantitiesToVariant = (variantName) => {
+    const details = formData.variantDetails[variantName] || {};
+    const updatedDetails = {
+      ...formData.variantDetails,
+      [variantName]: {
+        ...details,
+        quantityType: "select",
+        fixedQuantities: JSON.parse(JSON.stringify(formData.fixedQuantities || [])),
+      },
+    };
+    setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+  };
+
+  const handleLoadStandardQuantitiesToVariant = (variantName) => {
+    const details = formData.variantDetails[variantName] || {};
+    const baseP = Number(details.basePrice || formData.basePrice) || 1800;
+    const standards = [
+      { qty: 1000, price: baseP },
+      { qty: 2000, price: Math.round(baseP * 1.75) },
+      { qty: 3000, price: Math.round(baseP * 2.45) },
+      { qty: 4000, price: Math.round(baseP * 3.1) },
+      { qty: 8000, price: Math.round(baseP * 5.6) },
+      { qty: 12000, price: Math.round(baseP * 8.0) },
+      { qty: 16000, price: Math.round(baseP * 10.2) },
+    ];
+    const updatedDetails = {
+      ...formData.variantDetails,
+      [variantName]: {
+        ...details,
+        quantityType: "select",
+        fixedQuantities: standards,
+      },
+    };
+    setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
   };
 
   // Variant Pricing Tier Handlers
@@ -870,6 +1084,233 @@ export default function ProductManager() {
                         </div>
                       </div>
 
+                      {/* Quantity Configuration & Selection Mode */}
+                      <div className="p-4 bg-gradient-to-br from-slate-50 to-orange-50/20 border border-slate-200 rounded-xl space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
+                          <div>
+                            <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                              <FiTag className="w-4 h-4 text-orange-600" />
+                              Quantity Selection Mode & Pricing
+                            </label>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                              Choose whether customers increment quantity with +/- buttons or select from a preset dropdown with specific prices.
+                            </p>
+                          </div>
+
+                          {/* Mode Toggle Buttons */}
+                          <div className="flex items-center bg-slate-200/80 p-0.5 rounded-lg border border-slate-300/60 self-start sm:self-auto">
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, quantityType: "incremental" })}
+                              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 ${
+                                formData.quantityType !== "select"
+                                  ? "bg-white text-orange-700 shadow-xs"
+                                  : "text-slate-600 hover:text-slate-900"
+                              }`}
+                            >
+                              <FiSliders className="w-3.5 h-3.5" />
+                              <span>Increment (+ / -)</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, quantityType: "select" })}
+                              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 ${
+                                formData.quantityType === "select"
+                                  ? "bg-orange-600 text-white shadow-xs"
+                                  : "text-slate-600 hover:text-slate-900"
+                              }`}
+                            >
+                              <FiList className="w-3.5 h-3.5" />
+                              <span>Selecting (Dropdown)</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* If Incremental Mode */}
+                        {formData.quantityType !== "select" ? (
+                          <div className="space-y-3 bg-white p-3.5 rounded-lg border border-slate-200 text-xs">
+                            <div className="flex items-center gap-2 text-slate-700">
+                              <FiSliders className="w-4 h-4 text-slate-500" />
+                              <span className="font-bold">Incremental Counter Configuration</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500">
+                              Customers will use <strong>-</strong> and <strong>+</strong> buttons on the product page.
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                              <div>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                                  Quantity Step / Increment
+                                </label>
+                                <input
+                                  type="number"
+                                  value={formData.quantityStep || 1000}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, quantityStep: Number(e.target.value) })
+                                  }
+                                  placeholder="e.g. 1000"
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded font-mono"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                                  Min Quantity Required
+                                </label>
+                                <input
+                                  type="number"
+                                  value={formData.minQuantity || 1000}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, minQuantity: Number(e.target.value) })
+                                  }
+                                  placeholder="e.g. 1000"
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded font-mono"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          /* If Select Dropdown Mode */
+                          <div className="space-y-3 bg-white p-4 rounded-xl border border-orange-200 shadow-2xs">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-800 border border-orange-200">
+                                    Dropdown Selection Active
+                                  </span>
+                                  <span className="text-xs font-bold text-slate-800">
+                                    Particular Quantity Prices ({formData.fixedQuantities?.length || 0})
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 mt-0.5">
+                                  Configure the exact quantities available in the dropdown and set their particular price.
+                                </p>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={handleLoadStandardQuantities}
+                                  className="px-2.5 py-1 text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 rounded border border-amber-200 transition-colors"
+                                  title="Load 1000, 2000, 3000, 4000, 8000, 12000, 16000"
+                                >
+                                  ⚡ Load Standard (1k-16k)
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleAddFixedQuantity}
+                                  className="px-2.5 py-1 text-[11px] font-bold bg-orange-600 hover:bg-orange-500 text-white rounded transition-colors flex items-center gap-1 shadow-2xs"
+                                >
+                                  <FiPlus className="w-3.5 h-3.5" />
+                                  <span>Add Quantity</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {(!formData.fixedQuantities || formData.fixedQuantities.length === 0) ? (
+                              <div className="p-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200 space-y-2">
+                                <p className="text-xs text-slate-500 font-medium">
+                                  No quantity options added yet. Click &quot;Add Quantity&quot; or &quot;Load Standard&quot; to populate.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={handleLoadStandardQuantities}
+                                  className="px-3 py-1.5 text-xs font-bold bg-orange-600 text-white rounded-lg shadow-xs"
+                                >
+                                  Load Standard Quantities (1,000 - 16,000)
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="overflow-x-auto rounded-lg border border-slate-200">
+                                <table className="w-full text-left text-xs">
+                                  <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
+                                    <tr>
+                                      <th className="p-2.5">
+                                        Quantity ({formData.unitName || "Units"})
+                                      </th>
+                                      <th className="p-2.5">Particular Price (₹)</th>
+                                      <th className="p-2.5 hidden sm:table-cell">Rate / Unit</th>
+                                      <th className="p-2.5 text-right">Action</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-slate-100 bg-white">
+                                    {formData.fixedQuantities.map((item, idx) => {
+                                      const unitRate = item.qty > 0 ? (item.price / item.qty).toFixed(2) : 0;
+                                      return (
+                                        <tr key={idx} className="hover:bg-orange-50/20 transition-colors">
+                                          <td className="p-2.5">
+                                            <input
+                                              type="number"
+                                              value={item.qty}
+                                              onChange={(e) =>
+                                                handleUpdateFixedQuantity(idx, "qty", e.target.value)
+                                              }
+                                              className="w-full max-w-[140px] px-2.5 py-1 text-xs border border-slate-300 rounded font-bold text-slate-900 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                              placeholder="1000"
+                                            />
+                                          </td>
+                                          <td className="p-2.5">
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-slate-400 font-bold">₹</span>
+                                              <input
+                                                type="number"
+                                                value={item.price}
+                                                onChange={(e) =>
+                                                  handleUpdateFixedQuantity(idx, "price", e.target.value)
+                                                }
+                                                className="w-full max-w-[140px] px-2.5 py-1 text-xs border border-orange-300 rounded font-black text-orange-950 bg-orange-50/30 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                placeholder="1800"
+                                              />
+                                            </div>
+                                          </td>
+                                          <td className="p-2.5 text-slate-500 text-[11px] font-mono hidden sm:table-cell">
+                                            ₹{unitRate} / {formData.unitName?.slice(0, -1) || "unit"}
+                                          </td>
+                                          <td className="p-2.5 text-right">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveFixedQuantity(idx)}
+                                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                              title="Remove Quantity"
+                                            >
+                                              <FiTrash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+
+                            {/* Dropdown Live Preview Box */}
+                            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-bold text-slate-600">
+                                  Storefront Preview:
+                                </span>
+                                <span className="text-[11px] text-slate-400">
+                                  How customers will see the dropdown
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                  <FiTag className="w-3.5 h-3.5 text-orange-600" /> Qty.
+                                </span>
+                                <select
+                                  disabled
+                                  className="px-2.5 py-1 text-xs bg-white border border-slate-300 rounded font-semibold text-slate-700 opacity-90 cursor-default"
+                                >
+                                  <option>--Select--</option>
+                                  {(formData.fixedQuantities || []).map((fq, idx) => (
+                                    <option key={idx}>{fq.qty}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
                           Description
@@ -1169,126 +1610,375 @@ export default function ProductManager() {
                                     </div>
                                   </div>
 
-                                  {/* Sub-sub Variation Pricing Tiers */}
-                                  <div className="pt-3 border-t border-slate-100 space-y-2.5">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
-                                        <FiDollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                                        Variation Pricing Tiers ({variantPricingTiers.length})
-                                      </span>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleAddVariantPricingTier(variantName)
-                                        }
-                                        className="px-2.5 py-1 text-[11px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded border border-emerald-200 transition-colors flex items-center gap-1"
-                                      >
-                                        <FiPlus className="w-3 h-3" /> Add Tier
-                                      </button>
+                                  {/* Sub-sub Variation Quantity Selection Mode & Particular Pricing */}
+                                  <div className="p-3.5 bg-gradient-to-br from-slate-50 to-orange-50/20 border border-slate-200 rounded-xl space-y-3">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+                                      <div>
+                                        <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                                          <FiTag className="w-3.5 h-3.5 text-orange-600" />
+                                          {variantName} — Quantity Selection Mode & Pricing
+                                        </label>
+                                        <p className="text-[10px] text-slate-500 mt-0.5">
+                                          Choose whether this variation uses <strong>Increment (+/-)</strong> or <strong>Selecting (Dropdown)</strong> with custom prices.
+                                        </p>
+                                      </div>
+
+                                      {/* Toggle Pills */}
+                                      <div className="flex items-center bg-slate-200/80 p-0.5 rounded-lg border border-slate-300/60 self-start sm:self-auto">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedDetails = { ...formData.variantDetails };
+                                            updatedDetails[variantName] = {
+                                              ...variantObj,
+                                              quantityType: "incremental",
+                                            };
+                                            setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                          }}
+                                          className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                                            (variantObj.quantityType || formData.quantityType) !== "select"
+                                              ? "bg-white text-orange-700 shadow-2xs"
+                                              : "text-slate-600 hover:text-slate-900"
+                                          }`}
+                                        >
+                                          <FiSliders className="w-3 h-3" />
+                                          <span>Increment (+ / -)</span>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedDetails = { ...formData.variantDetails };
+                                            const existingFixed =
+                                              variantObj.fixedQuantities && variantObj.fixedQuantities.length > 0
+                                                ? variantObj.fixedQuantities
+                                                : JSON.parse(JSON.stringify(formData.fixedQuantities || []));
+                                            updatedDetails[variantName] = {
+                                              ...variantObj,
+                                              quantityType: "select",
+                                              fixedQuantities: existingFixed,
+                                            };
+                                            setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                          }}
+                                          className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
+                                            (variantObj.quantityType || formData.quantityType) === "select"
+                                              ? "bg-orange-600 text-white shadow-2xs"
+                                              : "text-slate-600 hover:text-slate-900"
+                                          }`}
+                                        >
+                                          <FiList className="w-3 h-3" />
+                                          <span>Selecting (Dropdown)</span>
+                                        </button>
+                                      </div>
                                     </div>
 
-                                    {variantPricingTiers.length === 0 ? (
-                                      <p className="text-[11px] text-slate-400 italic bg-slate-50 p-2.5 rounded-lg border border-dashed border-slate-200">
-                                        No variation-specific pricing tiers configured. Base price calculation will be used.
-                                      </p>
+                                    {/* If Select Dropdown is active for this variant */}
+                                    {(variantObj.quantityType || formData.quantityType) === "select" ? (
+                                      <div className="space-y-3 bg-white p-3.5 rounded-xl border border-orange-200 shadow-2xs">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                                          <div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-800 border border-orange-200">
+                                                Dropdown Selection Active
+                                              </span>
+                                              <span className="text-xs font-bold text-slate-800">
+                                                Particular Quantity Prices ({variantObj.fixedQuantities?.length || 0})
+                                              </span>
+                                            </div>
+                                            <p className="text-[10px] text-slate-500 mt-0.5">
+                                              Set the exact prices customers pay when selecting each quantity for {variantName}.
+                                            </p>
+                                          </div>
+
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleLoadStandardQuantitiesToVariant(variantName)}
+                                              className="px-2 py-1 text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 rounded border border-amber-200 transition-colors"
+                                              title="Auto-populate standard 1000 - 16000 quantities"
+                                            >
+                                              ⚡ Load Standard (1k-16k)
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleCopyProductQuantitiesToVariant(variantName)}
+                                              className="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 transition-colors"
+                                              title="Copy quantities & prices from general product"
+                                            >
+                                              📋 Copy from General
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleAddVariantFixedQuantity(variantName)}
+                                              className="px-2 py-1 text-[10px] font-bold bg-orange-600 hover:bg-orange-500 text-white rounded transition-colors flex items-center gap-1 shadow-2xs"
+                                            >
+                                              <FiPlus className="w-3 h-3" /> Add Qty
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        {(!variantObj.fixedQuantities || variantObj.fixedQuantities.length === 0) ? (
+                                          <div className="p-3 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200 space-y-1.5">
+                                            <p className="text-xs text-slate-500 font-medium">
+                                              No quantity options configured for {variantName}.
+                                            </p>
+                                            <div className="flex items-center justify-center gap-2">
+                                              <button
+                                                type="button"
+                                                onClick={() => handleLoadStandardQuantitiesToVariant(variantName)}
+                                                className="px-2.5 py-1 text-[11px] font-bold bg-orange-600 text-white rounded-lg shadow-xs"
+                                              >
+                                                Load Standard Quantities (1k - 16k)
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleCopyProductQuantitiesToVariant(variantName)}
+                                                className="px-2.5 py-1 text-[11px] font-bold bg-slate-200 text-slate-800 rounded-lg"
+                                              >
+                                                Copy from General
+                                              </button>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <div className="overflow-x-auto rounded-lg border border-slate-200">
+                                            <table className="w-full text-left text-xs">
+                                              <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
+                                                <tr>
+                                                  <th className="p-2">
+                                                    Quantity ({formData.unitName || "Units"})
+                                                  </th>
+                                                  <th className="p-2">Particular Price (₹)</th>
+                                                  <th className="p-2 hidden sm:table-cell">Rate / Unit</th>
+                                                  <th className="p-2 text-right">Action</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody className="divide-y divide-slate-100 bg-white">
+                                                {variantObj.fixedQuantities.map((item, qIdx) => {
+                                                  const unitRate = item.qty > 0 ? (item.price / item.qty).toFixed(2) : 0;
+                                                  return (
+                                                    <tr key={qIdx} className="hover:bg-orange-50/20 transition-colors">
+                                                      <td className="p-2">
+                                                        <input
+                                                          type="number"
+                                                          value={item.qty}
+                                                          onChange={(e) =>
+                                                            handleUpdateVariantFixedQuantity(variantName, qIdx, "qty", e.target.value)
+                                                          }
+                                                          className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-slate-900 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                          placeholder="1000"
+                                                        />
+                                                      </td>
+                                                      <td className="p-2">
+                                                        <div className="flex items-center gap-1">
+                                                          <span className="text-slate-400 font-bold">₹</span>
+                                                          <input
+                                                            type="number"
+                                                            value={item.price}
+                                                            onChange={(e) =>
+                                                              handleUpdateVariantFixedQuantity(variantName, qIdx, "price", e.target.value)
+                                                            }
+                                                            className="w-full max-w-[130px] px-2 py-1 text-xs border border-orange-300 rounded font-black text-orange-950 bg-orange-50/30 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                            placeholder="1800"
+                                                          />
+                                                        </div>
+                                                      </td>
+                                                      <td className="p-2 text-slate-500 text-[11px] font-mono hidden sm:table-cell">
+                                                        ₹{unitRate} / {formData.unitName?.slice(0, -1) || "unit"}
+                                                      </td>
+                                                      <td className="p-2 text-right">
+                                                        <button
+                                                          type="button"
+                                                          onClick={() => handleRemoveVariantFixedQuantity(variantName, qIdx)}
+                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                          title="Remove Quantity"
+                                                        >
+                                                          <FiTrash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                      </td>
+                                                    </tr>
+                                                  );
+                                                })}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
+
+                                        {/* Dropdown Live Preview Box for this Variant */}
+                                        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-[10px] font-bold text-slate-600 uppercase">
+                                              Live Storefront Preview:
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                              <FiTag className="w-3.5 h-3.5 text-orange-600" /> Qty.
+                                            </span>
+                                            <select
+                                              disabled
+                                              className="px-2 py-1 text-xs bg-white border border-slate-300 rounded font-semibold text-slate-700 opacity-90 cursor-default"
+                                            >
+                                              <option>--Select--</option>
+                                              {(variantObj.fixedQuantities || []).map((fq, idx) => (
+                                                <option key={idx}>{fq.qty}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        </div>
+                                      </div>
                                     ) : (
-                                      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-50/50">
-                                        <table className="w-full text-left text-xs">
-                                          <thead className="bg-slate-100 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
-                                            <tr>
-                                              <th className="p-2">
-                                                Min Quantity ({formData.unitName || "Units"})
-                                              </th>
-                                              <th className="p-2">Price Per Unit (₹)</th>
-                                              <th className="p-2 text-right">Action</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody className="divide-y divide-slate-100 bg-white">
-                                            {variantPricingTiers.map((tier, tIdx) => (
-                                              <tr key={tIdx} className="hover:bg-slate-50/50">
-                                                <td className="p-2">
-                                                  <input
-                                                    type="number"
-                                                    value={tier.minQty}
-                                                    onChange={(e) => {
-                                                      const updatedTiers = [
-                                                        ...variantPricingTiers,
-                                                      ];
-                                                      updatedTiers[tIdx] = {
-                                                        ...updatedTiers[tIdx],
-                                                        minQty: Number(e.target.value),
-                                                      };
-                                                      const updatedDetails = {
-                                                        ...formData.variantDetails,
-                                                        [variantName]: {
-                                                          ...variantObj,
-                                                          quantityPricingTiers: updatedTiers,
-                                                        },
-                                                      };
-                                                      setFormData((prev) => ({
-                                                        ...prev,
-                                                        variantDetails: updatedDetails,
-                                                      }));
-                                                    }}
-                                                    className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-mono"
-                                                    placeholder="1000"
-                                                  />
-                                                </td>
-                                                <td className="p-2">
-                                                  <div className="flex items-center gap-1">
-                                                    <span className="text-slate-400 text-xs font-bold">
-                                                      ₹
-                                                    </span>
-                                                    <input
-                                                      type="number"
-                                                      step="any"
-                                                      value={tier.pricePerUnit}
-                                                      onChange={(e) => {
-                                                        const updatedTiers = [
-                                                          ...variantPricingTiers,
-                                                        ];
-                                                        updatedTiers[tIdx] = {
-                                                          ...updatedTiers[tIdx],
-                                                          pricePerUnit: Number(
-                                                            e.target.value
-                                                          ),
-                                                        };
-                                                        const updatedDetails = {
-                                                          ...formData.variantDetails,
-                                                          [variantName]: {
-                                                            ...variantObj,
-                                                            quantityPricingTiers: updatedTiers,
-                                                          },
-                                                        };
-                                                        setFormData((prev) => ({
-                                                          ...prev,
-                                                          variantDetails: updatedDetails,
-                                                        }));
-                                                      }}
-                                                      className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-emerald-700 bg-white"
-                                                      placeholder="1.50"
-                                                    />
-                                                  </div>
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                  <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                      handleRemoveVariantPricingTier(
-                                                        variantName,
-                                                        tIdx
-                                                      )
-                                                    }
-                                                    className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                                                    title="Remove Tier"
-                                                  >
-                                                    <FiTrash2 className="w-3.5 h-3.5" />
-                                                  </button>
-                                                </td>
-                                              </tr>
-                                            ))}
-                                          </tbody>
-                                        </table>
+                                      /* If Incremental Mode for this variant */
+                                      <div className="space-y-3 bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                        <div className="flex items-center gap-2 text-slate-700">
+                                          <FiSliders className="w-4 h-4 text-slate-500" />
+                                          <span className="font-bold">Incremental Counter & Tiers for {variantName}</span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                                              Min Quantity Required
+                                            </label>
+                                            <input
+                                              type="number"
+                                              value={variantObj.minQuantity || formData.minQuantity || 1000}
+                                              onChange={(e) => {
+                                                const updatedDetails = { ...formData.variantDetails };
+                                                updatedDetails[variantName] = {
+                                                  ...variantObj,
+                                                  minQuantity: Number(e.target.value),
+                                                };
+                                                setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                              }}
+                                              className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded font-mono"
+                                            />
+                                          </div>
+
+                                          <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                                              Quantity Step / Increment
+                                            </label>
+                                            <input
+                                              type="number"
+                                              value={variantObj.quantityStep || formData.quantityStep || 1000}
+                                              onChange={(e) => {
+                                                const updatedDetails = { ...formData.variantDetails };
+                                                updatedDetails[variantName] = {
+                                                  ...variantObj,
+                                                  quantityStep: Number(e.target.value),
+                                                };
+                                                setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                              }}
+                                              className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded font-mono"
+                                            />
+                                          </div>
+                                        </div>
+
+                                        {/* Variation Pricing Tiers Table */}
+                                        <div className="pt-2 border-t border-slate-100 space-y-2">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1">
+                                              <FiDollarSign className="w-3 h-3 text-emerald-600" />
+                                              Tiers ({variantPricingTiers.length})
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleAddVariantPricingTier(variantName)}
+                                              className="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded border border-emerald-200 transition-colors flex items-center gap-1"
+                                            >
+                                              <FiPlus className="w-3 h-3" /> Add Tier
+                                            </button>
+                                          </div>
+
+                                          {variantPricingTiers.length === 0 ? (
+                                            <p className="text-[10px] text-slate-400 italic bg-slate-50 p-2 rounded border border-dashed border-slate-200">
+                                              No variation-specific pricing tiers configured. Base price calculation will be used.
+                                            </p>
+                                          ) : (
+                                            <div className="overflow-x-auto rounded border border-slate-200">
+                                              <table className="w-full text-left text-xs">
+                                                <thead className="bg-slate-100 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
+                                                  <tr>
+                                                    <th className="p-2">Min Quantity ({formData.unitName || "Units"})</th>
+                                                    <th className="p-2">Price Per Unit (₹)</th>
+                                                    <th className="p-2 text-right">Action</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 bg-white">
+                                                  {variantPricingTiers.map((tier, tIdx) => (
+                                                    <tr key={tIdx} className="hover:bg-slate-50/50">
+                                                      <td className="p-2">
+                                                        <input
+                                                          type="number"
+                                                          value={tier.minQty}
+                                                          onChange={(e) => {
+                                                            const updatedTiers = [...variantPricingTiers];
+                                                            updatedTiers[tIdx] = {
+                                                              ...updatedTiers[tIdx],
+                                                              minQty: Number(e.target.value),
+                                                            };
+                                                            const updatedDetails = {
+                                                              ...formData.variantDetails,
+                                                              [variantName]: {
+                                                                ...variantObj,
+                                                                quantityPricingTiers: updatedTiers,
+                                                              },
+                                                            };
+                                                            setFormData((prev) => ({
+                                                              ...prev,
+                                                              variantDetails: updatedDetails,
+                                                            }));
+                                                          }}
+                                                          className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-mono"
+                                                          placeholder="1000"
+                                                        />
+                                                      </td>
+                                                      <td className="p-2">
+                                                        <div className="flex items-center gap-1">
+                                                          <span className="text-slate-400 text-xs font-bold">₹</span>
+                                                          <input
+                                                            type="number"
+                                                            step="any"
+                                                            value={tier.pricePerUnit}
+                                                            onChange={(e) => {
+                                                              const updatedTiers = [...variantPricingTiers];
+                                                              updatedTiers[tIdx] = {
+                                                                ...updatedTiers[tIdx],
+                                                                pricePerUnit: Number(e.target.value),
+                                                              };
+                                                              const updatedDetails = {
+                                                                ...formData.variantDetails,
+                                                                [variantName]: {
+                                                                  ...variantObj,
+                                                                  quantityPricingTiers: updatedTiers,
+                                                                },
+                                                              };
+                                                              setFormData((prev) => ({
+                                                                ...prev,
+                                                                variantDetails: updatedDetails,
+                                                              }));
+                                                            }}
+                                                            className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-emerald-700 bg-white"
+                                                            placeholder="1.50"
+                                                          />
+                                                        </div>
+                                                      </td>
+                                                      <td className="p-2 text-right">
+                                                        <button
+                                                          type="button"
+                                                          onClick={() => handleRemoveVariantPricingTier(variantName, tIdx)}
+                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                          title="Remove Tier"
+                                                        >
+                                                          <FiTrash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                      </td>
+                                                    </tr>
+                                                  ))}
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          )}
+                                        </div>
                                       </div>
                                     )}
                                   </div>

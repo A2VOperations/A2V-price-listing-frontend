@@ -21,13 +21,56 @@ export function calculateProductPrice({
 }) {
   if (!product) return null;
 
-  const effectiveQty = Math.max(quantity, product.minQuantity || 1);
+  if (!quantity || isNaN(quantity) || Number(quantity) <= 0) {
+    return {
+      quantity: 0,
+      unitPrice: 0,
+      optionsTotal: 0,
+      subtotal: 0,
+      gstAmount: 0,
+      totalAmount: 0,
+      optionDetails: [],
+    };
+  }
+
+  const effectiveQty =
+    product.quantityType === "select"
+      ? Number(quantity)
+      : Math.max(Number(quantity), product.minQuantity || 1);
 
   // 1. Determine Base Price
   let unitPrice =
-    customBasePrice !== null ? customBasePrice : product.basePrice;
+    customBasePrice !== null ? customBasePrice : (product.basePrice || 0);
 
+  // If product uses dropdown select mode with predefined fixed quantities & particular prices
   if (
+    customBasePrice === null &&
+    product.quantityType === "select" &&
+    Array.isArray(product.fixedQuantities) &&
+    product.fixedQuantities.length > 0
+  ) {
+    const matched = product.fixedQuantities.find(
+      (fq) => Number(fq.qty) === effectiveQty
+    );
+    if (matched) {
+      unitPrice = Number(matched.price);
+    } else {
+      // Find nearest or calculate unit rate
+      const sorted = [...product.fixedQuantities].sort(
+        (a, b) => Number(a.qty) - Number(b.qty)
+      );
+      const exactOrBelow = [...sorted].reverse().find(
+        (fq) => effectiveQty >= Number(fq.qty)
+      );
+      if (exactOrBelow) {
+        unitPrice =
+          (Number(exactOrBelow.price) / Number(exactOrBelow.qty)) * effectiveQty;
+      } else {
+        unitPrice =
+          (Number(sorted[0].price) / Number(sorted[0].qty)) * effectiveQty;
+      }
+    }
+  } else if (
     customBasePrice === null &&
     product.quantityPricingTiers &&
     product.quantityPricingTiers.length > 0
@@ -74,10 +117,15 @@ export function calculateProductPrice({
         const foundVal = group.values?.find((v) => v.label === valLabel);
         if (foundVal) {
           let adjustment = 0;
-          const qtyRatio =
-            product.minQuantity && product.minQuantity > 0
-              ? effectiveQty / product.minQuantity
+          const baseReferenceQty =
+            product.quantityType === "select" &&
+            Array.isArray(product.fixedQuantities) &&
+            product.fixedQuantities.length > 0
+              ? Number(product.fixedQuantities[0].qty) || 1000
+              : product.minQuantity && product.minQuantity > 0
+              ? product.minQuantity
               : 1;
+          const qtyRatio = effectiveQty / baseReferenceQty;
 
           if (foundVal.priceAdjustment !== undefined) {
             adjustment += foundVal.priceAdjustment * qtyRatio;

@@ -59,6 +59,15 @@ export default function ProductPage() {
           activeVariantDetails.quantityPricingTiers.length > 0
             ? activeVariantDetails.quantityPricingTiers
             : rawProduct.quantityPricingTiers,
+        quantityType:
+          activeVariantDetails.quantityType ||
+          rawProduct.quantityType ||
+          "incremental",
+        fixedQuantities:
+          activeVariantDetails.fixedQuantities &&
+          activeVariantDetails.fixedQuantities.length > 0
+            ? activeVariantDetails.fixedQuantities
+            : rawProduct.fixedQuantities || [],
         minQuantity: activeVariantDetails.minQuantity || rawProduct.minQuantity,
         quantityStep:
           activeVariantDetails.quantityStep || rawProduct.quantityStep,

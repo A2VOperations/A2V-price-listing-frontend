@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiPackage, FiLayers, FiCheck } from "react-icons/fi";
+import { FiPackage, FiLayers, FiCheck, FiTag } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import { calculateProductPrice } from "@/lib/priceCalculator";
 import FlexBoardOrderForm from "./FlexBoardOrderForm";
@@ -66,14 +66,28 @@ export default function ProductOrderForm({
           activeVariantDetails.quantityPricingTiers.length > 0
             ? activeVariantDetails.quantityPricingTiers
             : product.quantityPricingTiers,
+        quantityType:
+          activeVariantDetails.quantityType ||
+          product.quantityType ||
+          "incremental",
+        fixedQuantities:
+          activeVariantDetails.fixedQuantities &&
+          activeVariantDetails.fixedQuantities.length > 0
+            ? activeVariantDetails.fixedQuantities
+            : product.fixedQuantities || [],
         minQuantity: activeVariantDetails.minQuantity || product.minQuantity,
         quantityStep: activeVariantDetails.quantityStep || product.quantityStep,
         options: activeVariantDetails.options || product.options,
       }
     : product;
 
+  const isSelectQty =
+    currentProduct.quantityType === "select" &&
+    Array.isArray(currentProduct.fixedQuantities) &&
+    currentProduct.fixedQuantities.length > 0;
+
   const minQty = currentProduct.minQuantity || 500;
-  const [quantity, setQuantity] = useState(minQty);
+  const [quantity, setQuantity] = useState(isSelectQty ? "" : minQty);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
@@ -96,7 +110,16 @@ export default function ProductOrderForm({
 
   useEffect(() => {
     if (currentProduct) {
-      setQuantity(currentProduct.minQuantity || 500);
+      if (isSelectQty) {
+        setQuantity((prev) => {
+          const exists = currentProduct.fixedQuantities.some(
+            (fq) => Number(fq.qty) === Number(prev)
+          );
+          return exists ? prev : "";
+        });
+      } else {
+        setQuantity(currentProduct.minQuantity || 500);
+      }
 
       const initialOptions = {};
       (currentProduct.options || []).filter(Boolean).forEach((group) => {
@@ -114,9 +137,14 @@ export default function ProductOrderForm({
     }));
   };
 
-  // Form is valid if variant selected & all required product options have values
+  // Form is valid if variant selected, quantity selected & all required product options have values
+  const isQuantityValid = isSelectQty
+    ? Boolean(quantity && Number(quantity) > 0)
+    : Boolean(quantity && Number(quantity) >= minQty);
+
   const isFormValid = Boolean(
     selectedVariant &&
+      isQuantityValid &&
       productOptions.every((group) => {
         const key = group.name || group.id;
         return group.required === false || Boolean(selectedOptions[key]);
@@ -193,55 +221,75 @@ export default function ProductOrderForm({
           {/* Quantity Row */}
           <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center space-x-2 font-bold text-orange-950">
-              <FiPackage className="w-4 h-4 text-orange-600 flex-shrink-0" />
-              <span>Quantity</span>
+              <FiTag className="w-4 h-4 text-orange-600 flex-shrink-0" />
+              <span>Qty.</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQuantity(
-                      Math.max(
-                        minQty,
-                        quantity - (currentProduct.quantityStep || 100)
-                      )
-                    )
-                  }
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-sm border-r border-slate-300 select-none active:bg-slate-300 transition-colors"
-                  aria-label="Decrease Quantity"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min={minQty}
-                  step={currentProduct.quantityStep || 100}
+
+            {isSelectQty ? (
+              <div className="w-full sm:w-72">
+                <select
                   value={quantity}
                   onChange={(e) =>
-                    setQuantity(
-                      Math.max(minQty, parseInt(e.target.value, 10) || minQty)
-                    )
+                    setQuantity(e.target.value ? Number(e.target.value) : "")
                   }
-                  className="w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQuantity(
-                      quantity + (currentProduct.quantityStep || 100)
-                    )
-                  }
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-sm border-l border-slate-300 select-none active:bg-slate-300 transition-colors"
-                  aria-label="Increase Quantity"
+                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 font-bold focus:ring-2 focus:ring-orange-600 focus:outline-none cursor-pointer"
                 >
-                  +
-                </button>
+                  <option value="">--Select--</option>
+                  {currentProduct.fixedQuantities.map((item, idx) => (
+                    <option key={idx} value={item.qty}>
+                      {item.qty}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <span className="text-xs font-semibold text-orange-600">
-                (Min Qty. : {minQty})
-              </span>
-            </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuantity(
+                        Math.max(
+                          minQty,
+                          quantity - (currentProduct.quantityStep || 100)
+                        )
+                      )
+                    }
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-sm border-r border-slate-300 select-none active:bg-slate-300 transition-colors"
+                    aria-label="Decrease Quantity"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min={minQty}
+                    step={currentProduct.quantityStep || 100}
+                    value={quantity}
+                    onChange={(e) =>
+                      setQuantity(
+                        Math.max(minQty, parseInt(e.target.value, 10) || minQty)
+                      )
+                    }
+                    className="w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuantity(
+                        quantity + (currentProduct.quantityStep || 100)
+                      )
+                    }
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-sm border-l border-slate-300 select-none active:bg-slate-300 transition-colors"
+                    aria-label="Increase Quantity"
+                  >
+                    +
+                  </button>
+                </div>
+                <span className="text-xs font-semibold text-orange-600">
+                  (Min Qty. : {minQty})
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Dynamic Product Options Row (ONLY shown if present in product.options) */}
@@ -318,6 +366,8 @@ export default function ProductOrderForm({
             <FiCheck className="w-5 h-5" />
             <span>Order Added to Cart!</span>
           </>
+        ) : isSelectQty && !quantity ? (
+          <span>Select Quantity to Continue</span>
         ) : (
           <span>Add Order (Pay From Wallet)</span>
         )}

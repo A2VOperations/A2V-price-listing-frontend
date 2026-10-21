@@ -23,7 +23,7 @@ export default function Header({ onToggleMobileSidebar }) {
               <FiMenu className="w-5 h-5" />
             </button>
 
-            <Link to="/" className="flex items-center space-x-2.5 group">
+            <Link to="/" className="flex items-center group">
               <img src={Logo} alt="logo" className="w-20 h-20 object-contain" />
               <div>
                 <div className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
