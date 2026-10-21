@@ -11,10 +11,13 @@ import StandieHutPreview from "./StandieHutPreview";
 import { generateStandieHutQuotationPdf } from "@/lib/generateQuotationPdf";
 
 const FIXED_SIZE_PRESETS = [
-  { width: 2.5, height: 4, label: "2.5 × 4 Ft", tag: "Popular Compact" },
-  { width: 3, height: 4, label: "3 × 4 Ft", tag: "Standard Display" },
-  { width: 2, height: 3, label: "2 × 3 Ft", tag: "Countertop / Small" },
-  { width: 3, height: 5, label: "3 × 5 Ft", tag: "Tall / High Visibility" },
+  { width: 2, height: 3, label: "2 × 3 Ft", tag: "Compact Small" },
+  { width: 2.5, height: 3, label: "2.5 × 3 Ft", tag: "Standard Small" },
+  { width: 3, height: 4, label: "3 × 4 Ft", tag: "Popular Standard" },
+  { width: 3, height: 5, label: "3 × 5 Ft", tag: "Tall Display" },
+  { width: 3, height: 6, label: "3 × 6 Ft", tag: "High Visibility" },
+  { width: 3.5, height: 5, label: "3.5 × 5 Ft", tag: "Wide Tall" },
+  { width: 3.5, height: 6, label: "3.5 × 6 Ft", tag: "Mega Tent" },
 ];
 
 const FRAME_OPTIONS = {
@@ -51,8 +54,8 @@ const MEDIA_CATALOG = {
   "normal-flex": {
     id: "normal-flex",
     name: "Normal Frontlit Flex",
-    defaultRate: 15,
-    tag: "Standard Matte",
+    defaultRate: 20,
+    tag: "Standard Economy",
     description: "Standard weather-resistant frontlit flex media with vibrant outdoor visibility.",
   },
   "star-flex": {
@@ -68,9 +71,9 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
   const { addToQuote } = useQuote();
 
   // Dimensions
-  const [standeeWidth, setStandeeWidth] = useState(2.5);
-  const [standeeHeight, setStandeeHeight] = useState(4);
-  const [legClearance, setLegClearance] = useState(0.5); // 0.5 ft fixed bottom legs
+  const [standeeWidth, setStandeeWidth] = useState(product?.widthFt || 2);
+  const [standeeHeight, setStandeeHeight] = useState(product?.heightFt || 3);
+  const [legClearance, setLegClearance] = useState(1); // 1 ft default bottom legs
 
   // Frame Material & Rates
   const [frameType, setFrameType] = useState("iron-3kg"); // "iron-3kg" | "iron-5kg" | "wooden"
@@ -79,7 +82,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
 
   // Flex Media Selection & Rate
   const [selectedMediaId, setSelectedMediaId] = useState("star-flex");
-  const [customFlexRate, setCustomFlexRate] = useState(25);
+  const [customFlexRate, setCustomFlexRate] = useState(30);
   const [isDoubleSided, setIsDoubleSided] = useState(true);
 
   // Top Apex Hinges (Default 2 hinges @ ₹15 each, customizable quantity & price)
@@ -100,7 +103,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
   // Safe Dimension Parsing
   const validWidth = Math.max(1, parseFloat(standeeWidth) || 2.5);
   const validHeight = Math.max(1.5, parseFloat(standeeHeight) || 4);
-  const validLeg = Math.max(0, parseFloat(legClearance) || 0.5);
+  const validLeg = Math.max(0, parseFloat(legClearance) || (legClearance === 0 ? 0 : 1));
 
   // Flex Display Area (Full standee banner height, legs are ADDED to frame height, not minused)
   const flexHeight = parseFloat(validHeight.toFixed(2));
@@ -158,7 +161,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
     // If switching to Iron, enforce Star Flex only
     if (type === "iron-3kg" || type === "iron-5kg") {
       setSelectedMediaId("star-flex");
-      setCustomFlexRate(25);
+      setCustomFlexRate(30);
     }
   };
 
@@ -268,7 +271,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
             Standee Hut (A-Frame Tent Standee)
           </h1>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Free-standing A-frame double-sided tent standee with sturdy apex hinges. Available with <strong>Iron Frame (3 kg / 5 kg)</strong> using <strong>Star Flex @ ₹25/sqft</strong> or <strong>Wooden Frame</strong> using <strong>Normal Flex @ ₹15/sqft</strong> or <strong>Star Flex @ ₹25/sqft</strong>. Includes 0.5 ft ground legs and fully editable rates.
+            Free-standing A-frame double-sided tent standee with sturdy apex hinges. Available with <strong>Iron Frame (3 kg / 5 kg)</strong> or <strong>Wooden Frame</strong> using <strong>Star Flex @ ₹30/sqft</strong> or <strong>Normal Flex @ ₹20/sqft</strong>. Includes 1 ft ground legs and fully editable rates.
           </p>
         </div>
 
@@ -293,7 +296,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
             <span className="text-xs font-bold text-slate-700 block mb-2">
               Select Standard Hut Size Presets:
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
               {FIXED_SIZE_PRESETS.map((preset) => {
                 const isSelected =
                   validWidth === preset.width && validHeight === preset.height;
@@ -312,7 +315,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
                       {preset.label}
                     </span>
                     <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
-                      Flex: {preset.width}×{(preset.height - 0.5).toFixed(1)}'
+                      Flex: {preset.width}×{preset.height}' (+1' Legs)
                     </span>
                     <span className="inline-block mt-1.5 text-[8.5px] font-extrabold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
                       {preset.tag}
@@ -389,7 +392,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-black text-slate-900 font-mono outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                 />
                 <span className="absolute right-3 top-2 text-xs font-bold text-slate-400">
-                  Ft (6")
+                  Ft (12")
                 </span>
               </div>
             </div>
@@ -572,7 +575,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
 
           {/* Media Selection (Conditional per Frame Material) */}
           {frameType === "wooden" ? (
-            /* Wooden Frame allows Normal Flex (@ ₹15) and Star Flex (@ ₹25) */
+            /* Wooden Frame allows Normal Flex (@ ₹20) and Star Flex (@ ₹30) */
             <div className="space-y-3">
               <span className="text-xs font-bold text-slate-700 block">
                 Select Flex Substrate for Wooden Frame:
@@ -616,7 +619,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
               </div>
             </div>
           ) : (
-            /* Iron Frames (3kg & 5kg) strictly use Star Flex @ ₹25 */
+            /* Iron Frames (3kg & 5kg) strictly use Star Flex @ ₹30 */
             <div className="p-4 rounded-xl border-2 border-amber-500 bg-amber-50/40 ring-2 ring-amber-500/20 shadow-xs">
               <div className="flex items-center justify-between gap-2">
                 <div>
@@ -634,7 +637,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-xs font-black text-amber-800 font-mono block">
-                    Default ₹25 / sqft
+                    Default ₹30 / sqft
                   </span>
                 </div>
               </div>

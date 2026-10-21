@@ -2,28 +2,25 @@ import React from "react";
 import {
   FiMaximize2,
   FiLayers,
-  FiShield,
-  FiCheckCircle,
-  FiZap,
 } from "react-icons/fi";
 
 export default function StandieHutPreview({
   totalWidth = 2.5,
   totalHeight = 4,
-  legClearance = 0.5,
+  legClearance = 1,
   frameType = "iron-3kg", // "iron-3kg" | "iron-5kg" | "wooden"
   mediaType = "star-flex", // "star-flex" | "normal-flex"
-  flexRate = 25,
+  flexRate = 30,
   frameRate = 35,
-  runningFt = 26,
+  runningFt = 30,
   hingesCount = 2,
   hingeRate = 15,
   isDoubleSided = true,
-  unitTotal = 1378,
+  unitTotal = 1680,
 }) {
   const numW = parseFloat(totalWidth) || 2.5;
   const numH = parseFloat(totalHeight) || 4;
-  const numLeg = parseFloat(legClearance) || 0.5;
+  const numLeg = parseFloat(legClearance) || (legClearance === 0 ? 0 : 1);
   const numHinges = Math.max(1, parseInt(hingesCount) || 2);
   const numHingePrice = Math.max(0, parseFloat(hingeRate) || 0);
   const hingesTotalCost = numHinges * numHingePrice;
