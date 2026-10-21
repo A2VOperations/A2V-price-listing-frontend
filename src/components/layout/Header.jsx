@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FiSearch, FiFileText, FiMenu, FiPrinter } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import SearchModal from "../common/SearchModal";
+import Logo from "../../../public/logo/A2V  Groups Logo.png";
 
 export default function Header({ onToggleMobileSidebar }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -23,11 +24,7 @@ export default function Header({ onToggleMobileSidebar }) {
             </button>
 
             <Link to="/" className="flex items-center space-x-2.5 group">
-              <img
-                src="../../public/logo/A2V  Groups Logo.png"
-                alt="logo"
-                className="w-20 h-20 object-contain"
-              />
+              <img src={Logo} alt="logo" className="w-20 h-20 object-contain" />
               <div>
                 <div className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
                   A2V PRINTS
