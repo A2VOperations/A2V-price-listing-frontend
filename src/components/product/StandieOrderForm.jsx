@@ -20,7 +20,7 @@ const FLEX_MEDIA_TYPES = [
   {
     id: "star-flex",
     name: "Star Flex - High Gloss Finish",
-    defaultRate: 25,
+    defaultRate: 30,
     tag: "High Gloss",
     description: "High durability glossy Star Flex with vivid color contrast and rich ink saturation.",
   },
@@ -36,7 +36,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
 
   // Flex Printing Configurations
   const [selectedMediaId, setSelectedMediaId] = useState("star-flex");
-  const [flexRatePerSqFt, setFlexRatePerSqFt] = useState(25);
+  const [flexRatePerSqFt, setFlexRatePerSqFt] = useState(30);
   const [isDoubleSided, setIsDoubleSided] = useState(true);
 
   // Iron Rod Frame Specifications

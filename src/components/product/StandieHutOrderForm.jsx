@@ -65,7 +65,7 @@ const MEDIA_CATALOG = {
   "star-flex": {
     id: "star-flex",
     name: "Star Flex - High Gloss Finish",
-    defaultRate: 25,
+    defaultRate: 30,
     tag: "Premium Gloss",
     description: "High durability glossy flex with vivid contrast, deep blacks, and rich ink saturation.",
   },

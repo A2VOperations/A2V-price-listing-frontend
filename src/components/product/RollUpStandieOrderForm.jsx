@@ -5,13 +5,6 @@ import {
   FiShoppingBag,
   FiDownload,
   FiCheckCircle,
-  FiLayers,
-  FiShield,
-  FiInfo,
-  FiGrid,
-  FiPackage,
-  FiZap,
-  FiArrowRight,
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import RollUpStandiePreview from "./RollUpStandiePreview";
@@ -21,7 +14,7 @@ const ROLLUP_MEDIA_TYPES = [
   {
     id: "star-flex",
     name: "Star Flex",
-    defaultRate: 25,
+    defaultRate: 30,
     tag: "High Gloss",
     description: "High durability glossy flex with vivid color contrast and rich ink saturation.",
   },
@@ -34,8 +27,8 @@ const MACHINE_OPTIONS = {
     tag: "Standard Base",
     description: "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
     defaultRates: {
-      2.5: 550,
-      3.5: 750,
+      2.5: 1250,
+      3.5: 1350,
     },
   },
   luxury: {
@@ -64,11 +57,11 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
 
   // Machine Hardware Configuration
   const [machineType, setMachineType] = useState("standard");
-  const [customMachineRate, setCustomMachineRate] = useState(550);
+  const [customMachineRate, setCustomMachineRate] = useState(1250);
 
-  // Flex Banner Media Configuration (Star Flex @ ₹25/sqft)
+  // Flex Banner Media Configuration (Star Flex @ ₹30/sqft)
   const [selectedMediaId, setSelectedMediaId] = useState("star-flex");
-  const [customFlexRate, setCustomFlexRate] = useState(25);
+  const [customFlexRate, setCustomFlexRate] = useState(30);
 
   // Quantity & Discount
   const [quantity, setQuantity] = useState(1);
@@ -113,7 +106,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Handle Fixed Width change (updates machine default rate)
   const handleWidthChange = (newWidth) => {
     setFixedWidth(newWidth);
-    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3.5 ? 750 : 550);
+    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3.5 ? 1350 : 1250);
     setCustomMachineRate(newRate);
   };
 
@@ -121,7 +114,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const handleMachineTypeChange = (newType) => {
     setMachineType(newType);
     const config = MACHINE_OPTIONS[newType] || MACHINE_OPTIONS.standard;
-    const newRate = config.defaultRates[validWidth] || 550;
+    const newRate = config.defaultRates[validWidth] || 1250;
     setCustomMachineRate(newRate);
   };
 
@@ -323,9 +316,15 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                <span className="font-bold text-slate-800 font-mono">Fixed 2.5 Ft</span>
+              <div className="mt-3 pt-2.5 border-t border-slate-200/60 space-y-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Machine Base:</span>
+                  <span className="font-black text-blue-700 font-mono">₹1,250</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Inside Banner Width:</span>
+                  <span className="font-bold text-slate-800 font-mono">Fixed 2.5 Ft</span>
+                </div>
               </div>
             </div>
 
@@ -361,9 +360,15 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                <span className="font-bold text-slate-800 font-mono">Fixed 3.5 Ft</span>
+              <div className="mt-3 pt-2.5 border-t border-slate-200/60 space-y-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Machine Base:</span>
+                  <span className="font-black text-blue-700 font-mono">₹1,350</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Inside Banner Width:</span>
+                  <span className="font-bold text-slate-800 font-mono">Fixed 3.5 Ft</span>
+                </div>
               </div>
             </div>
           </div>
@@ -479,7 +484,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
           </div>
         </div>
 
-        {/* STEP 3: FLEX PRINTING MEDIA (Star Flex @ ₹25/sqft) */}
+        {/* STEP 3: FLEX PRINTING MEDIA (Star Flex @ ₹30/sqft) */}
         {includeBanner && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -492,7 +497,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 </h2>
               </div>
               <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                Star Flex @ ₹25/Sq.Ft.
+                Star Flex @ ₹30/Sq.Ft.
               </span>
             </div>
 
@@ -507,7 +512,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                       Star Flex - High Gloss Finish
                     </h3>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                      ₹25 / Sq.Ft.
+                      ₹30 / Sq.Ft.
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">

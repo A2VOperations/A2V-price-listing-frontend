@@ -16,11 +16,11 @@ export default function RollUpStandiePreview({
   includeMachine = true,
   includeBanner = true,
   mediaName = "Star Flex - High Gloss Finish",
-  flexRate = 25,
-  machineCost = 550,
-  flexCost = 375,
+  flexRate = 30,
+  machineCost = 1250,
+  flexCost = 450,
   totalAreaSqFt = 15.0,
-  totalPrice = 925,
+  totalPrice = 1700,
 }) {
   const numWidth = parseFloat(machineWidth) || 2.5;
   const numHeight = Math.min(6, Math.max(1, parseFloat(customHeight) || 6));
