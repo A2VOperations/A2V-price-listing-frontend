@@ -68,10 +68,13 @@ export function generateFlexQuotationPdf(data) {
   // Warm Orange Accent Triangle on the right
   doc.setFillColor(194, 65, 12); // #C2410C orange-700
   doc.triangle(
-    rightEdge - 30, headerY,
-    rightEdge, headerY,
-    rightEdge, headerY + headerHeight,
-    "F"
+    rightEdge - 30,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F",
   );
 
   // Logo: "A2V" in bold White, "PRINTS" in Orange
@@ -87,13 +90,22 @@ export function generateFlexQuotationPdf(data) {
   // Orange underline accent beneath A2V
   doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(1.2);
-  doc.line(margin + 7, headerY + 14.5, margin + 7 + a2vWidth + 4, headerY + 14.5);
+  doc.line(
+    margin + 7,
+    headerY + 14.5,
+    margin + 7 + a2vWidth + 4,
+    headerY + 14.5,
+  );
 
   // Subtitle
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(226, 232, 240); // slate-200
-  doc.text("Premium Flex Board Printing & Framing Solutions", margin + 7, headerY + 20);
+  doc.text(
+    "Premium Flex Board Printing & Framing Solutions",
+    margin + 7,
+    headerY + 20,
+  );
 
   // Right Header: Document icon in orange
   const iconX = rightEdge - 78;
@@ -109,12 +121,19 @@ export function generateFlexQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10.5);
   doc.setTextColor(255, 255, 255);
-  doc.text("QUOTATION ESTIMATE", rightEdge - 5, headerY + 9, { align: "right" });
+  doc.text("QUOTATION ESTIMATE", rightEdge - 5, headerY + 9, {
+    align: "right",
+  });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(254, 215, 170); // orange-200
-  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" },
+  );
 
   // 2. CLIENT & SPECIFICATIONS SUMMARY CARD
   const cardY = headerY + 30;
@@ -140,13 +159,18 @@ export function generateFlexQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(15, 23, 42); // slate-900
-  const clientName = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  const clientName =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
   doc.text(clientName, margin + 14, cardY + 14);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139); // slate-500
-  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  const contactText =
+    [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") ||
+    "Contact: N/A";
   doc.text(contactText, margin + 14, cardY + 20);
 
   // Right Section: SPECIFICATION SUMMARY
@@ -166,9 +190,21 @@ export function generateFlexQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85); // slate-700
-  doc.text(`Size: ${validHeight} ft x ${validWidth} ft (${flexAreaSqFt} sq. ft.)`, rightColX + 8, cardY + 13);
-  doc.text(`Media: ${activeMaterial?.name || "Flex"}`, rightColX + 8, cardY + 18);
-  doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Board" : "Boards"}`, rightColX + 8, cardY + 23);
+  doc.text(
+    `Size: ${validHeight} ft x ${validWidth} ft (${flexAreaSqFt} sq. ft.)`,
+    rightColX + 8,
+    cardY + 13,
+  );
+  doc.text(
+    `Media: ${activeMaterial?.name || "Flex"}`,
+    rightColX + 8,
+    cardY + 18,
+  );
+  doc.text(
+    `Quantity: ${quantity} ${quantity === 1 ? "Board" : "Boards"}`,
+    rightColX + 8,
+    cardY + 23,
+  );
 
   // 3. ITEMIZED COST BREAKDOWN TABLE
   const tableY = cardY + 32;
@@ -269,7 +305,11 @@ export function generateFlexQuotationPdf(data) {
 
   rows.forEach((row, idx) => {
     const isEven = idx % 2 === 0;
-    doc.setFillColor(isEven ? 255 : 255, isEven ? 255 : 250, isEven ? 255 : 245); // alternating white / soft cream
+    doc.setFillColor(
+      isEven ? 255 : 255,
+      isEven ? 255 : 250,
+      isEven ? 255 : 245,
+    ); // alternating white / soft cream
     doc.rect(margin, currentY, contentWidth, rowHeight, "F");
 
     // Grid Borders
@@ -286,7 +326,9 @@ export function generateFlexQuotationPdf(data) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(idx + 1), (x1 + x2) / 2, currentY + 5.5, { align: "center" });
+    doc.text(String(idx + 1), (x1 + x2) / 2, currentY + 5.5, {
+      align: "center",
+    });
 
     doc.setFont("helvetica", "bold");
     doc.setTextColor(15, 23, 42); // slate-900
@@ -332,21 +374,39 @@ export function generateFlexQuotationPdf(data) {
     // Light line divider
     doc.setDrawColor(254, 215, 170); // orange-200
     doc.setLineWidth(0.4);
-    doc.line(margin + 14, bottomSectionY + 11, margin + frameBoxW - 4, bottomSectionY + 11);
+    doc.line(
+      margin + 14,
+      bottomSectionY + 11,
+      margin + frameBoxW - 4,
+      bottomSectionY + 11,
+    );
 
     // Detail lines
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.setTextColor(51, 65, 85);
     const perimeterFormula = `2 x (${validHeight} + ${validWidth}) = ${validHeight * 2 + validWidth * 2} ft`;
-    doc.text(`Outer Perimeter: ${perimeterFormula}`, margin + 14, bottomSectionY + 17);
+    doc.text(
+      `Outer Perimeter: ${perimeterFormula}`,
+      margin + 14,
+      bottomSectionY + 17,
+    );
 
-    const supportRodDetail = hasSupportRod === "Yes" && supportRodCount > 0
-      ? `${runningFeetDetails.supportRunningFeet || 0} ft (${supportRodCount} ${supportRodType})`
-      : "Not Required (0 ft)";
-    doc.text(`Support Rods: ${supportRodDetail}`, margin + 14, bottomSectionY + 23);
+    const supportRodDetail =
+      hasSupportRod === "Yes" && supportRodCount > 0
+        ? `${runningFeetDetails.supportRunningFeet || 0} ft (${supportRodCount} ${supportRodType})`
+        : "Not Required (0 ft)";
+    doc.text(
+      `Support Rods: ${supportRodDetail}`,
+      margin + 14,
+      bottomSectionY + 23,
+    );
 
-    doc.text(`Total Running Ft: ${runningFeetDetails.totalRunningFeet || 0} ft`, margin + 14, bottomSectionY + 29);
+    doc.text(
+      `Total Running Ft: ${runningFeetDetails.totalRunningFeet || 0} ft`,
+      margin + 14,
+      bottomSectionY + 29,
+    );
   }
 
   // --- RIGHT SIDE: FINANCIAL TOTALS ---
@@ -360,7 +420,12 @@ export function generateFlexQuotationPdf(data) {
   doc.text("Gross Subtotal Amount:", totalsBoxX + 2, bottomSectionY + 6);
   doc.setFontSize(9);
   doc.setTextColor(15, 23, 42); // slate-900
-  doc.text(`Rs. ${grossSubtotal.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 6, { align: "right" });
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}/-`,
+    rightEdge - 3,
+    bottomSectionY + 6,
+    { align: "right" },
+  );
 
   // Row: Special Discount Deducted (if any)
   let totalsPayableY = bottomSectionY + 12;
@@ -370,7 +435,12 @@ export function generateFlexQuotationPdf(data) {
     doc.setTextColor(234, 88, 12); // #EA580C orange-600
     doc.text("Special Discount Deducted:", totalsBoxX + 2, bottomSectionY + 14);
     doc.setFontSize(9);
-    doc.text(`- Rs. ${validDiscount.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 14, { align: "right" });
+    doc.text(
+      `- Rs. ${validDiscount.toLocaleString()}/-`,
+      rightEdge - 3,
+      bottomSectionY + 14,
+      { align: "right" },
+    );
     totalsPayableY = bottomSectionY + 20;
   }
 
@@ -379,7 +449,15 @@ export function generateFlexQuotationPdf(data) {
   doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
   doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(0.8);
-  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD",
+  );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
@@ -388,7 +466,12 @@ export function generateFlexQuotationPdf(data) {
 
   doc.setFontSize(11.5);
   doc.setTextColor(194, 65, 12); // orange-700
-  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 4,
+    totalsPayableY + 8.5,
+    { align: "right" },
+  );
 
   // 5. SAVE & DOWNLOAD FILE
   const filename = `A2V_Quotation_FlexBoard_${quoteRef}.pdf`;
@@ -478,10 +561,13 @@ export function generateStandieQuotationPdf(data) {
   // Warm Orange Accent Triangle on the right
   doc.setFillColor(194, 65, 12); // #C2410C orange-700
   doc.triangle(
-    rightEdge - 30, headerY,
-    rightEdge, headerY,
-    rightEdge, headerY + headerHeight,
-    "F"
+    rightEdge - 30,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F",
   );
 
   // Logo: "A2V" in bold White, "PRINTS" in Orange
@@ -497,13 +583,22 @@ export function generateStandieQuotationPdf(data) {
   // Orange underline accent beneath A2V
   doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(1.2);
-  doc.line(margin + 7, headerY + 14.5, margin + 7 + a2vWidth + 4, headerY + 14.5);
+  doc.line(
+    margin + 7,
+    headerY + 14.5,
+    margin + 7 + a2vWidth + 4,
+    headerY + 14.5,
+  );
 
   // Subtitle
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(226, 232, 240); // slate-200
-  doc.text("Heavy-Duty MS Iron Frame Standee & Displays", margin + 7, headerY + 20);
+  doc.text(
+    "Heavy-Duty MS Iron Frame Standee & Displays",
+    margin + 7,
+    headerY + 20,
+  );
 
   // Right Header: Document icon in orange
   const iconX = rightEdge - 78;
@@ -524,7 +619,12 @@ export function generateStandieQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(254, 215, 170); // orange-200
-  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" },
+  );
 
   // 2. CLIENT & SPECIFICATIONS SUMMARY CARD
   const cardY = headerY + 30;
@@ -549,13 +649,18 @@ export function generateStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(15, 23, 42); // slate-900
-  const clientName = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  const clientName =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
   doc.text(clientName, margin + 14, cardY + 14);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139); // slate-500
-  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  const contactText =
+    [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") ||
+    "Contact: N/A";
   doc.text(contactText, margin + 14, cardY + 20);
 
   // Right Section: SPECIFICATION SUMMARY
@@ -574,9 +679,21 @@ export function generateStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85); // slate-700
-  doc.text(`Standee Size: ${validWidth}ft (W) × ${validHeight}ft (H)`, rightColX + 8, cardY + 13);
-  doc.text(`Flex Area: ${flexWidth}×${flexHeight} ft (${flexArea} sq.ft. ${isDoubleSided ? "Both Sides" : "Single Side"})`, rightColX + 8, cardY + 18);
-  doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`, rightColX + 8, cardY + 23);
+  doc.text(
+    `Standee Size: ${validWidth}ft (W) × ${validHeight}ft (H)`,
+    rightColX + 8,
+    cardY + 13,
+  );
+  doc.text(
+    `Flex Area: ${flexWidth}×${flexHeight} ft (${flexArea} sq.ft. ${isDoubleSided ? "Both Sides" : "Single Side"})`,
+    rightColX + 8,
+    cardY + 18,
+  );
+  doc.text(
+    `Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`,
+    rightColX + 8,
+    cardY + 23,
+  );
 
   // 3. ITEMIZED COST BREAKDOWN TABLE
   const tableY = cardY + 32;
@@ -637,7 +754,7 @@ export function generateStandieQuotationPdf(data) {
 
     // 4. Flex Printing
     rows.push({
-      desc: `Graphic Flex Banner (${isDoubleSided ? "Both Sides: Front + Back" : "Single-Sided"})`,
+      desc: `Flex Banner with Fitting (${isDoubleSided ? "Both Sides" : "Single-Sided"})`,
       spec: `${mediaName || "Normal Flex"} (${flexArea} sqft ${isDoubleSided ? "× 2" : ""}) @ Rs. ${flexRate}/sqft`,
       total: `Rs. ${(flexCost * quantity).toLocaleString()}/-`,
     });
@@ -746,7 +863,12 @@ export function generateStandieQuotationPdf(data) {
   doc.text("Gross Subtotal:", totalsBoxX + 2, bottomSectionY + 6);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(30, 41, 59);
-  doc.text(`Rs. ${grossSubtotal.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 6, { align: "right" });
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}/-`,
+    rightEdge - 3,
+    bottomSectionY + 6,
+    { align: "right" },
+  );
 
   let totalsPayableY = bottomSectionY + 14;
 
@@ -756,7 +878,12 @@ export function generateStandieQuotationPdf(data) {
     doc.setTextColor(234, 88, 12); // orange-600
     doc.text("Special Discount:", totalsBoxX + 2, bottomSectionY + 14);
     doc.setFontSize(9);
-    doc.text(`- Rs. ${validDiscount.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 14, { align: "right" });
+    doc.text(
+      `- Rs. ${validDiscount.toLocaleString()}/-`,
+      rightEdge - 3,
+      bottomSectionY + 14,
+      { align: "right" },
+    );
     totalsPayableY = bottomSectionY + 22;
   }
 
@@ -765,7 +892,15 @@ export function generateStandieQuotationPdf(data) {
   doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
   doc.setDrawColor(234, 88, 12); // #EA580C orange-600
   doc.setLineWidth(0.8);
-  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD",
+  );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
@@ -774,7 +909,12 @@ export function generateStandieQuotationPdf(data) {
 
   doc.setFontSize(11.5);
   doc.setTextColor(194, 65, 12); // orange-700
-  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 4,
+    totalsPayableY + 8.5,
+    { align: "right" },
+  );
 
   // 5. SAVE & DOWNLOAD FILE
   const filename = `A2V_Quotation_Standee_${quoteRef}.pdf`;
@@ -815,7 +955,7 @@ export function generateRollUpStandieQuotationPdf(data) {
     format: "a4",
   });
 
-  const margin = 15;                  
+  const margin = 15;
   const contentWidth = 180;
   const rightEdge = margin + contentWidth;
   const quoteRef = `Q-RLP-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -840,10 +980,13 @@ export function generateRollUpStandieQuotationPdf(data) {
   // Blue Accent Triangle on Right
   doc.setFillColor(37, 99, 235); // blue-600
   doc.triangle(
-    rightEdge - 30, headerY,
-    rightEdge, headerY,
-    rightEdge, headerY + headerHeight,
-    "F"
+    rightEdge - 30,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F",
   );
 
   // Logo: "A2V" in bold White, "PRINTS" in Blue
@@ -858,23 +1001,39 @@ export function generateRollUpStandieQuotationPdf(data) {
 
   doc.setDrawColor(37, 99, 235);
   doc.setLineWidth(1.2);
-  doc.line(margin + 7, headerY + 14.5, margin + 7 + a2vWidth + 4, headerY + 14.5);
+  doc.line(
+    margin + 7,
+    headerY + 14.5,
+    margin + 7 + a2vWidth + 4,
+    headerY + 14.5,
+  );
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(226, 232, 240);
-  doc.text("Roll-Up Standee Systems & Display Solutions", margin + 7, headerY + 20);
+  doc.text(
+    "Roll-Up Standee Systems & Display Solutions",
+    margin + 7,
+    headerY + 20,
+  );
 
   // Right Header Text
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10.5);
   doc.setTextColor(255, 255, 255);
-  doc.text("ROLL-UP STANDEE QUOTATION", rightEdge - 5, headerY + 9, { align: "right" });
+  doc.text("ROLL-UP STANDEE QUOTATION", rightEdge - 5, headerY + 9, {
+    align: "right",
+  });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(191, 219, 254); // blue-200
-  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" },
+  );
 
   // Client & Specifications Summary Card
   const cardY = headerY + 30;
@@ -899,13 +1058,18 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(15, 23, 42);
-  const clientName = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  const clientName =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
   doc.text(clientName, margin + 14, cardY + 14);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  const contactText =
+    [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") ||
+    "Contact: N/A";
   doc.text(contactText, margin + 14, cardY + 20);
 
   // Right Section: Specs Summary
@@ -924,9 +1088,21 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85);
-  doc.text(`Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.5 ? '30"' : '42"'})`, rightColX + 8, cardY + 13);
-  doc.text(`Standee Display Size: ${machineWidth}ft (W) × ${customHeight}ft (H) (${totalAreaSqFt} Sq.Ft.)`, rightColX + 8, cardY + 18);
-  doc.text(`Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`, rightColX + 8, cardY + 23);
+  doc.text(
+    `Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.5 ? '30"' : '42"'})`,
+    rightColX + 8,
+    cardY + 13,
+  );
+  doc.text(
+    `Standee Display Size: ${machineWidth}ft (W) × ${customHeight}ft (H) (${totalAreaSqFt} Sq.Ft.)`,
+    rightColX + 8,
+    cardY + 18,
+  );
+  doc.text(
+    `Quantity: ${quantity} ${quantity === 1 ? "Unit" : "Units"}`,
+    rightColX + 8,
+    cardY + 23,
+  );
 
   // Table
   const tableY = cardY + 34;
@@ -1006,7 +1182,11 @@ export function generateRollUpStandieQuotationPdf(data) {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.8);
-    doc.setTextColor(row.total === "INCLUDED" ? 16 : 15, row.total === "INCLUDED" ? 185 : 23, row.total === "INCLUDED" ? 129 : 42);
+    doc.setTextColor(
+      row.total === "INCLUDED" ? 16 : 15,
+      row.total === "INCLUDED" ? 185 : 23,
+      row.total === "INCLUDED" ? 129 : 42,
+    );
     doc.text(row.total, x5 - 4, currentY + 7, { align: "right" });
 
     currentY += rowHeight;
@@ -1053,7 +1233,12 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.text("Gross Subtotal:", totalsBoxX + 2, bottomSectionY + 6);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(30, 41, 59);
-  doc.text(`Rs. ${grossSubtotal.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 6, { align: "right" });
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}/-`,
+    rightEdge - 3,
+    bottomSectionY + 6,
+    { align: "right" },
+  );
 
   let totalsPayableY = bottomSectionY + 14;
 
@@ -1063,7 +1248,12 @@ export function generateRollUpStandieQuotationPdf(data) {
     doc.setTextColor(220, 38, 38);
     doc.text("Special Discount:", totalsBoxX + 2, bottomSectionY + 14);
     doc.setFontSize(9);
-    doc.text(`- Rs. ${validDiscount.toLocaleString()}/-`, rightEdge - 3, bottomSectionY + 14, { align: "right" });
+    doc.text(
+      `- Rs. ${validDiscount.toLocaleString()}/-`,
+      rightEdge - 3,
+      bottomSectionY + 14,
+      { align: "right" },
+    );
     totalsPayableY = bottomSectionY + 22;
   }
 
@@ -1072,7 +1262,15 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.setFillColor(239, 246, 255); // blue-50
   doc.setDrawColor(37, 99, 235); // blue-600
   doc.setLineWidth(0.8);
-  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD",
+  );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
@@ -1081,7 +1279,12 @@ export function generateRollUpStandieQuotationPdf(data) {
 
   doc.setFontSize(11.5);
   doc.setTextColor(29, 78, 216);
-  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 4,
+    totalsPayableY + 8.5,
+    { align: "right" },
+  );
 
   // Save & Download
   const filename = `A2V_Quotation_RollUpStandee_${quoteRef}.pdf`;
@@ -1101,31 +1304,38 @@ export function generateStandieHutQuotationPdf(data) {
   const {
     standeeWidth = 2.5,
     standeeHeight = 4,
+    totalHeight,
     legClearance = 0.5,
     flexWidth = 2.5,
-    flexHeight = 3.5,
-    singleSideFlexArea = 8.75,
-    totalFlexArea = 17.5,
+    flexHeight = 4,
+    singleSideFlexArea = 10,
+    totalFlexArea = 20,
     isDoubleSided = true,
     frameType = "iron-3kg",
     frameName = "Iron Frame - Light (3 kg)",
-    runningFt = 26,
+    runningFt = 28,
     frameRate = 35,
-    frameCost = 910,
+    frameCost = 980,
     hingesCount = 2,
     hingeRate = 15,
     hingesCost = 30,
     mediaId = "star-flex",
     mediaName = "Star Flex - High Gloss Finish",
-    flexRate = 30,
-    flexCost = 440,
-    unitPrice = 1350,
+    flexRate = 25,
+    flexCost = 500,
+    unitPrice = 1510,
     quantity = 1,
-    grossSubtotal = 1350,
+    grossSubtotal = 1510,
     validDiscount = 0,
-    totalAmount = 1350,
+    totalAmount = 1510,
     clientInfo = {},
   } = data;
+
+  const totalFrameHeight =
+    totalHeight ||
+    parseFloat(
+      (parseFloat(standeeHeight) + parseFloat(legClearance)).toFixed(2),
+    );
 
   const doc = new jsPDF({
     orientation: "portrait",
@@ -1167,18 +1377,29 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
   doc.setTextColor(251, 191, 36); // amber-300
-  doc.text("LARGE FORMAT PRINTING  |  FABRICATED STANDEES  |  SIGNAGE SOLUTIONS", margin + 10, headerY + 18);
+  doc.text(
+    "LARGE FORMAT PRINTING  |  FABRICATED STANDEES  |  SIGNAGE SOLUTIONS",
+    margin + 10,
+    headerY + 18,
+  );
 
   // Right Header Text
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10.5);
   doc.setTextColor(255, 255, 255);
-  doc.text("STANDEE HUT QUOTATION", rightEdge - 5, headerY + 9, { align: "right" });
+  doc.text("STANDEE HUT QUOTATION", rightEdge - 5, headerY + 9, {
+    align: "right",
+  });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(253, 230, 138); // amber-200
-  doc.text(`Ref: ${quoteRef}  |  Date: ${dateStr}`, rightEdge - 5, headerY + 16, { align: "right" });
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" },
+  );
 
   // Client & Specs Summary Card
   const cardY = headerY + 30;
@@ -1198,13 +1419,18 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(15, 23, 42);
-  const clientNameStr = clientInfo?.clientName || clientInfo?.companyName || "Walk-in Client / Customer";
+  const clientNameStr =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
   doc.text(clientNameStr, margin + 6, cardY + 14);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  const contactText = [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") || "Contact: N/A";
+  const contactText =
+    [clientInfo?.phone, clientInfo?.email].filter(Boolean).join("  |  ") ||
+    "Contact: N/A";
   doc.text(contactText, margin + 6, cardY + 21);
 
   // Right Section: Specs
@@ -1218,8 +1444,16 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85);
   doc.text(`Hut Geometry: A-Frame Double-Sided Tent`, rightColX, cardY + 13);
-  doc.text(`Total Size: ${standeeWidth}ft (W) × ${standeeHeight}ft (H) (${legClearance}ft Legs)`, rightColX, cardY + 18);
-  doc.text(`Flex Size: ${flexWidth}ft (W) × ${flexHeight}ft (H) (${totalFlexArea} Sq.Ft.)`, rightColX, cardY + 23);
+  doc.text(
+    `Total Height: ${standeeWidth}ft (W) × ${totalFrameHeight}ft (H) (${legClearance}ft Legs)`,
+    rightColX,
+    cardY + 18,
+  );
+  doc.text(
+    `Flex Size: ${flexWidth}ft (W) × ${flexHeight}ft (H) (${totalFlexArea} Sq.Ft.)`,
+    rightColX,
+    cardY + 23,
+  );
 
   // Table
   const tableY = cardY + 35;
@@ -1252,7 +1486,7 @@ export function generateStandieHutQuotationPdf(data) {
       title: "A-Frame Hut Structure Fabrication",
       subtitle: `${frameName} (2 Faces / Tent Structure)`,
       spec: `${runningFt} Running Ft @ Rs. ${frameRate}/ft`,
-      subSpec: `2 faces × (2×${standeeHeight} + 2×${standeeWidth} ft) = ${runningFt} ft`,
+      subSpec: `2 faces × (2×${totalFrameHeight} + 2×${standeeWidth} ft) = ${runningFt} ft`,
       amount: `Rs. ${frameCost.toLocaleString()}`,
     },
     {
@@ -1268,15 +1502,16 @@ export function generateStandieHutQuotationPdf(data) {
       title: "Top Apex Hinges Hardware",
       subtitle: "Heavy-duty folding hinges for A-frame apex joint",
       spec: `${hingesCount} Pcs @ Rs. ${hingeRate}/pc`,
-      subSpec: "High stability metal folding hinges connecting front & back frames",
+      subSpec:
+        "High stability metal folding hinges connecting front & back frames",
       amount: `Rs. ${hingesCost.toLocaleString()}`,
     },
     {
       num: "4",
       title: "Safety Stay Chain & Leg Clearance",
-      subtitle: `Elevated 0.5 Ft (${Math.round(legClearance * 12)} Inches) feet clearance + limiting chain`,
+      subtitle: `Elevated +${legClearance} Ft (${Math.round(legClearance * 12)} Inches) bottom legs added + limiting chain`,
       spec: "Included Standard",
-      subSpec: "Ensures rigid A-frame stability and protects banner from dirt",
+      subSpec: "Bottom legs added below banner to protect from dirt and moisture",
       amount: "INCLUDED",
     },
   ];
@@ -1285,7 +1520,11 @@ export function generateStandieHutQuotationPdf(data) {
   const rowH = 15;
 
   rows.forEach((row, i) => {
-    doc.setFillColor(i % 2 === 0 ? 255 : 248, i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 252);
+    doc.setFillColor(
+      i % 2 === 0 ? 255 : 248,
+      i % 2 === 0 ? 255 : 250,
+      i % 2 === 0 ? 255 : 252,
+    );
     doc.rect(margin, currentY, contentWidth, rowH, "F");
 
     doc.setDrawColor(226, 232, 240);
@@ -1323,7 +1562,11 @@ export function generateStandieHutQuotationPdf(data) {
     // Amount
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
-    doc.setTextColor(row.amount === "INCLUDED" ? 16 : 15, row.amount === "INCLUDED" ? 185 : 23, row.amount === "INCLUDED" ? 129 : 42);
+    doc.setTextColor(
+      row.amount === "INCLUDED" ? 16 : 15,
+      row.amount === "INCLUDED" ? 185 : 23,
+      row.amount === "INCLUDED" ? 129 : 42,
+    );
     doc.text(row.amount, x5 - 4, currentY + 7, { align: "right" });
 
     currentY += rowH;
@@ -1353,10 +1596,26 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.8);
   doc.setTextColor(71, 85, 105);
-  doc.text("• Foldable A-Frame Hut standee for effortless storage & transit.", margin + 4, totalsY + 11.5);
-  doc.text("• Dual-sided viewing maximizes pedestrian walk-by visibility.", margin + 4, totalsY + 16.5);
-  doc.text("• Weather-resistant solvent / eco-solvent UV-cure printing.", margin + 4, totalsY + 21.5);
-  doc.text("• 50% advance required for custom fabrication; balance on dispatch.", margin + 4, totalsY + 26.5);
+  doc.text(
+    "• Foldable A-Frame Hut standee for effortless storage & transit.",
+    margin + 4,
+    totalsY + 11.5,
+  );
+  doc.text(
+    "• Dual-sided viewing maximizes pedestrian walk-by visibility.",
+    margin + 4,
+    totalsY + 16.5,
+  );
+  doc.text(
+    "• Weather-resistant solvent / eco-solvent UV-cure printing.",
+    margin + 4,
+    totalsY + 21.5,
+  );
+  doc.text(
+    "• 50% advance required for custom fabrication; balance on dispatch.",
+    margin + 4,
+    totalsY + 26.5,
+  );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(7.2);
@@ -1366,7 +1625,11 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.8);
   doc.setTextColor(71, 85, 105);
-  doc.text("A2V Digi Graphics  |  Bank: HDFC Bank  |  UPI: a2vgroups@upi", margin + 4, totalsY + 39.5);
+  doc.text(
+    "A2V Digi Graphics  |  Bank: HDFC Bank  |  UPI: a2vgroups@upi",
+    margin + 4,
+    totalsY + 39.5,
+  );
 
   // Right: Price Breakdown
   doc.setFillColor(255, 255, 255);
@@ -1376,16 +1639,36 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(71, 85, 105);
-  doc.text(`Subtotal (${quantity} ${quantity === 1 ? "Unit" : "Units"}):`, totalsBoxX + 4, totalsY + 8);
-  doc.text(`Rs. ${grossSubtotal.toLocaleString()}`, rightEdge - 4, totalsY + 8, { align: "right" });
+  doc.text(
+    `Subtotal (${quantity} ${quantity === 1 ? "Unit" : "Units"}):`,
+    totalsBoxX + 4,
+    totalsY + 8,
+  );
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}`,
+    rightEdge - 4,
+    totalsY + 8,
+    { align: "right" },
+  );
 
   doc.text("Special Discount:", totalsBoxX + 4, totalsY + 16);
-  doc.setTextColor(validDiscount > 0 ? 16 : 71, validDiscount > 0 ? 185 : 85, validDiscount > 0 ? 129 : 105);
-  doc.text(validDiscount > 0 ? `- Rs. ${validDiscount.toLocaleString()}` : "Rs. 0", rightEdge - 4, totalsY + 16, { align: "right" });
+  doc.setTextColor(
+    validDiscount > 0 ? 16 : 71,
+    validDiscount > 0 ? 185 : 85,
+    validDiscount > 0 ? 129 : 105,
+  );
+  doc.text(
+    validDiscount > 0 ? `- Rs. ${validDiscount.toLocaleString()}` : "Rs. 0",
+    rightEdge - 4,
+    totalsY + 16,
+    { align: "right" },
+  );
 
   doc.setTextColor(71, 85, 105);
   doc.text("GST / Taxes:", totalsBoxX + 4, totalsY + 24);
-  doc.text("Extra as applicable", rightEdge - 4, totalsY + 24, { align: "right" });
+  doc.text("Extra as applicable", rightEdge - 4, totalsY + 24, {
+    align: "right",
+  });
 
   // Grand Total Payable Box
   const totalsPayableY = totalsY + 33;
@@ -1394,7 +1677,15 @@ export function generateStandieHutQuotationPdf(data) {
   doc.setFillColor(254, 243, 199); // amber-100
   doc.setDrawColor(245, 158, 11); // amber-500
   doc.setLineWidth(0.8);
-  doc.roundedRect(totalsBoxX, totalsPayableY, totalsBoxW, payableBoxH, 2, 2, "FD");
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD",
+  );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
@@ -1403,7 +1694,12 @@ export function generateStandieHutQuotationPdf(data) {
 
   doc.setFontSize(11.5);
   doc.setTextColor(180, 83, 9);
-  doc.text(`Rs. ${totalAmount.toLocaleString()}/-`, rightEdge - 4, totalsPayableY + 8.5, { align: "right" });
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 4,
+    totalsPayableY + 8.5,
+    { align: "right" },
+  );
 
   // Save & Download
   const filename = `A2V_Quotation_StandeeHut_${quoteRef}.pdf`;
@@ -1415,6 +1711,3 @@ export function generateStandieHutQuotationPdf(data) {
     return null;
   }
 }
-
-
-

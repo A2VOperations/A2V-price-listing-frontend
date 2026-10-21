@@ -15,14 +15,14 @@ import { useQuote } from "@/context/QuoteContext";
 import StandiePreview from "./StandiePreview";
 import { generateStandieQuotationPdf } from "@/lib/generateQuotationPdf";
 
-
 const FLEX_MEDIA_TYPES = [
   {
     id: "star-flex",
     name: "Star Flex - High Gloss Finish",
     defaultRate: 30,
     tag: "High Gloss",
-    description: "High durability glossy Star Flex with vivid color contrast and rich ink saturation.",
+    description:
+      "High durability glossy Star Flex with vivid color contrast and rich ink saturation.",
   },
 ];
 
@@ -42,7 +42,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   // Iron Rod Frame Specifications
   const [ironRodRatePerFt, setIronRodRatePerFt] = useState(35);
 
-  // Angle Rod Base Feet Specifications
+  // Angle legs Rod Base Feet Specifications
   const [angleBaseTotalFt, setAngleBaseTotalFt] = useState(2);
   const [angleRodRatePerFt, setAngleRodRatePerFt] = useState(50);
 
@@ -61,18 +61,22 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const [addedSuccess, setAddedSuccess] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-
   // Safe Dimension Parsing
   const validHeight = Math.max(1, parseFloat(standeeHeight) || 5);
   const validWidth = Math.max(0.5, parseFloat(standeeWidth) || 3);
-  const validLeg = Math.max(0, Math.min(validHeight - 0.5, parseFloat(legClearance) || 1));
+  const validLeg = Math.max(
+    0,
+    Math.min(validHeight - 0.5, parseFloat(legClearance) || 1),
+  );
 
   // Calculated Flex Display Size
   const flexHeight = parseFloat((validHeight - validLeg).toFixed(2));
   const flexWidth = validWidth;
   const singleSideFlexArea = parseFloat((flexHeight * flexWidth).toFixed(2));
   const sidesMultiplier = isDoubleSided ? 2 : 1;
-  const totalFlexPrintArea = parseFloat((singleSideFlexArea * sidesMultiplier).toFixed(2));
+  const totalFlexPrintArea = parseFloat(
+    (singleSideFlexArea * sidesMultiplier).toFixed(2),
+  );
 
   // Safe Rates
   const validFlexRate = Math.max(0, parseFloat(flexRatePerSqFt) || 0);
@@ -86,7 +90,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
 
   // 2. Iron Rod Frame Running Feet: (Height + Height + Width + Width) = 5+5+3+3 = 16 running ft
   // Cost: 16 × 35 = ₹560
-  const ironRunningFt = parseFloat((validHeight * 2 + validWidth * 2).toFixed(2));
+  const ironRunningFt = parseFloat(
+    (validHeight * 2 + validWidth * 2).toFixed(2),
+  );
   const ironRodCostTotal = Math.round(ironRunningFt * validIronRate);
 
   // 3. Angle Rod Base (Legs): default 2 ft × ₹50 = ₹100
@@ -98,13 +104,19 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const supportCostTotal = Math.round(validSupports * validSupportRate);
 
   // Per Unit Subtotal: 560 + 100 + 320 + 600 = ₹1,580
-  const unitTotal = ironRodCostTotal + angleRodCostTotal + supportCostTotal + flexCostTotal;
+  const unitTotal =
+    ironRodCostTotal + angleRodCostTotal + supportCostTotal + flexCostTotal;
   const grossSubtotal = Math.round(unitTotal * quantity);
-  const validDiscount = Math.max(0, Math.min(grossSubtotal, parseFloat(discount) || 0));
+  const validDiscount = Math.max(
+    0,
+    Math.min(grossSubtotal, parseFloat(discount) || 0),
+  );
   const netAmountPayable = Math.max(0, grossSubtotal - validDiscount);
 
   // Media object
-  const activeMedia = FLEX_MEDIA_TYPES.find((m) => m.id === selectedMediaId) || FLEX_MEDIA_TYPES[0];
+  const activeMedia =
+    FLEX_MEDIA_TYPES.find((m) => m.id === selectedMediaId) ||
+    FLEX_MEDIA_TYPES[0];
 
   const handleMediaChange = (media) => {
     setSelectedMediaId(media.id);
@@ -129,7 +141,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
         "Flex Display Area": `${flexWidth} ft × ${flexHeight} ft (${singleSideFlexArea} sq.ft. ${isDoubleSided ? "Both Sides × 2" : "Single Side"})`,
         "Ground Leg Clearance": `${validLeg} ft`,
         "Iron Pipe Frame": `${ironRunningFt} running ft (${validHeight}+${validHeight}+${validWidth}+${validWidth} ft) @ ₹${validIronRate}/ft (₹${ironRodCostTotal})`,
-        "Angle Rod Base Feet": `${validAngleFt} ft @ ₹${validAngleRate}/ft (₹${angleRodCostTotal})`,
+        "Angle legs": `${validAngleFt} ft @ ₹${validAngleRate}/ft (₹${angleRodCostTotal})`,
         "Support Rods": `${validSupports} supports @ ₹${validSupportRate}/pc (₹${supportCostTotal})`,
         "Flex Printing": `${activeMedia.name} @ ₹${validFlexRate}/sqft (₹${flexCostTotal})`,
       },
@@ -192,13 +204,16 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 uppercase tracking-wide">
               Iron Frame Standee Configurator
             </span>
-            <span className="text-xs text-slate-400 font-mono">#{product?.code || "STD-002"}</span>
+            <span className="text-xs text-slate-400 font-mono">
+              #{product?.code || "STD-002"}
+            </span>
           </div>
           <h2 className="text-xl font-black text-slate-900 mt-1">
             Iron Frame Standee &amp; Flex Display Calculator
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Heavy-duty MS iron pipe framing with running feet, angle base stand, 4 corner supports, and 2-sided flex printing.
+            Heavy-duty MS iron pipe framing with running feet, angle base stand,
+            4 corner supports, and 2-sided flex printing.
           </p>
         </div>
 
@@ -211,7 +226,8 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
             ₹{netAmountPayable.toLocaleString()}
           </div>
           <div className="text-[10px] text-slate-500 font-mono">
-            ₹{unitTotal.toLocaleString()} / unit • {quantity} {quantity === 1 ? "unit" : "units"}
+            ₹{unitTotal.toLocaleString()} / unit • {quantity}{" "}
+            {quantity === 1 ? "unit" : "units"}
           </div>
         </div>
       </div>
@@ -247,9 +263,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                     onChange={(e) => setStandeeHeight(e.target.value)}
                     className="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
-                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">ft</span>
+                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">
+                    ft
+                  </span>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-0.5 block">Full frame height</span>
+                <span className="text-[9px] text-slate-400 mt-0.5 block">
+                  Full frame height
+                </span>
               </div>
 
               <div>
@@ -266,9 +286,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                     onChange={(e) => setStandeeWidth(e.target.value)}
                     className="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
-                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">ft</span>
+                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">
+                    ft
+                  </span>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-0.5 block">Frame width</span>
+                <span className="text-[9px] text-slate-400 mt-0.5 block">
+                  Frame width
+                </span>
               </div>
 
               <div>
@@ -285,9 +309,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                     onChange={(e) => setLegClearance(e.target.value)}
                     className="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
-                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">ft</span>
+                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-bold">
+                    ft
+                  </span>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-0.5 block">Default 1 ft clearance</span>
+                <span className="text-[9px] text-slate-400 mt-0.5 block">
+                  Default 1 ft clearance
+                </span>
               </div>
             </div>
 
@@ -300,7 +328,8 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 <span className="text-amber-900 font-semibold">
                   Mounted Flex Board Size:{" "}
                   <strong className="text-amber-950 font-bold font-mono">
-                    {flexHeight} ft (H) × {flexWidth} ft (W) = {singleSideFlexArea} Sq.Ft.
+                    {flexHeight} ft (H) × {flexWidth} ft (W) ={" "}
+                    {singleSideFlexArea} Sq.Ft.
                   </strong>
                 </span>
               </div>
@@ -326,11 +355,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               <div className="flex justify-between items-center text-slate-700">
                 <span>Running Feet Formula:</span>
                 <span className="font-bold text-slate-900">
-                  {validHeight} + {validHeight} + {validWidth} + {validWidth} = {ironRunningFt} Running Ft
+                  {validHeight} + {validHeight} + {validWidth} + {validWidth} ={" "}
+                  {ironRunningFt} Running Ft
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-sans">
-                (2 Vertical side poles of {validHeight}ft each + Top horizontal pipe of {validWidth}ft + Bottom crossbar of {validWidth}ft)
+                (2 Vertical side poles of {validHeight}ft each + Top horizontal
+                pipe of {validWidth}ft + Bottom crossbar of {validWidth}ft)
               </p>
             </div>
 
@@ -340,7 +371,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 Iron Rod Price per Running Foot:
               </span>
               <div className="relative w-36">
-                <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">₹</span>
+                <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">
+                  ₹
+                </span>
                 <input
                   type="number"
                   min="1"
@@ -348,21 +381,24 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                   onChange={(e) => setIronRodRatePerFt(e.target.value)}
                   className="w-full pl-6 pr-2 py-1 text-xs font-extrabold bg-white border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
-                <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">/ft</span>
+                <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">
+                  /ft
+                </span>
               </div>
             </div>
             <div className="text-right text-[11px] text-slate-500 font-mono">
-              {ironRunningFt} ft × ₹{validIronRate} = <strong className="text-slate-900">₹{ironRodCostTotal}</strong>
+              {ironRunningFt} ft × ₹{validIronRate} ={" "}
+              <strong className="text-slate-900">₹{ironRodCostTotal}</strong>
             </div>
           </div>
 
           {/* 3. Angle Rod Stand (Base Legs) & 4. Support Rods */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Angle Rod Base Feet */}
+            {/* Angle legs */}
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                  3. Angle Rod Base Feet
+                  3. Angle legs
                 </span>
                 <span className="text-xs font-extrabold text-orange-700">
                   ₹{angleRodCostTotal.toLocaleString()}
@@ -374,7 +410,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
 
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-600">Base Feet Span:</span>
+                  <span className="text-[11px] font-semibold text-slate-600">
+                    Base Feet Span:
+                  </span>
                   <div className="relative w-24">
                     <input
                       type="number"
@@ -384,14 +422,20 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                       onChange={(e) => setAngleBaseTotalFt(e.target.value)}
                       className="w-full pr-6 pl-2 py-1 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none"
                     />
-                    <span className="absolute right-2 top-1 text-[10px] text-slate-400 font-bold">ft</span>
+                    <span className="absolute right-2 top-1 text-[10px] text-slate-400 font-bold">
+                      ft
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-600">Rate per Foot:</span>
+                  <span className="text-[11px] font-semibold text-slate-600">
+                    Rate per Foot:
+                  </span>
                   <div className="relative w-24">
-                    <span className="absolute left-2 top-1 text-xs text-slate-400 font-bold">₹</span>
+                    <span className="absolute left-2 top-1 text-xs text-slate-400 font-bold">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min="1"
@@ -404,7 +448,8 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               </div>
 
               <div className="text-right text-[10px] text-slate-500 font-mono pt-1 border-t border-slate-200">
-                {validAngleFt} ft × ₹{validAngleRate} = <strong className="text-slate-900">₹{angleRodCostTotal}</strong>
+                {validAngleFt} ft × ₹{validAngleRate} ={" "}
+                <strong className="text-slate-900">₹{angleRodCostTotal}</strong>
               </div>
             </div>
 
@@ -419,12 +464,15 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 </span>
               </div>
               <p className="text-[10px] text-slate-500 leading-tight">
-                4 Corner stays (2 on each leg) bracing upright poles to the angle feet.
+                4 Corner stays (2 on each leg) bracing upright poles to the
+                angle feet.
               </p>
 
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-600">Support Count:</span>
+                  <span className="text-[11px] font-semibold text-slate-600">
+                    Support Count:
+                  </span>
                   <div className="relative w-24">
                     <input
                       type="number"
@@ -437,9 +485,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-600">Rate per Piece:</span>
+                  <span className="text-[11px] font-semibold text-slate-600">
+                    Rate per Piece:
+                  </span>
                   <div className="relative w-24">
-                    <span className="absolute left-2 top-1 text-xs text-slate-400 font-bold">₹</span>
+                    <span className="absolute left-2 top-1 text-xs text-slate-400 font-bold">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min="0"
@@ -452,7 +504,8 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               </div>
 
               <div className="text-right text-[10px] text-slate-500 font-mono pt-1 border-t border-slate-200">
-                {validSupports} pcs × ₹{validSupportRate} = <strong className="text-slate-900">₹{supportCostTotal}</strong>
+                {validSupports} pcs × ₹{validSupportRate} ={" "}
+                <strong className="text-slate-900">₹{supportCostTotal}</strong>
               </div>
             </div>
           </div>
@@ -503,20 +556,27 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-slate-900">Star Flex - High Gloss Finish</span>
+                    <span className="text-sm font-black text-slate-900">
+                      Star Flex - High Gloss Finish
+                    </span>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-200">
                       High Gloss Flex
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
-                    High durability glossy Star Flex with vivid color contrast and rich ink saturation.
+                    High durability glossy Star Flex with vivid color contrast
+                    and rich ink saturation.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2.5 shrink-0 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-xs">
-                  <span className="text-xs font-bold text-slate-700 whitespace-nowrap">Star Flex Rate:</span>
+                  <span className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                    Star Flex Rate:
+                  </span>
                   <div className="relative w-28">
-                    <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">₹</span>
+                    <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min="1"
@@ -524,7 +584,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                       onChange={(e) => setFlexRatePerSqFt(e.target.value)}
                       className="w-full pl-6 pr-2 py-1 text-xs font-black bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
                     />
-                    <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">/sqft</span>
+                    <span className="absolute right-2 top-1.5 text-[10px] text-slate-400 font-bold">
+                      /sqft
+                    </span>
                   </div>
                 </div>
               </div>
@@ -532,17 +594,20 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
 
             {/* Flex Calculation Breakdown Display */}
             <div className="text-right text-[11px] text-slate-600 font-mono bg-white p-2.5 rounded-lg border border-slate-200">
-              Flex Size: {flexHeight} × {flexWidth} = {singleSideFlexArea} sq.ft.
+              Flex Size: {flexHeight} × {flexWidth} = {singleSideFlexArea}{" "}
+              sq.ft.
               <br />
               {isDoubleSided ? (
                 <>
-                  = {singleSideFlexArea} sq.ft. × ₹{validFlexRate} = ₹{singleSideFlexCost}
-                  <br />
-                  = 2 × ₹{singleSideFlexCost} = <strong className="text-slate-900">₹{flexCostTotal}</strong>
+                  = {singleSideFlexArea} sq.ft. × ₹{validFlexRate} = ₹
+                  {singleSideFlexCost}
+                  <br />= 2 × ₹{singleSideFlexCost} ={" "}
+                  <strong className="text-slate-900">₹{flexCostTotal}</strong>
                 </>
               ) : (
                 <>
-                  = {singleSideFlexArea} sq.ft. × ₹{validFlexRate} = <strong className="text-slate-900">₹{flexCostTotal}</strong>
+                  = {singleSideFlexArea} sq.ft. × ₹{validFlexRate} ={" "}
+                  <strong className="text-slate-900">₹{flexCostTotal}</strong>
                 </>
               )}
             </div>
@@ -566,7 +631,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                   type="number"
                   min="1"
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                  }
                   className="w-20 text-center py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-bold text-slate-900 shadow-xs focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
                 <button
@@ -584,7 +651,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 Special Discount (₹):
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">₹</span>
+                <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">
+                  ₹
+                </span>
                 <input
                   type="number"
                   min="0"
@@ -636,9 +705,12 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               {/* Iron Rod Frame */}
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="font-bold text-slate-800 block">1. Iron Rod Frame:</span>
+                  <span className="font-bold text-slate-800 block">
+                    1. Iron Rod Frame:
+                  </span>
                   <span className="text-[10px] text-slate-500 font-sans">
-                    {validHeight}+{validHeight}+{validWidth}+{validWidth} = {ironRunningFt} ft × ₹{validIronRate}
+                    {validHeight}+{validHeight}+{validWidth}+{validWidth} ={" "}
+                    {ironRunningFt} ft × ₹{validIronRate}
                   </span>
                 </div>
                 <span className="font-bold text-slate-900 shrink-0">
@@ -649,7 +721,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               {/* Angle Rod Base */}
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="font-bold text-slate-800 block">2. Angle Rod Base (Legs):</span>
+                  <span className="font-bold text-slate-800 block">
+                    2. Angle Rod Base (Legs):
+                  </span>
                   <span className="text-[10px] text-slate-500 font-sans">
                     {validAngleFt} ft × ₹{validAngleRate}
                   </span>
@@ -662,7 +736,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               {/* Support Rods */}
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="font-bold text-slate-800 block">3. Support Rods:</span>
+                  <span className="font-bold text-slate-800 block">
+                    3. Support Rods:
+                  </span>
                   <span className="text-[10px] text-slate-500 font-sans">
                     {validSupports} pcs × ₹{validSupportRate}
                   </span>
@@ -676,10 +752,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               <div className="flex justify-between items-start">
                 <div>
                   <span className="font-bold text-slate-800 block">
-                    4. Flex Printing ({isDoubleSided ? "Both Sides" : "Single Side"}):
+                    4. Flex Printing with Fitting (
+                    {isDoubleSided ? "Both Sides" : "Single Side"}):
                   </span>
                   <span className="text-[10px] text-slate-500 font-sans">
-                    {isDoubleSided ? `2 × (${singleSideFlexArea} sqft × ₹${validFlexRate})` : `${singleSideFlexArea} sqft × ₹${validFlexRate}`}
+                    {isDoubleSided
+                      ? `2 × (${singleSideFlexArea} sqft × ₹${validFlexRate})`
+                      : `${singleSideFlexArea} sqft × ₹${validFlexRate}`}
                   </span>
                 </div>
                 <span className="font-bold text-slate-900 shrink-0">
@@ -689,8 +768,11 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
 
               {/* Formula Verification Note */}
               <div className="pt-2 border-t border-slate-200 text-[10.5px] text-slate-500">
-                Formula: {ironRodCostTotal} + {angleRodCostTotal} + {supportCostTotal} + {flexCostTotal} ={" "}
-                <strong className="text-slate-800">₹{unitTotal.toLocaleString()} / unit</strong>
+                Formula: {ironRodCostTotal} + {angleRodCostTotal} +{" "}
+                {supportCostTotal} + {flexCostTotal} ={" "}
+                <strong className="text-slate-800">
+                  ₹{unitTotal.toLocaleString()} / unit
+                </strong>
               </div>
 
               {validDiscount > 0 && (
@@ -770,7 +852,9 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center gap-2 transition-all shadow-sm"
               >
                 <FiDownload className="w-4 h-4 text-orange-400" />
-                {isGeneratingPdf ? "Generating PDF..." : "Download Official Quotation PDF"}
+                {isGeneratingPdf
+                  ? "Generating PDF..."
+                  : "Download Official Quotation PDF"}
               </button>
             </div>
           </div>

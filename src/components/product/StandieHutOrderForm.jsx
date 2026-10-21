@@ -1,16 +1,9 @@
 import React, { useState, useMemo } from "react";
 import {
   FiMaximize2,
-  FiSliders,
   FiShoppingBag,
   FiDownload,
   FiCheckCircle,
-  FiLayers,
-  FiShield,
-  FiInfo,
-  FiGrid,
-  FiPackage,
-  FiZap,
   FiCheck,
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
@@ -107,18 +100,20 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
   // Safe Dimension Parsing
   const validWidth = Math.max(1, parseFloat(standeeWidth) || 2.5);
   const validHeight = Math.max(1.5, parseFloat(standeeHeight) || 4);
-  const validLeg = Math.max(0, Math.min(validHeight - 0.5, parseFloat(legClearance) || 0.5));
+  const validLeg = Math.max(0, parseFloat(legClearance) || 0.5);
 
-  // Flex Display Area
-  const flexHeight = parseFloat(Math.max(0.5, validHeight - validLeg).toFixed(2));
+  // Flex Display Area (Full standee banner height, legs are ADDED to frame height, not minused)
+  const flexHeight = parseFloat(validHeight.toFixed(2));
   const flexWidth = validWidth;
+  const totalStandeeHeight = parseFloat((validHeight + validLeg).toFixed(2));
   const singleSideFlexArea = parseFloat((flexWidth * flexHeight).toFixed(2));
   const sidesMultiplier = isDoubleSided ? 2 : 1;
   const totalFlexArea = parseFloat((singleSideFlexArea * sidesMultiplier).toFixed(2));
 
   // Running feet calculation: A-frame has 2 rectangular faces (Front + Back)
-  // Perimeter of 1 face = 2H + 2W. For 2 faces = (2H + 2W) * 2 = 4H + 4W
-  const autoRunningFt = parseFloat((validHeight * 4 + validWidth * 4).toFixed(2));
+  // Total Frame Height for each face = Flex Height + Leg Clearance = totalStandeeHeight
+  // Perimeter of 1 face = 2*(totalStandeeHeight) + 2*W. For 2 faces = 4*(totalStandeeHeight) + 4*W
+  const autoRunningFt = parseFloat((totalStandeeHeight * 4 + validWidth * 4).toFixed(2));
   const actualRunningFt = manualRunningFt !== "" && !isNaN(parseFloat(manualRunningFt))
     ? Math.max(1, parseFloat(manualRunningFt))
     : autoRunningFt;
@@ -181,7 +176,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
     const quoteItem = {
       productId: product?.id || "STD-003",
       code: product?.code || "STD-003",
-      name: `Standee Hut A-Frame (${validWidth}×${validHeight} Ft, ${activeFrameConfig.name})`,
+      name: `Standee Hut A-Frame (${validWidth}×${validHeight} Ft Flex + ${validLeg} Ft Legs, ${activeFrameConfig.name})`,
       categoryId: "flex-board",
       subCategory: "STANDIE",
       unitPrice: unitTotal,
@@ -190,9 +185,9 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
       discount: validDiscount,
       total: netAmountPayable,
       specifications: {
-        "Total Hut Size": `${validWidth} ft (W) × ${validHeight} ft (H)`,
+        "Total Standee Height": `${totalStandeeHeight} ft (${validHeight} ft Flex + ${validLeg} ft Legs)`,
         "Flex Banner Display Size": `${flexWidth} ft (W) × ${flexHeight} ft (H) (${singleSideFlexArea} sq.ft. ${isDoubleSided ? "Both Sides × 2" : "Single Side"})`,
-        "Ground Leg Clearance": `${validLeg} ft (6 Inches)`,
+        "Ground Leg Clearance": `${validLeg} ft (+ Added at bottom)`,
         "Hut Frame Structure": `${activeFrameConfig.name} (${actualRunningFt} Running Ft @ ₹${validFrameRate}/ft = ₹${frameCostTotal})`,
         "Top Apex Hinges": `${validHingesCount} Pcs @ ₹${validHingeRate}/pc = ₹${hingesCostTotal}`,
         "Flex Printing Substrate": `${activeMedia.name} (${totalFlexArea} sq.ft. @ ₹${validFlexRate}/sqft = ₹${flexCostTotal})`,
@@ -212,6 +207,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
       generateStandieHutQuotationPdf({
         standeeWidth: validWidth,
         standeeHeight: validHeight,
+        totalHeight: totalStandeeHeight,
         legClearance: validLeg,
         flexWidth,
         flexHeight,
@@ -354,7 +350,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
 
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
-                Total Height (in Feet):
+                Flex Banner Height (in Feet):
               </label>
               <div className="relative">
                 <input
@@ -377,7 +373,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
 
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
-                Leg Clearance (from bottom):
+                Bottom Legs Clearance (+ Added):
               </label>
               <div className="relative">
                 <input
@@ -386,7 +382,10 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
                   min="0"
                   max="2"
                   value={legClearance}
-                  onChange={(e) => setLegClearance(e.target.value)}
+                  onChange={(e) => {
+                    setLegClearance(e.target.value);
+                    setManualRunningFt("");
+                  }}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-black text-slate-900 font-mono outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                 />
                 <span className="absolute right-3 top-2 text-xs font-bold text-slate-400">
@@ -406,7 +405,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
               </span>
             </div>
             <span className="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded">
-              Total Height ({validHeight}') - Legs ({validLeg}') = {flexHeight} Ft
+              Flex Height ({flexHeight}') + Legs ({validLeg}') = {totalStandeeHeight} Ft Total Frame Height
             </span>
           </div>
         </div>
@@ -496,7 +495,7 @@ export default function StandieHutOrderForm({ product, onVariantSelect }) {
                 </span>
               </div>
               <span className="text-[9.5px] text-slate-500 block mt-1">
-                Formula: 2 Faces × (2×{validHeight} + 2×{validWidth}) = {autoRunningFt} ft
+                Formula: 2 Faces × (2×{totalStandeeHeight} + 2×{validWidth}) = {autoRunningFt} ft ({validHeight}' flex + {validLeg}' legs)
               </span>
             </div>
 

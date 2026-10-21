@@ -27,7 +27,8 @@ export default function StandieHutPreview({
   const numHinges = Math.max(1, parseInt(hingesCount) || 2);
   const numHingePrice = Math.max(0, parseFloat(hingeRate) || 0);
   const hingesTotalCost = numHinges * numHingePrice;
-  const numFlexH = Math.max(0.5, numH - numLeg);
+  const numFlexH = numH;
+  const totalFrameH = parseFloat((numH + numLeg).toFixed(2));
   const singleSideArea = parseFloat((numW * numFlexH).toFixed(2));
   const totalArea = parseFloat((singleSideArea * (isDoubleSided ? 2 : 1)).toFixed(2));
 
@@ -35,7 +36,7 @@ export default function StandieHutPreview({
   const isIron5kg = frameType === "iron-5kg";
 
   // Visual aspect ratio
-  const ratio = Math.max(0.4, Math.min(0.9, numW / numH));
+  const ratio = Math.max(0.4, Math.min(0.9, numW / totalFrameH));
   const hutWidthPx = Math.round(Math.max(180, Math.min(270, 210 * (ratio / 0.62))));
   const hutHeightPx = 280;
 
@@ -59,7 +60,7 @@ export default function StandieHutPreview({
               </span>
             </span>
             <span className="text-[10px] text-slate-400 block font-mono">
-              Total: {numW} × {numH} Ft • Flex: {numW} × {numFlexH} Ft
+              Total Frame: {numW} × {totalFrameH} Ft • Flex: {numW} × {numFlexH} Ft
             </span>
           </div>
         </div>
@@ -90,7 +91,7 @@ export default function StandieHutPreview({
           <div className="w-2.5 h-0.5 bg-amber-500" />
           <div className="h-full border-l-2 border-dashed border-amber-500/60 relative flex items-center justify-center">
             <span className="bg-slate-900 px-1.5 py-0.5 rounded text-[9px] text-amber-400 font-extrabold whitespace-nowrap rotate-[-90deg] shadow-xs border border-amber-500/30">
-              Total Height: {numH} Ft
+              Total Height: {totalFrameH} Ft ({numFlexH}' Flex + {numLeg}' Legs)
             </span>
           </div>
           <div className="w-2.5 h-0.5 bg-amber-500" />
@@ -220,8 +221,8 @@ export default function StandieHutPreview({
 
               {/* Bottom Specs Badge */}
               <div className="relative z-10 pt-1.5 border-t border-slate-700/60 flex items-center justify-between text-[7.5px] text-slate-300 font-mono">
-                <span className="text-amber-400 font-bold">W: {numW} Ft</span>
-                <span className="text-emerald-400 font-bold">Leg: {numLeg} Ft</span>
+                <span className="text-amber-400 font-bold">W: {numW} Ft • H: {numFlexH} Ft</span>
+                <span className="text-emerald-400 font-bold">Leg: +{numLeg} Ft</span>
               </div>
             </div>
 
@@ -257,7 +258,7 @@ export default function StandieHutPreview({
 
               {/* Leg Clearance Label */}
               <span className="text-[8px] font-bold text-amber-400 bg-slate-900 px-1 py-0.5 rounded border border-amber-500/40 shadow-xs mt-1">
-                {numLeg} Ft Legs
+                +{numLeg} Ft Legs
               </span>
 
               {/* Right Ground Leg */}
