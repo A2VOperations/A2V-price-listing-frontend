@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 
 export default function AdminDashboard() {
-  const { categories, products } = useData();
+  const { categories, products, loading, refreshData } = useData();
 
   // Compute unique sub-categories
   const subCategoriesSet = new Set();
@@ -36,7 +36,11 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Total Categories
               </p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{categories.length}</h3>
+              {loading ? (
+                <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
+              ) : (
+                <h3 className="text-2xl font-black text-slate-900 mt-1">{categories.length}</h3>
+              )}
               <Link
                 to="/admin/categories"
                 className="text-[11px] font-bold text-orange-600 hover:underline mt-2 inline-block"
@@ -54,9 +58,13 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Sub-Categories
               </p>
-              <h3 className="text-2xl font-black text-amber-600 mt-1">
-                {subCategoriesSet.size}
-              </h3>
+              {loading ? (
+                <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
+              ) : (
+                <h3 className="text-2xl font-black text-amber-600 mt-1">
+                  {subCategoriesSet.size}
+                </h3>
+              )}
               <span className="text-[11px] text-slate-400 mt-2 block">
                 Across all product lines
               </span>
@@ -71,7 +79,11 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Products & Lines
               </p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{products.length}</h3>
+              {loading ? (
+                <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
+              ) : (
+                <h3 className="text-2xl font-black text-slate-900 mt-1">{products.length}</h3>
+              )}
               <Link
                 to="/admin/products"
                 className="text-[11px] font-bold text-orange-600 hover:underline mt-2 inline-block"
@@ -89,9 +101,13 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Sub-Sub / Variants
               </p>
-              <h3 className="text-2xl font-black text-indigo-600 mt-1">
-                {totalVariantsCount}
-              </h3>
+              {loading ? (
+                <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
+              ) : (
+                <h3 className="text-2xl font-black text-indigo-600 mt-1">
+                  {totalVariantsCount}
+                </h3>
+              )}
               <span className="text-[11px] text-slate-400 mt-2 block">
                 Die Cut, UV, Foil, GSM Specs
               </span>

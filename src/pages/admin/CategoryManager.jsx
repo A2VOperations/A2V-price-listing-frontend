@@ -12,16 +12,27 @@ import {
   FiCheck,
   FiUploadCloud,
   FiImage,
+  FiRefreshCw,
+  FiAlertCircle,
+  FiCheckCircle,
 } from "react-icons/fi";
 
 export default function CategoryManager() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useData();
+  const { categories, addCategory, updateCategory, deleteCategory, loading, refreshData } = useData();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [notice, setNotice] = useState(null);
+
+  const showNotice = (type, message) => {
+    setNotice({ type, message });
+    setTimeout(() => setNotice(null), 4000);
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -45,7 +56,7 @@ export default function CategoryManager() {
       name: "",
       slug: "",
       description: "",
-      image: "/src/assets/images/categories (1).webp",
+      image: "/assets/images/categories (1).webp",
     });
     setIsModalOpen(true);
   };
@@ -62,6 +73,18 @@ export default function CategoryManager() {
     setIsModalOpen(true);
   };
 
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await refreshData();
+      showNotice("success", "Refreshed categories from MongoDB.");
+    } catch (err) {
+      showNotice("error", "Failed to refresh: " + err.message);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -70,6 +93,7 @@ export default function CategoryManager() {
       setUploadingImage(true);
       const imageUrl = await uploadImageApi(file);
       setFormData((prev) => ({ ...prev, image: imageUrl }));
+      showNotice("success", "Image uploaded to Cloudinary successfully.");
     } catch (err) {
       alert("Failed to upload image: " + err.message);
     } finally {
@@ -96,13 +120,15 @@ export default function CategoryManager() {
 
       if (editingCategory) {
         await updateCategory(editingCategory.id, payload);
+        showNotice("success", `Category "${payload.name}" updated in MongoDB.`);
       } else {
         await addCategory(payload);
+        showNotice("success", `Category "${payload.name}" created in MongoDB.`);
       }
 
       setIsModalOpen(false);
     } catch (err) {
-      alert("Error saving category: " + err.message);
+      alert("Error saving category to MongoDB: " + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -111,13 +137,17 @@ export default function CategoryManager() {
   const handleDelete = async (category) => {
     if (
       window.confirm(
-        `Are you sure you want to delete category "${category.name}"? This action cannot be undone.`
+        `Are you sure you want to permanently delete category "${category.name}" from MongoDB? This action cannot be undone.`
       )
     ) {
       try {
+        setDeletingId(category.id);
         await deleteCategory(category.id);
+        showNotice("success", `Category "${category.name}" deleted from MongoDB.`);
       } catch (err) {
         alert("Failed to delete category: " + err.message);
+      } finally {
+        setDeletingId(null);
       }
     }
   };
@@ -125,16 +155,39 @@ export default function CategoryManager() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Notice Banner */}
+        {notice && (
+          <div
+            className={`p-3 rounded-lg text-xs font-semibold flex items-center justify-between transition-all animate-fadeIn ${
+              notice.type === "success"
+                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                : "bg-rose-50 text-rose-800 border border-rose-200"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {notice.type === "success" ? (
+                <FiCheckCircle className="w-4 h-4 text-emerald-600" />
+              ) : (
+                <FiAlertCircle className="w-4 h-4 text-rose-600" />
+              )}
+              <span>{notice.message}</span>
+            </div>
+            <button onClick={() => setNotice(null)} className="p-0.5 hover:opacity-75">
+              <FiX className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div>
             <h2 className="text-base font-bold text-slate-900">Category Management</h2>
             <p className="text-xs text-slate-500">
-              Add, edit, or delete main product categories visible on the dashboard.
+              Add, edit, or delete main product categories directly in MongoDB database.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="relative max-w-xs w-full">
               <input
                 type="text"
@@ -147,8 +200,17 @@ export default function CategoryManager() {
             </div>
 
             <button
+              onClick={handleRefresh}
+              disabled={isRefreshing || loading}
+              className="p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 title='Reload from MongoDB'"
+              title="Refresh from MongoDB"
+            >
+              <FiRefreshCw className={`w-4 h-4 ${isRefreshing || loading ? "animate-spin text-orange-600" : ""}`} />
+            </button>
+
+            <button
               onClick={openCreateModal}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap shadow-xs"
             >
               <FiPlus className="w-4 h-4" /> Add Category
             </button>
@@ -169,10 +231,19 @@ export default function CategoryManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredCategories.length === 0 ? (
+                {loading ? (
                   <tr>
-                    <td colSpan={5} className="p-6 text-center text-slate-400">
-                      No categories found.
+                    <td colSpan={5} className="p-12 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center space-y-2.5">
+                        <div className="w-7 h-7 border-3 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs font-semibold text-slate-600">Loading categories from MongoDB...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredCategories.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-400">
+                      No categories found matching filters.
                     </td>
                   </tr>
                 ) : (
@@ -197,16 +268,21 @@ export default function CategoryManager() {
                           <button
                             onClick={() => openEditModal(cat)}
                             className="p-1.5 bg-slate-100 hover:bg-orange-50 text-slate-700 hover:text-orange-600 rounded transition-colors"
-                            title="Edit Category"
+                            title="Edit Category in MongoDB"
                           >
                             <FiEdit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(cat)}
-                            className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 rounded transition-colors"
-                            title="Delete Category"
+                            disabled={deletingId === cat.id}
+                            className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 rounded transition-colors disabled:opacity-50"
+                            title="Delete Category from MongoDB"
                           >
-                            <FiTrash2 className="w-4 h-4" />
+                            {deletingId === cat.id ? (
+                              <FiRefreshCw className="w-4 h-4 text-rose-600 animate-spin" />
+                            ) : (
+                              <FiTrash2 className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </td>
@@ -218,17 +294,19 @@ export default function CategoryManager() {
           </div>
         </div>
 
-        {/* Modal for Creating / Editing Category */}
+        {/* Create/Edit Category Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div className="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-200">
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50">
-                <h3 className="text-sm font-bold text-slate-900">
-                  {editingCategory ? "Edit Category" : "Add New Category"}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
+            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 animate-scaleUp">
+              <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-900 text-white">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <FiImage className="w-4 h-4 text-orange-400" />
+                  {editingCategory ? "Edit Category in MongoDB" : "Create New Category in MongoDB"}
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                  disabled={isSubmitting}
+                  className="p-1 text-slate-400 hover:text-white rounded-lg disabled:opacity-50"
                 >
                   <FiX className="w-5 h-5" />
                 </button>
@@ -243,29 +321,22 @@ export default function CategoryManager() {
                     type="text"
                     required
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        name: e.target.value,
-                        slug:
-                          formData.slug || e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-                      })
-                    }
-                    placeholder="e.g. Flex Board, Letter Heads"
+                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. Visiting Cards, Flex Board"
                     className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    URL Slug / Identifier
+                    Slug / URL Key (Optional)
                   </label>
                   <input
                     type="text"
                     value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="e.g. flex-board"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+                    placeholder="e.g. visiting-cards (auto-generated if empty)"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-mono"
                   />
                 </div>
 
@@ -274,40 +345,46 @@ export default function CategoryManager() {
                   <textarea
                     rows={3}
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Enter category description..."
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, description: e.target.value }))
+                    }
+                    placeholder="Short description for the category..."
                     className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Category Thumbnail Image
+                    Category Image
                   </label>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-16 h-12 rounded border border-slate-200 overflow-hidden bg-slate-100 flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
                       <ProductImage
                         src={formData.image}
                         alt="Preview"
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-1.5">
                       <input
                         type="text"
                         value={formData.image}
-                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                        placeholder="Image URL or Path (/src/assets/images/...)"
+                        onChange={(e) => setFormData((prev) => ({ ...prev, image: e.target.value }))}
+                        placeholder="Image URL or Cloudinary CDN link"
                         className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-mono"
                       />
                       <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg cursor-pointer transition-colors border border-slate-300">
-                        <FiUploadCloud className="w-4 h-4 text-orange-600" />
-                        <span>{uploadingImage ? "Uploading..." : "Upload Local Image File"}</span>
+                        {uploadingImage ? (
+                          <FiRefreshCw className="w-3.5 h-3.5 text-orange-600 animate-spin" />
+                        ) : (
+                          <FiUploadCloud className="w-4 h-4 text-orange-600" />
+                        )}
+                        <span>{uploadingImage ? "Uploading to Cloudinary..." : "Upload Image to Cloudinary"}</span>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleImageUpload}
-                          disabled={uploadingImage}
+                          disabled={uploadingImage || isSubmitting}
                           className="hidden"
                         />
                       </label>
@@ -319,17 +396,27 @@ export default function CategoryManager() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || uploadingImage}
-                    className="px-4 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
+                    className="px-4 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <FiCheck className="w-4 h-4" />
-                    {editingCategory ? "Save Changes" : "Create Category"}
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Saving to MongoDB...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiCheck className="w-4 h-4" />
+                        <span>{editingCategory ? "Save to MongoDB" : "Create in MongoDB"}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

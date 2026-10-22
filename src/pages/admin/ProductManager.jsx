@@ -21,10 +21,13 @@ import {
   FiTag,
   FiImage,
   FiStar,
+  FiRefreshCw,
+  FiAlertCircle,
+  FiCheckCircle,
 } from "react-icons/fi";
 
 export default function ProductManager() {
-  const { categories, products, addProduct, updateProduct, deleteProduct } =
+  const { categories, products, addProduct, updateProduct, deleteProduct, loading, refreshData } =
     useData();
 
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -37,6 +40,26 @@ export default function ProductManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [manualImageUrl, setManualImageUrl] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [notice, setNotice] = useState(null);
+
+  const showNotice = (type, message) => {
+    setNotice({ type, message });
+    setTimeout(() => setNotice(null), 4000);
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await refreshData();
+      showNotice("success", "Refreshed products from MongoDB.");
+    } catch (err) {
+      showNotice("error", "Failed to refresh: " + err.message);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Extract all subcategories present across products
   const allSubCategories = Array.from(
@@ -793,13 +816,15 @@ export default function ProductManager() {
 
       if (editingProduct) {
         await updateProduct(editingProduct.id, payload);
+        showNotice("success", `Product "${payload.name}" updated in MongoDB.`);
       } else {
         await addProduct(payload);
+        showNotice("success", `Product "${payload.name}" created in MongoDB.`);
       }
 
       setIsModalOpen(false);
     } catch (err) {
-      alert("Error saving product: " + err.message);
+      alert("Error saving product to MongoDB: " + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -808,13 +833,17 @@ export default function ProductManager() {
   const handleDelete = async (product) => {
     if (
       window.confirm(
-        `Are you sure you want to delete product "${product.name}"? This action cannot be undone.`,
+        `Are you sure you want to permanently delete product "${product.name}" from MongoDB? This action cannot be undone.`,
       )
     ) {
       try {
+        setDeletingId(product.id);
         await deleteProduct(product.id);
+        showNotice("success", `Product "${product.name}" deleted from MongoDB.`);
       } catch (err) {
         alert("Failed to delete product: " + err.message);
+      } finally {
+        setDeletingId(null);
       }
     }
   };
@@ -822,6 +851,29 @@ export default function ProductManager() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Notice Banner */}
+        {notice && (
+          <div
+            className={`p-3 rounded-lg text-xs font-semibold flex items-center justify-between transition-all animate-fadeIn ${
+              notice.type === "success"
+                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                : "bg-rose-50 text-rose-800 border border-rose-200"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {notice.type === "success" ? (
+                <FiCheckCircle className="w-4 h-4 text-emerald-600" />
+              ) : (
+                <FiAlertCircle className="w-4 h-4 text-rose-600" />
+              )}
+              <span>{notice.message}</span>
+            </div>
+            <button onClick={() => setNotice(null)} className="p-0.5 hover:opacity-75">
+              <FiX className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Header Bar with Filters */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -830,18 +882,27 @@ export default function ProductManager() {
                 Product & Sub-category Manager
               </h2>
               <p className="text-xs text-slate-500">
-                Edit products, sub-categories, individual sub-sub variation
-                details (prices, descriptions, codes, specs), and custom select
-                options.
+                Manage products, sub-categories, calculations, pricing matrices, and options directly in MongoDB.
               </p>
             </div>
 
-            <button
-              onClick={openCreateModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap shadow-xs"
-            >
-              <FiPlus className="w-4 h-4" /> Create New Product / Variation
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing || loading}
+                className="p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200"
+                title="Refresh from MongoDB"
+              >
+                <FiRefreshCw className={`w-4 h-4 ${isRefreshing || loading ? "animate-spin text-orange-600" : ""}`} />
+              </button>
+
+              <button
+                onClick={openCreateModal}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors whitespace-nowrap shadow-xs"
+              >
+                <FiPlus className="w-4 h-4" /> Create New Product
+              </button>
+            </div>
           </div>
 
           {/* Filters Bar */}
@@ -923,7 +984,16 @@ export default function ProductManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredProducts.length === 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan={9} className="p-12 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center space-y-2.5">
+                        <div className="w-7 h-7 border-3 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs font-semibold text-slate-600">Loading products from MongoDB...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredProducts.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="p-6 text-center text-slate-400">
                       No products found matching filters.
@@ -986,10 +1056,15 @@ export default function ProductManager() {
                           </button>
                           <button
                             onClick={() => handleDelete(p)}
-                            className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded transition-colors"
-                            title="Delete Product"
+                            disabled={deletingId === p.id}
+                            className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded transition-colors disabled:opacity-50"
+                            title="Delete Product from MongoDB"
                           >
-                            <FiTrash2 className="w-4 h-4" />
+                            {deletingId === p.id ? (
+                              <FiRefreshCw className="w-4 h-4 text-rose-600 animate-spin" />
+                            ) : (
+                              <FiTrash2 className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </td>
@@ -2672,12 +2747,23 @@ export default function ProductManager() {
                     <button
                       type="submit"
                       disabled={isSubmitting || uploadingImage}
-                      className="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
+                      className="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <FiCheck className="w-4 h-4" />
-                      {editingProduct
-                        ? "Save Product Changes"
-                        : "Create Product"}
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Saving to MongoDB...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCheck className="w-4 h-4" />
+                          <span>
+                            {editingProduct
+                              ? "Save Changes to MongoDB"
+                              : "Create in MongoDB"}
+                          </span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
