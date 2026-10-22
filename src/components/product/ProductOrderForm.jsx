@@ -252,14 +252,14 @@ export default function ProductOrderForm({
     }
 
     const optLastTotal = calculation?.optionsLastPriceTotal || 0;
-    const optRegTotal = calculation?.optionsTotal || 0;
-    const finalOptionsLast = optLastTotal > 0 ? optLastTotal : optRegTotal;
+    const hasCustomOptionLastPrice = optLastTotal > 0;
 
-    if (hasBaseLastPrice) {
-      return Math.round(baseLastPrice + finalOptionsLast);
-    } else if (optLastTotal > 0) {
-      const baseStandard = calculation?.baseUnitPrice || 0;
-      return Math.round(baseStandard + optLastTotal);
+    // If Last Price is set by Variation Custom Options, don't add Particular Quantity Last Price;
+    // if not, put the Last Price of Particular Quantity Prices.
+    if (hasCustomOptionLastPrice) {
+      return Math.round(optLastTotal);
+    } else if (hasBaseLastPrice) {
+      return Math.round(baseLastPrice);
     }
 
     return null;

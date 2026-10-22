@@ -221,7 +221,14 @@ export function calculateProductPrice({
   });
 
   // 3. Subtotal & Final Price computation
-  let subtotal = Math.round((unitPrice + optionsTotal) * 100) / 100;
+  // If the prices are set by Variation Custom Options, don't add Particular Quantity Prices;
+  // and if not then put the price of Particular Quantity Prices.
+  let subtotal = 0;
+  if (optionsTotal > 0) {
+    subtotal = Math.round(optionsTotal * 100) / 100;
+  } else {
+    subtotal = Math.round(unitPrice * 100) / 100;
+  }
 
   // If custom manual price override is provided, use it directly
   if (
