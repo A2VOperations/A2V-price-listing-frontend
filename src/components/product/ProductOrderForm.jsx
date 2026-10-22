@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   FiPackage,
   FiLayers,
@@ -204,6 +204,59 @@ export default function ProductOrderForm({
   });
 
   const applicableCost = isFormValid ? calculation?.totalAmount || 0 : 0;
+
+  // Calculate last price for the current quantity & variant to reveal strictly on hover
+  const currentLastPrice = useMemo(() => {
+    if (!isFormValid) return null;
+    const numQty = Number(quantity);
+    if (!numQty || numQty <= 0) return null;
+
+    if (isSelectQty) {
+      const matched = currentProduct.fixedQuantities?.find(
+        (fq) => Number(fq.qty) === numQty,
+      );
+      if (
+        matched &&
+        matched.lastPrice !== undefined &&
+        matched.lastPrice !== null &&
+        matched.lastPrice !== "" &&
+        !isNaN(Number(matched.lastPrice)) &&
+        Number(matched.lastPrice) > 0
+      ) {
+        const baseLastPrice = Number(matched.lastPrice);
+        const optionsTotal = calculation?.optionsTotal || 0;
+        return Math.round(baseLastPrice + optionsTotal);
+      }
+    } else if (
+      currentProduct.quantityPricingTiers &&
+      currentProduct.quantityPricingTiers.length > 0
+    ) {
+      const effQty = Math.max(numQty, currentProduct.minQuantity || 1);
+      const sortedTiers = [...currentProduct.quantityPricingTiers].sort(
+        (a, b) => b.minQty - a.minQty,
+      );
+      const applicableTier = sortedTiers.find((t) => effQty >= t.minQty);
+      if (
+        applicableTier &&
+        applicableTier.lastPrice !== undefined &&
+        applicableTier.lastPrice !== null &&
+        applicableTier.lastPrice !== "" &&
+        !isNaN(Number(applicableTier.lastPrice)) &&
+        Number(applicableTier.lastPrice) > 0
+      ) {
+        const unitLastPrice = Number(applicableTier.lastPrice);
+        const optionsTotal = calculation?.optionsTotal || 0;
+        return Math.round(unitLastPrice * effQty + optionsTotal);
+      }
+    }
+    return null;
+  }, [
+    isFormValid,
+    quantity,
+    isSelectQty,
+    currentProduct,
+    calculation?.optionsTotal,
+  ]);
 
   // Specific discount calculation as per price
   const numDiscount = Math.max(0, parseFloat(discount) || 0);
@@ -543,13 +596,39 @@ export default function ProductOrderForm({
 
           {/* PRICE BREAKDOWN TABLE */}
           <div className="divide-y divide-slate-200 text-xs">
-            <div className="p-3.5 sm:px-4 flex justify-between items-center">
-              <span className="font-semibold text-slate-700">
-                Applicable Cost
-              </span>
-              <span className="font-bold text-slate-900">
-                Rs. {applicableCost.toLocaleString()}/-
-              </span>
+            <div className="p-3.5 sm:px-4 flex justify-between items-center group relative hover:bg-amber-50/25 transition-colors cursor-default select-none">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-slate-700">
+                  Applicable Cost
+                </span>
+                {currentLastPrice !== null && (
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100/90 text-amber-900 border border-amber-300 shadow-2xs">
+                    <span className="font-normal text-amber-700">Last Price:</span>
+                    <span>Rs. {currentLastPrice.toLocaleString()}/-</span>
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {currentLastPrice !== null && (
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-semibold text-slate-400 hidden sm:inline">
+                    (Last: Rs. {currentLastPrice.toLocaleString()}/-)
+                  </span>
+                )}
+                <span className="font-bold text-slate-900">
+                  Rs. {applicableCost.toLocaleString()}/-
+                </span>
+              </div>
+
+              {/* Floating Tooltip strictly on Hover */}
+              {currentLastPrice !== null && (
+                <div className="pointer-events-none absolute -top-8 left-4 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-semibold rounded shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 z-30 flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="text-amber-400 font-bold">Last Price:</span>
+                  <span className="font-bold text-white">
+                    Rs. {currentLastPrice.toLocaleString()}/-
+                  </span>
+                  <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                </div>
+              )}
             </div>
 
             {validDiscount > 0 && (

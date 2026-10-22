@@ -225,6 +225,7 @@ export default function ProductManager() {
           vFixed = vData.quantityPricingTiers.map((tier) => ({
             qty: Number(tier.minQty),
             price: Math.round(Number(tier.minQty) * Number(tier.pricePerUnit)),
+            lastPrice: tier.lastPrice !== undefined ? tier.lastPrice : "",
           }));
         }
 
@@ -564,8 +565,12 @@ export default function ProductManager() {
     const nextPrice = lastItem
       ? Math.round(Number(lastItem.price) * 1.5)
       : details.basePrice || formData.basePrice || 1800;
+    const nextLastPrice = lastItem?.lastPrice !== undefined ? lastItem.lastPrice : "";
 
-    const updated = [...list, { qty: nextQty, price: nextPrice }];
+    const updated = [
+      ...list,
+      { qty: nextQty, price: nextPrice, lastPrice: nextLastPrice },
+    ];
     const updatedDetails = {
       ...formData.variantDetails,
       [variantName]: {
@@ -585,7 +590,9 @@ export default function ProductManager() {
   ) => {
     const details = formData.variantDetails[variantName] || {};
     const updated = [...(details.fixedQuantities || [])];
-    updated[index] = { ...updated[index], [field]: Number(value) || 0 };
+    const parsed =
+      value === "" ? "" : isNaN(Number(value)) ? value : Number(value);
+    updated[index] = { ...updated[index], [field]: parsed };
     const updatedDetails = {
       ...formData.variantDetails,
       [variantName]: { ...details, fixedQuantities: updated },
@@ -624,13 +631,13 @@ export default function ProductManager() {
     const details = formData.variantDetails[variantName] || {};
     const baseP = Number(details.basePrice || formData.basePrice) || 1800;
     const standards = [
-      { qty: 1000, price: baseP },
-      { qty: 2000, price: Math.round(baseP * 1.75) },
-      { qty: 3000, price: Math.round(baseP * 2.45) },
-      { qty: 4000, price: Math.round(baseP * 3.1) },
-      { qty: 8000, price: Math.round(baseP * 5.6) },
-      { qty: 12000, price: Math.round(baseP * 8.0) },
-      { qty: 16000, price: Math.round(baseP * 10.2) },
+      { qty: 1000, price: baseP, lastPrice: "" },
+      { qty: 2000, price: Math.round(baseP * 1.75), lastPrice: "" },
+      { qty: 3000, price: Math.round(baseP * 2.45), lastPrice: "" },
+      { qty: 4000, price: Math.round(baseP * 3.1), lastPrice: "" },
+      { qty: 8000, price: Math.round(baseP * 5.6), lastPrice: "" },
+      { qty: 12000, price: Math.round(baseP * 8.0), lastPrice: "" },
+      { qty: 16000, price: Math.round(baseP * 10.2), lastPrice: "" },
     ];
     const updatedDetails = {
       ...formData.variantDetails,
@@ -657,10 +664,12 @@ export default function ProductManager() {
       : details.basePrice
         ? Number((details.basePrice / (newMinQty || 1000)).toFixed(2))
         : 1.0;
+    const newLastPrice =
+      lastTier?.lastPrice !== undefined ? lastTier.lastPrice : "";
 
     const updatedTiers = [
       ...currentTiers,
-      { minQty: newMinQty, pricePerUnit: newPrice },
+      { minQty: newMinQty, pricePerUnit: newPrice, lastPrice: newLastPrice },
     ];
     const updatedDetails = {
       ...formData.variantDetails,
@@ -1979,6 +1988,9 @@ export default function ProductManager() {
                                                   <th className="p-2">
                                                     Particular Price (₹)
                                                   </th>
+                                                  <th className="p-2">
+                                                    Last Price (₹)
+                                                  </th>
                                                   <th className="p-2 hidden sm:table-cell">
                                                     Rate / Unit
                                                   </th>
@@ -2037,6 +2049,28 @@ export default function ProductManager() {
                                                               }
                                                               className="w-full max-w-[130px] px-2 py-1 text-xs border border-orange-300 rounded font-black text-orange-950 bg-orange-50/30 focus:ring-1 focus:ring-orange-500 focus:outline-none"
                                                               placeholder="1800"
+                                                            />
+                                                          </div>
+                                                        </td>
+                                                        <td className="p-2">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-slate-400 font-bold">
+                                                              ₹
+                                                            </span>
+                                                            <input
+                                                              type="number"
+                                                              step="any"
+                                                              value={item.lastPrice !== undefined ? item.lastPrice : ""}
+                                                              onChange={(e) =>
+                                                                handleUpdateVariantFixedQuantity(
+                                                                  variantName,
+                                                                  qIdx,
+                                                                  "lastPrice",
+                                                                  e.target.value,
+                                                                )
+                                                              }
+                                                              className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-slate-800 bg-white focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                              placeholder="e.g. 2100"
                                                             />
                                                           </div>
                                                         </td>
@@ -2188,6 +2222,9 @@ export default function ProductManager() {
                                                     <th className="p-2">
                                                       Price Per Unit (₹)
                                                     </th>
+                                                    <th className="p-2">
+                                                      Last Price (₹)
+                                                    </th>
                                                     <th className="p-2 text-right">
                                                       Action
                                                     </th>
@@ -2290,6 +2327,43 @@ export default function ProductManager() {
                                                               }}
                                                               className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-emerald-700 bg-white"
                                                               placeholder="1.50"
+                                                            />
+                                                          </div>
+                                                        </td>
+                                                        <td className="p-2">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-slate-400 text-xs font-bold">
+                                                              ₹
+                                                            </span>
+                                                            <input
+                                                              type="number"
+                                                              step="any"
+                                                              value={tier.lastPrice !== undefined ? tier.lastPrice : ""}
+                                                              onChange={(e) => {
+                                                                const updatedTiers = [
+                                                                  ...variantPricingTiers,
+                                                                ];
+                                                                updatedTiers[tIdx] = {
+                                                                  ...updatedTiers[tIdx],
+                                                                  lastPrice:
+                                                                    e.target.value === ""
+                                                                      ? ""
+                                                                      : Number(e.target.value),
+                                                                };
+                                                                const updatedDetails = {
+                                                                  ...formData.variantDetails,
+                                                                  [variantName]: {
+                                                                    ...variantObj,
+                                                                    quantityPricingTiers: updatedTiers,
+                                                                  },
+                                                                };
+                                                                setFormData((prev) => ({
+                                                                  ...prev,
+                                                                  variantDetails: updatedDetails,
+                                                                }));
+                                                              }}
+                                                              className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-slate-800 bg-white focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                              placeholder="e.g. 1.80"
                                                             />
                                                           </div>
                                                         </td>
