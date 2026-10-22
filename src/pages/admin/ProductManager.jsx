@@ -3146,9 +3146,6 @@ export default function ProductManager() {
                                                 <FiGrid className="w-4 h-4 text-indigo-600" />
                                                 Attribute Combination & Quantity Matrix (Cross-Option Pricing)
                                               </h5>
-                                              <p className="text-[11px] text-slate-500 mt-0.5">
-                                                Set non-additive package prices for specific attribute pairs (e.g., <strong>70 GSM + Both Side</strong> vs <strong>90 GSM + Both Side</strong>) per quantity tier, with Last Price support.
-                                              </p>
                                             </div>
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                               <button
@@ -3158,7 +3155,7 @@ export default function ProductManager() {
                                                 title="Generate combinations from all custom options above"
                                               >
                                                 <FiRefreshCw className="w-3 h-3" />
-                                                <span>Generate / Sync Matrix ({comboPrices.length})</span>
+                                                <span>Generate ({comboPrices.length})</span>
                                               </button>
                                               {comboPrices.length > 0 && (
                                                 <button
@@ -3177,7 +3174,7 @@ export default function ProductManager() {
                                             <div className="py-4 text-center text-xs text-slate-500 bg-white/70 rounded-lg border border-dashed border-indigo-200">
                                               <p className="font-semibold text-slate-700">No combination matrix generated yet.</p>
                                               <p className="text-[11px] text-slate-400 mt-0.5">
-                                                Add custom options above (e.g. Paper Quality, Printing), then click <strong>&quot;Generate / Sync Matrix&quot;</strong>.
+                                                Add custom options above (e.g. Paper Quality, Printing), then click <strong>&quot;Generate&quot;</strong>.
                                               </p>
                                             </div>
                                           ) : (

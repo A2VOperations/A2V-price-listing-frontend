@@ -662,12 +662,6 @@ export default function ProductOrderForm({
                 <span className="font-semibold text-slate-700">
                   Applicable Cost
                 </span>
-                {currentLastPrice !== null && (
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100/90 text-amber-900 border border-amber-300 shadow-2xs">
-                    <span className="font-normal text-amber-700">Last Price:</span>
-                    <span>Rs. {currentLastPrice.toLocaleString()}/-</span>
-                  </span>
-                )}
               </div>
               <div className="flex items-center gap-2">
                 {currentLastPrice !== null && (
@@ -680,16 +674,7 @@ export default function ProductOrderForm({
                 </span>
               </div>
 
-              {/* Floating Tooltip strictly on Hover */}
-              {currentLastPrice !== null && (
-                <div className="pointer-events-none absolute -top-8 left-4 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-semibold rounded shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 z-30 flex items-center gap-1.5 whitespace-nowrap">
-                  <span className="text-amber-400 font-bold">Last Price:</span>
-                  <span className="font-bold text-white">
-                    Rs. {currentLastPrice.toLocaleString()}/-
-                  </span>
-                  <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                </div>
-              )}
+              
             </div>
 
             {validDiscount > 0 && (
