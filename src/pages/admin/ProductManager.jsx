@@ -13,6 +13,7 @@ import {
   FiUploadCloud,
   FiFilter,
   FiLayers,
+  FiGrid,
   FiList,
   FiSliders,
   FiDollarSign,
@@ -116,6 +117,7 @@ export default function ProductManager() {
     pricingModel: "quantity_tiered",
     variantCombinations: [],
     variantDetails: {},
+    combinationPrices: [],
     quantityPricingTiers: [
       { minQty: 1000, pricePerUnit: 1.8 },
       { minQty: 2000, pricePerUnit: 1.5 },
@@ -158,6 +160,14 @@ export default function ProductManager() {
   const [editingVariantName, setEditingVariantName] = useState(null);
   const [tempVariantName, setTempVariantName] = useState("");
   const [expandedChoices, setExpandedChoices] = useState({});
+  const [expandedCombos, setExpandedCombos] = useState({});
+
+  const toggleComboExpand = (key) => {
+    setExpandedCombos((prev) => ({
+      ...prev,
+      [key]: prev[key] === undefined ? false : !prev[key],
+    }));
+  };
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -250,6 +260,7 @@ export default function ProductManager() {
           quantityType:
             vData.quantityType || product.quantityType || "incremental",
           fixedQuantities: vFixed,
+          combinationPrices: Array.isArray(vData.combinationPrices) ? vData.combinationPrices : [],
         };
       });
     }
@@ -388,6 +399,7 @@ export default function ProductManager() {
           JSON.stringify(formData.quantityPricingTiers || []),
         ),
         options: [], // Custom options for this sub-sub category
+        combinationPrices: [], // Matrix combinations
       },
     };
     setFormData((prev) => ({
@@ -835,6 +847,350 @@ export default function ProductManager() {
         [variantName]: { ...details, options: updatedOptions },
       },
     }));
+  };
+
+
+  // ==========================================
+  // COMBINATION MATRIX HELPER & HANDLERS
+  // ==========================================
+  const generateAttributeCombinations = (options) => {
+    if (!options || !Array.isArray(options) || options.length === 0) return [];
+    const validOptions = options.filter(
+      (o) => o && o.name && Array.isArray(o.values) && o.values.length > 0
+    );
+    if (validOptions.length === 0) return [];
+
+    return validOptions.reduce(
+      (acc, opt) => {
+        const next = [];
+        const optName = opt.name.trim();
+        acc.forEach((combo) => {
+          opt.values.forEach((val) => {
+            const valLabel = val.label?.trim() || "Choice";
+            next.push({
+              attributes: {
+                ...combo.attributes,
+                [optName]: valLabel,
+              },
+            });
+          });
+        });
+        return next;
+      },
+      [{ attributes: {} }]
+    ).map((combo, idx) => {
+      const combinationKey = Object.values(combo.attributes).join(" + ");
+      return {
+        id: `combo-${idx}-${Date.now()}`,
+        combinationKey,
+        attributes: combo.attributes,
+        basePrice: 0,
+        quantityPrices: [],
+      };
+    });
+  };
+
+  const handleSyncVariantCombinations = (variantName) => {
+    const details = formData.variantDetails[variantName] || {};
+    const options = details.options || [];
+    if (options.length === 0) {
+      alert("Please add at least 1 or 2 custom options above first (e.g. Paper Quality, Printing).");
+      return;
+    }
+
+    const generated = generateAttributeCombinations(options);
+    const existing = details.combinationPrices || [];
+
+    const existingMap = {};
+    existing.forEach((c) => {
+      if (c && c.attributes) {
+        const key = Object.entries(c.attributes)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([k, v]) => `${k.toLowerCase()}:${v.toLowerCase()}`)
+          .join("|");
+        existingMap[key] = c;
+      }
+    });
+
+    let sourceQuantities = [];
+    if (Array.isArray(details.fixedQuantities) && details.fixedQuantities.length > 0) {
+      sourceQuantities = details.fixedQuantities.map((fq) => ({
+        qty: Number(fq.qty),
+        price: Number(fq.price) || 0,
+        lastPrice: fq.lastPrice !== undefined ? fq.lastPrice : "",
+      }));
+    } else {
+      sourceQuantities = [
+        { qty: 1000, price: 0, lastPrice: "" },
+        { qty: 2000, price: 0, lastPrice: "" },
+        { qty: 3000, price: 0, lastPrice: "" },
+        { qty: 4000, price: 0, lastPrice: "" },
+        { qty: 8000, price: 0, lastPrice: "" },
+      ];
+    }
+
+    const merged = generated.map((gen) => {
+      const key = Object.entries(gen.attributes)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k.toLowerCase()}:${v.toLowerCase()}`)
+        .join("|");
+
+      if (existingMap[key]) {
+        return {
+          ...gen,
+          quantityPrices: existingMap[key].quantityPrices || sourceQuantities,
+        };
+      }
+      return {
+        ...gen,
+        quantityPrices: JSON.parse(JSON.stringify(sourceQuantities)),
+      };
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: {
+          ...details,
+          combinationPrices: merged,
+        },
+      },
+    }));
+
+    setExpandedCombos((prev) => {
+      const next = { ...prev };
+      merged.forEach((_, idx) => {
+        next[`${variantName}_combo_${idx}`] = true;
+      });
+      return next;
+    });
+
+    showNotice("success", `Generated ${merged.length} attribute combinations for "${variantName}"!`);
+  };
+
+  const handleClearVariantCombinations = (variantName) => {
+    if (!confirm(`Are you sure you want to clear all combination matrix prices for "${variantName}"?`)) return;
+    const details = formData.variantDetails[variantName] || {};
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: {
+          ...details,
+          combinationPrices: [],
+        },
+      },
+    }));
+  };
+
+  const handleAddVariantCombinationPriceRow = (variantName, comboIdx) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = JSON.parse(JSON.stringify(details.combinationPrices || []));
+    if (!combos[comboIdx]) return;
+
+    const list = combos[comboIdx].quantityPrices || [];
+    const lastItem = list[list.length - 1];
+    const nextQty = lastItem ? Number(lastItem.qty) + 1000 : 1000;
+    const nextPrice = lastItem ? Math.round(Number(lastItem.price) * 1.5) : 0;
+    const nextLastPrice = lastItem?.lastPrice !== undefined ? lastItem.lastPrice : "";
+
+    combos[comboIdx].quantityPrices = [
+      ...list,
+      { qty: nextQty, price: nextPrice, lastPrice: nextLastPrice },
+    ];
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: { ...details, combinationPrices: combos },
+      },
+    }));
+  };
+
+  const handleUpdateVariantCombinationPrice = (variantName, comboIdx, qpIdx, field, value) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = JSON.parse(JSON.stringify(details.combinationPrices || []));
+    if (!combos[comboIdx] || !combos[comboIdx].quantityPrices) return;
+
+    const list = [...combos[comboIdx].quantityPrices];
+    if (list[qpIdx]) {
+      const parsed = value === "" ? "" : isNaN(Number(value)) ? value : Number(value);
+      list[qpIdx][field] = parsed;
+      combos[comboIdx].quantityPrices = list;
+
+      setFormData((prev) => ({
+        ...prev,
+        variantDetails: {
+          ...prev.variantDetails,
+          [variantName]: { ...details, combinationPrices: combos },
+        },
+      }));
+    }
+  };
+
+  const handleRemoveVariantCombinationPrice = (variantName, comboIdx, qpIdx) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = JSON.parse(JSON.stringify(details.combinationPrices || []));
+    if (!combos[comboIdx] || !combos[comboIdx].quantityPrices) return;
+
+    combos[comboIdx].quantityPrices = combos[comboIdx].quantityPrices.filter((_, i) => i !== qpIdx);
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: { ...details, combinationPrices: combos },
+      },
+    }));
+  };
+
+  const handleAutoFillVariantComboQuantities = (variantName, comboIdx) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = JSON.parse(JSON.stringify(details.combinationPrices || []));
+    if (!combos[comboIdx]) return;
+
+    let sourceQuantities = [];
+    if (Array.isArray(details.fixedQuantities) && details.fixedQuantities.length > 0) {
+      sourceQuantities = details.fixedQuantities.map((fq) => Number(fq.qty));
+    } else {
+      sourceQuantities = [1000, 2000, 3000, 4000, 8000, 12000, 16000];
+    }
+
+    const priceMap = {};
+    (combos[comboIdx].quantityPrices || []).forEach((qp) => {
+      priceMap[qp.qty] = qp;
+    });
+
+    combos[comboIdx].quantityPrices = sourceQuantities.map((qty) => {
+      if (priceMap[qty]) return priceMap[qty];
+      return { qty, price: 0, lastPrice: "" };
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: { ...details, combinationPrices: combos },
+      },
+    }));
+  };
+
+  const handleCopyVariantComboPricing = (variantName, targetComboIdx, sourceComboIdx) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = JSON.parse(JSON.stringify(details.combinationPrices || []));
+    if (!combos[targetComboIdx] || !combos[sourceComboIdx]) return;
+
+    combos[targetComboIdx].quantityPrices = JSON.parse(
+      JSON.stringify(combos[sourceComboIdx].quantityPrices || [])
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: { ...details, combinationPrices: combos },
+      },
+    }));
+
+    showNotice("success", `Copied pricing from Combo #${sourceComboIdx + 1} to Combo #${targetComboIdx + 1}!`);
+  };
+
+  const handleDeleteVariantCombination = (variantName, comboIdx) => {
+    const details = formData.variantDetails[variantName] || {};
+    const combos = (details.combinationPrices || []).filter((_, i) => i !== comboIdx);
+
+    setFormData((prev) => ({
+      ...prev,
+      variantDetails: {
+        ...prev.variantDetails,
+        [variantName]: { ...details, combinationPrices: combos },
+      },
+    }));
+  };
+
+  // Main Options Combination Handlers
+  const handleSyncMainCombinations = () => {
+    const options = formData.options || [];
+    if (options.length === 0) {
+      alert("Please add at least 1 or 2 options first.");
+      return;
+    }
+    const generated = generateAttributeCombinations(options);
+    const existing = formData.combinationPrices || [];
+
+    const existingMap = {};
+    existing.forEach((c) => {
+      if (c && c.attributes) {
+        const key = Object.entries(c.attributes)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([k, v]) => `${k.toLowerCase()}:${v.toLowerCase()}`)
+          .join("|");
+        existingMap[key] = c;
+      }
+    });
+
+    let sourceQuantities = [1000, 2000, 3000, 4000, 8000];
+    if (Array.isArray(formData.fixedQuantities) && formData.fixedQuantities.length > 0) {
+      sourceQuantities = formData.fixedQuantities.map((fq) => Number(fq.qty));
+    }
+
+    const merged = generated.map((gen) => {
+      const key = Object.entries(gen.attributes)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k.toLowerCase()}:${v.toLowerCase()}`)
+        .join("|");
+
+      if (existingMap[key]) {
+        return existingMap[key];
+      }
+      return {
+        ...gen,
+        quantityPrices: sourceQuantities.map((qty) => ({ qty, price: 0, lastPrice: "" })),
+      };
+    });
+
+    setFormData((prev) => ({ ...prev, combinationPrices: merged }));
+    showNotice("success", `Generated ${merged.length} main product attribute combinations!`);
+  };
+
+  const handleUpdateMainCombinationPrice = (comboIdx, qpIdx, field, value) => {
+    const combos = JSON.parse(JSON.stringify(formData.combinationPrices || []));
+    if (!combos[comboIdx] || !combos[comboIdx].quantityPrices) return;
+
+    const list = [...combos[comboIdx].quantityPrices];
+    if (list[qpIdx]) {
+      const parsed = value === "" ? "" : isNaN(Number(value)) ? value : Number(value);
+      list[qpIdx][field] = parsed;
+      combos[comboIdx].quantityPrices = list;
+      setFormData((prev) => ({ ...prev, combinationPrices: combos }));
+    }
+  };
+
+  const handleAddMainCombinationPriceRow = (comboIdx) => {
+    const combos = JSON.parse(JSON.stringify(formData.combinationPrices || []));
+    if (!combos[comboIdx]) return;
+    const list = combos[comboIdx].quantityPrices || [];
+    const lastItem = list[list.length - 1];
+    const nextQty = lastItem ? Number(lastItem.qty) + 1000 : 1000;
+    combos[comboIdx].quantityPrices = [
+      ...list,
+      { qty: nextQty, price: 0, lastPrice: "" },
+    ];
+    setFormData((prev) => ({ ...prev, combinationPrices: combos }));
+  };
+
+  const handleRemoveMainCombinationPrice = (comboIdx, qpIdx) => {
+    const combos = JSON.parse(JSON.stringify(formData.combinationPrices || []));
+    if (!combos[comboIdx] || !combos[comboIdx].quantityPrices) return;
+    combos[comboIdx].quantityPrices = combos[comboIdx].quantityPrices.filter((_, i) => i !== qpIdx);
+    setFormData((prev) => ({ ...prev, combinationPrices: combos }));
+  };
+
+  const handleDeleteMainCombination = (comboIdx) => {
+    const combos = (formData.combinationPrices || []).filter((_, i) => i !== comboIdx);
+    setFormData((prev) => ({ ...prev, combinationPrices: combos }));
   };
 
   // Main Options Handlers
@@ -2777,6 +3133,295 @@ export default function ProductManager() {
                                       </div>
                                     ))}
                                   </div>
+
+                                    {/* DYNAMIC COMBINATION MATRIX FOR THIS SUB-SUB VARIANT */}
+                                    {(() => {
+                                      const comboPrices = variantObj.combinationPrices || [];
+
+                                      return (
+                                        <div className="mt-4 p-3.5 bg-gradient-to-r from-indigo-50/70 via-slate-50 to-purple-50/50 rounded-xl border border-indigo-200/80 shadow-2xs space-y-3">
+                                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-2.5">
+                                            <div>
+                                              <h5 className="text-xs font-black text-indigo-950 uppercase tracking-wide flex items-center gap-1.5">
+                                                <FiGrid className="w-4 h-4 text-indigo-600" />
+                                                Attribute Combination & Quantity Matrix (Cross-Option Pricing)
+                                              </h5>
+                                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                                Set non-additive package prices for specific attribute pairs (e.g., <strong>70 GSM + Both Side</strong> vs <strong>90 GSM + Both Side</strong>) per quantity tier, with Last Price support.
+                                              </p>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                              <button
+                                                type="button"
+                                                onClick={() => handleSyncVariantCombinations(variantName)}
+                                                className="px-2.5 py-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-1 shadow-2xs"
+                                                title="Generate combinations from all custom options above"
+                                              >
+                                                <FiRefreshCw className="w-3 h-3" />
+                                                <span>Generate / Sync Matrix ({comboPrices.length})</span>
+                                              </button>
+                                              {comboPrices.length > 0 && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleClearVariantCombinations(variantName)}
+                                                  className="px-2 py-1 text-[11px] font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded border border-slate-200 transition-colors"
+                                                  title="Clear all combinations"
+                                                >
+                                                  Clear
+                                                </button>
+                                              )}
+                                            </div>
+                                          </div>
+
+                                          {comboPrices.length === 0 ? (
+                                            <div className="py-4 text-center text-xs text-slate-500 bg-white/70 rounded-lg border border-dashed border-indigo-200">
+                                              <p className="font-semibold text-slate-700">No combination matrix generated yet.</p>
+                                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                                Add custom options above (e.g. Paper Quality, Printing), then click <strong>&quot;Generate / Sync Matrix&quot;</strong>.
+                                              </p>
+                                            </div>
+                                          ) : (
+                                            <div className="space-y-2.5">
+                                              {comboPrices.map((combo, cIdx) => {
+                                                const comboKey = `${variantName}_combo_${cIdx}`;
+                                                const isExpanded = expandedCombos[comboKey] !== false;
+                                                const qpList = combo.quantityPrices || [];
+
+                                                return (
+                                                  <div
+                                                    key={cIdx}
+                                                    className="bg-white rounded-lg border border-indigo-100 shadow-2xs overflow-hidden transition-all"
+                                                  >
+                                                    {/* Combo Header */}
+                                                    <div className="p-2.5 bg-slate-50/80 hover:bg-indigo-50/40 border-b border-indigo-50 flex items-center justify-between gap-2 flex-wrap">
+                                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                          Combo #{cIdx + 1}:
+                                                        </span>
+                                                        {Object.entries(combo.attributes || {}).map(([aKey, aVal], aIdx) => (
+                                                          <span
+                                                            key={aIdx}
+                                                            className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100/80 text-indigo-900 border border-indigo-200/70"
+                                                          >
+                                                            <span className="text-indigo-600 font-normal">{aKey}: </span>
+                                                            {aVal}
+                                                          </span>
+                                                        ))}
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                          {qpList.length} Qty Tiers
+                                                        </span>
+                                                      </div>
+
+                                                      <div className="flex items-center gap-1.5">
+                                                        {comboPrices.length > 1 && (
+                                                          <select
+                                                            value=""
+                                                            onChange={(e) => {
+                                                              if (e.target.value !== "") {
+                                                                handleCopyVariantComboPricing(
+                                                                  variantName,
+                                                                  cIdx,
+                                                                  Number(e.target.value)
+                                                                );
+                                                              }
+                                                            }}
+                                                            className="text-[10px] px-1.5 py-0.5 border border-slate-200 rounded bg-white text-slate-700 font-semibold focus:outline-none"
+                                                            title="Copy quantity pricing from another combination"
+                                                          >
+                                                            <option value="">📋 Copy prices from...</option>
+                                                            {comboPrices.map((otherCombo, oIdx) => {
+                                                              if (oIdx === cIdx) return null;
+                                                              const label = Object.values(otherCombo.attributes || {}).join(" + ");
+                                                              return (
+                                                                <option key={oIdx} value={oIdx}>
+                                                                  From: {label || `Combo #${oIdx + 1}`}
+                                                                </option>
+                                                             );
+                                                            })}
+                                                          </select>
+                                                        )}
+
+                                                        <button
+                                                          type="button"
+                                                          onClick={() => toggleComboExpand(comboKey)}
+                                                          className="px-2 py-0.5 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100/70 rounded flex items-center gap-1 transition-colors"
+                                                        >
+                                                          {isExpanded ? (
+                                                            <>
+                                                              <span>Collapse</span>
+                                                              <FiChevronUp className="w-3.5 h-3.5" />
+                                                            </>
+                                                          ) : (
+                                                            <>
+                                                              <span>Edit Tiers ({qpList.length})</span>
+                                                              <FiChevronDown className="w-3.5 h-3.5" />
+                                                            </>
+                                                          )}
+                                                        </button>
+
+                                                        <button
+                                                          type="button"
+                                                          onClick={() => handleDeleteVariantCombination(variantName, cIdx)}
+                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                          title="Remove this combination"
+                                                        >
+                                                          <FiTrash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                      </div>
+                                                    </div>
+
+                                                    {/* Quantity Table inside Combo Card */}
+                                                    {isExpanded && (
+                                                      <div className="p-3 bg-white space-y-2">
+                                                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                                            Quantity Pricing & Last Price for this Combination
+                                                          </span>
+                                                          <div className="flex items-center gap-1.5">
+                                                            <button
+                                                              type="button"
+                                                              onClick={() => handleAutoFillVariantComboQuantities(variantName, cIdx)}
+                                                              className="px-2 py-0.5 text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 rounded border border-amber-200 transition-colors"
+                                                              title="Auto-fill standard quantities from fixed quantities"
+                                                            >
+                                                              ⚡ Auto-Fill Quantities
+                                                            </button>
+                                                            <button
+                                                              type="button"
+                                                              onClick={() => handleAddVariantCombinationPriceRow(variantName, cIdx)}
+                                                              className="px-2 py-0.5 text-[10px] font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors flex items-center gap-0.5 shadow-2xs"
+                                                            >
+                                                              <FiPlus className="w-3 h-3" /> Add Qty
+                                                            </button>
+                                                          </div>
+                                                        </div>
+
+                                                        {qpList.length === 0 ? (
+                                                          <p className="text-[11px] text-slate-400 italic py-2 text-center">
+                                                            No quantity tiers defined. Click &quot;Auto-Fill Quantities&quot; or &quot;Add Qty&quot; above.
+                                                          </p>
+                                                        ) : (
+                                                          <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                                                            <table className="w-full text-left text-xs border-collapse">
+                                                              <thead>
+                                                                <tr className="bg-slate-100/80 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold">
+                                                                  <th className="p-1.5 pl-2.5">Quantity (Pcs)</th>
+                                                                  <th className="p-1.5">Particular Price (₹)</th>
+                                                                  <th className="p-1.5">Last Price (₹)</th>
+                                                                  <th className="p-1.5">Rate / Pc</th>
+                                                                  <th className="p-1.5 pr-2.5 text-right">Action</th>
+                                                                </tr>
+                                                              </thead>
+                                                              <tbody className="divide-y divide-slate-100">
+                                                                {qpList.map((qp, qpIdx) => {
+                                                                  const unitRate = qp.qty && Number(qp.qty) > 0 && qp.price
+                                                                    ? (Number(qp.price) / Number(qp.qty)).toFixed(2)
+                                                                    : null;
+
+                                                                  return (
+                                                                    <tr key={qpIdx} className="hover:bg-indigo-50/20">
+                                                                      <td className="p-1.5 pl-2.5">
+                                                                        <input
+                                                                          type="number"
+                                                                          value={qp.qty}
+                                                                          onChange={(e) =>
+                                                                            handleUpdateVariantCombinationPrice(
+                                                                              variantName,
+                                                                              cIdx,
+                                                                              qpIdx,
+                                                                              "qty",
+                                                                              e.target.value
+                                                                            )
+                                                                          }
+                                                                          className="w-24 px-1.5 py-0.5 text-xs border border-slate-300 rounded font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                                          placeholder="1000"
+                                                                        />
+                                                                      </td>
+                                                                      <td className="p-1.5">
+                                                                        <div className="flex items-center gap-1">
+                                                                          <span className="text-slate-400 font-bold">₹</span>
+                                                                          <input
+                                                                            type="number"
+                                                                            step="any"
+                                                                            value={qp.price}
+                                                                            onChange={(e) =>
+                                                                              handleUpdateVariantCombinationPrice(
+                                                                                variantName,
+                                                                                cIdx,
+                                                                                qpIdx,
+                                                                                "price",
+                                                                                e.target.value
+                                                                              )
+                                                                            }
+                                                                            className="w-24 px-1.5 py-0.5 text-xs border border-indigo-200 rounded font-bold text-indigo-950 bg-indigo-50/20 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                                            placeholder="0"
+                                                                          />
+                                                                        </div>
+                                                                      </td>
+                                                                      <td className="p-1.5">
+                                                                        <div className="flex items-center gap-1">
+                                                                          <span className="text-slate-400 font-bold">₹</span>
+                                                                          <input
+                                                                            type="number"
+                                                                            step="any"
+                                                                            value={qp.lastPrice !== undefined ? qp.lastPrice : ""}
+                                                                            onChange={(e) =>
+                                                                              handleUpdateVariantCombinationPrice(
+                                                                                variantName,
+                                                                                cIdx,
+                                                                                qpIdx,
+                                                                                "lastPrice",
+                                                                                e.target.value
+                                                                              )
+                                                                            }
+                                                                            className="w-24 px-1.5 py-0.5 text-xs border border-slate-300 rounded font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                                            placeholder="Hover Cost"
+                                                                          />
+                                                                        </div>
+                                                                      </td>
+                                                                      <td className="p-1.5">
+                                                                        {unitRate ? (
+                                                                          <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
+                                                                            ₹{unitRate}/pc
+                                                                          </span>
+                                                                        ) : (
+                                                                          <span className="text-[10px] text-slate-400">—</span>
+                                                                        )}
+                                                                      </td>
+                                                                      <td className="p-1.5 pr-2.5 text-right">
+                                                                        <button
+                                                                          type="button"
+                                                                          onClick={() =>
+                                                                            handleRemoveVariantCombinationPrice(
+                                                                              variantName,
+                                                                              cIdx,
+                                                                              qpIdx
+                                                                            )
+                                                                          }
+                                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                                          title="Remove Quantity Tier"
+                                                                        >
+                                                                          <FiTrash2 className="w-3.5 h-3.5" />
+                                                                        </button>
+                                                                      </td>
+                                                                    </tr>
+                                                                  );
+                                                                })}
+                                                              </tbody>
+                                                            </table>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
+
                                 </div>
                               </div>
                             </div>
@@ -2961,6 +3606,239 @@ export default function ProductManager() {
                             </div>
                           ))
                         )}
+
+                        {/* MAIN PRODUCT COMBINATION MATRIX */}
+                        {(() => {
+                          const comboPrices = formData.combinationPrices || [];
+
+                          return (
+                            <div className="mt-6 p-4 bg-gradient-to-r from-orange-50/70 via-slate-50 to-amber-50/50 rounded-xl border border-orange-200/80 shadow-2xs space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-orange-100 pb-2.5">
+                                <div>
+                                  <h5 className="text-xs font-black text-orange-950 uppercase tracking-wide flex items-center gap-1.5">
+                                    <FiGrid className="w-4 h-4 text-orange-600" />
+                                    Main Product Attribute Combination & Quantity Matrix
+                                  </h5>
+                                  <p className="text-[11px] text-slate-500 mt-0.5">
+                                    Define non-additive package prices for combinations of the select detail options above per quantity tier.
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <button
+                                    type="button"
+                                    onClick={handleSyncMainCombinations}
+                                    className="px-2.5 py-1 text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-1 shadow-2xs"
+                                  >
+                                    <FiRefreshCw className="w-3 h-3" />
+                                    <span>Sync Combinations ({comboPrices.length})</span>
+                                  </button>
+                                  {comboPrices.length > 0 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setFormData((prev) => ({ ...prev, combinationPrices: [] }))}
+                                      className="px-2 py-1 text-[11px] font-bold text-slate-500 hover:text-rose-600 rounded border border-slate-200"
+                                    >
+                                      Clear
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {comboPrices.length === 0 ? (
+                                <div className="py-4 text-center text-xs text-slate-500 bg-white/70 rounded-lg border border-dashed border-orange-200">
+                                  <p className="font-semibold text-slate-700">No combination matrix generated yet.</p>
+                                  <p className="text-[11px] text-slate-400 mt-0.5">
+                                    Add 2 or more options above, then click <strong>&quot;Sync Combinations&quot;</strong>.
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="space-y-2.5">
+                                  {comboPrices.map((combo, cIdx) => {
+                                    const comboKey = `main_combo_${cIdx}`;
+                                    const isExpanded = expandedCombos[comboKey] !== false;
+                                    const qpList = combo.quantityPrices || [];
+
+                                    return (
+                                      <div
+                                        key={cIdx}
+                                        className="bg-white rounded-lg border border-orange-100 shadow-2xs overflow-hidden"
+                                      >
+                                        <div className="p-2.5 bg-slate-50/80 hover:bg-orange-50/30 border-b border-orange-100 flex items-center justify-between gap-2 flex-wrap">
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase">Combo #{cIdx + 1}:</span>
+                                            {Object.entries(combo.attributes || {}).map(([aKey, aVal], aIdx) => (
+                                              <span
+                                                key={aIdx}
+                                                className="px-2 py-0.5 rounded text-[11px] font-bold bg-orange-100/80 text-orange-900 border border-orange-200/70"
+                                              >
+                                                <span className="text-orange-600 font-normal">{aKey}: </span>
+                                                {aVal}
+                                              </span>
+                                            ))}
+                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                              {qpList.length} Tiers
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-1.5">
+                                            <button
+                                              type="button"
+                                              onClick={() => toggleComboExpand(comboKey)}
+                                              className="px-2 py-0.5 text-[11px] font-bold text-orange-700 hover:bg-orange-100/70 rounded flex items-center gap-1"
+                                            >
+                                              {isExpanded ? (
+                                                <>
+                                                  <span>Collapse</span>
+                                                  <FiChevronUp className="w-3.5 h-3.5" />
+                                                </>
+                                              ) : (
+                                                <>
+                                                  <span>Edit Tiers ({qpList.length})</span>
+                                                  <FiChevronDown className="w-3.5 h-3.5" />
+                                                </>
+                                              )}
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleDeleteMainCombination(cIdx)}
+                                              className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                                            >
+                                              <FiTrash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        {isExpanded && (
+                                          <div className="p-3 bg-white space-y-2">
+                                            <div className="flex items-center justify-between">
+                                              <span className="text-[10px] font-bold uppercase text-slate-500">
+                                                Quantity Pricing & Last Price
+                                              </span>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleAddMainCombinationPriceRow(cIdx)}
+                                                className="px-2 py-0.5 text-[10px] font-bold bg-orange-600 hover:bg-orange-700 text-white rounded flex items-center gap-0.5"
+                                              >
+                                                <FiPlus className="w-3 h-3" /> Add Qty
+                                              </button>
+                                            </div>
+
+                                            {qpList.length > 0 && (
+                                              <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                                                <table className="w-full text-left text-xs border-collapse">
+                                                  <thead>
+                                                    <tr className="bg-slate-100/80 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold">
+                                                      <th className="p-1.5 pl-2.5">Quantity (Pcs)</th>
+                                                      <th className="p-1.5">Price (₹)</th>
+                                                      <th className="p-1.5">Last Price (₹)</th>
+                                                      <th className="p-1.5">Rate / Pc</th>
+                                                      <th className="p-1.5 pr-2.5 text-right">Action</th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody className="divide-y divide-slate-100">
+                                                    {qpList.map((qp, qpIdx) => {
+                                                      const unitRate = qp.qty && Number(qp.qty) > 0 && qp.price
+                                                        ? (Number(qp.price) / Number(qp.qty)).toFixed(2)
+                                                        : null;
+
+                                                      return (
+                                                        <tr key={qpIdx} className="hover:bg-orange-50/20">
+                                                          <td className="p-1.5 pl-2.5">
+                                                            <input
+                                                              type="number"
+                                                              value={qp.qty}
+                                                              onChange={(e) =>
+                                                                handleUpdateMainCombinationPrice(
+                                                                  cIdx,
+                                                                  qpIdx,
+                                                                  "qty",
+                                                                  e.target.value
+                                                                )
+                                                              }
+                                                              className="w-24 px-1.5 py-0.5 text-xs border border-slate-300 rounded font-bold text-slate-900"
+                                                              placeholder="1000"
+                                                            />
+                                                          </td>
+                                                          <td className="p-1.5">
+                                                            <div className="flex items-center gap-1">
+                                                              <span className="text-slate-400 font-bold">₹</span>
+                                                              <input
+                                                                type="number"
+                                                                step="any"
+                                                                value={qp.price}
+                                                                onChange={(e) =>
+                                                                  handleUpdateMainCombinationPrice(
+                                                                    cIdx,
+                                                                    qpIdx,
+                                                                    "price",
+                                                                    e.target.value
+                                                                  )
+                                                                }
+                                                                className="w-24 px-1.5 py-0.5 text-xs border border-orange-200 rounded font-bold text-orange-950 bg-orange-50/20"
+                                                                placeholder="0"
+                                                              />
+                                                            </div>
+                                                          </td>
+                                                          <td className="p-1.5">
+                                                            <div className="flex items-center gap-1">
+                                                              <span className="text-slate-400 font-bold">₹</span>
+                                                              <input
+                                                                type="number"
+                                                                step="any"
+                                                                value={qp.lastPrice !== undefined ? qp.lastPrice : ""}
+                                                                onChange={(e) =>
+                                                                  handleUpdateMainCombinationPrice(
+                                                                    cIdx,
+                                                                    qpIdx,
+                                                                    "lastPrice",
+                                                                    e.target.value
+                                                                  )
+                                                                }
+                                                                className="w-24 px-1.5 py-0.5 text-xs border border-slate-300 rounded font-bold text-slate-800"
+                                                                placeholder="Hover Cost"
+                                                              />
+                                                            </div>
+                                                          </td>
+                                                          <td className="p-1.5">
+                                                            {unitRate ? (
+                                                              <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
+                                                                ₹{unitRate}/pc
+                                                              </span>
+                                                            ) : (
+                                                              <span className="text-[10px] text-slate-400">—</span>
+                                                            )}
+                                                          </td>
+                                                          <td className="p-1.5 pr-2.5 text-right">
+                                                            <button
+                                                              type="button"
+                                                              onClick={() =>
+                                                                handleRemoveMainCombinationPrice(
+                                                                  cIdx,
+                                                                  qpIdx
+                                                                )
+                                                              }
+                                                              className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                                                            >
+                                                              <FiTrash2 className="w-3.5 h-3.5" />
+                                                            </button>
+                                                          </td>
+                                                        </tr>
+                                                      );
+                                                    })}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
                       </div>
                     </div>
                   )}

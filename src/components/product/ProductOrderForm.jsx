@@ -122,6 +122,10 @@ export default function ProductOrderForm({
         minQuantity: activeVariantDetails.minQuantity || product.minQuantity,
         quantityStep: activeVariantDetails.quantityStep || product.quantityStep,
         options: activeVariantDetails.options || product.options,
+        combinationPrices:
+          activeVariantDetails.combinationPrices ||
+          product.combinationPrices ||
+          [],
       }
     : product;
 
@@ -211,6 +215,22 @@ export default function ProductOrderForm({
     const numQty = Number(quantity);
     if (!numQty || numQty <= 0) return null;
 
+    if (
+      calculation?.finalLastPrice !== undefined &&
+      calculation?.finalLastPrice !== null &&
+      calculation?.finalLastPrice > 0
+    ) {
+      return Math.round(calculation.finalLastPrice);
+    }
+
+    if (calculation?.combinationLastPrice > 0) {
+      return Math.round(calculation.combinationLastPrice);
+    }
+
+    if (calculation?.optionsLastPriceTotal > 0) {
+      return Math.round(calculation.optionsLastPriceTotal);
+    }
+
     let baseLastPrice = 0;
     let hasBaseLastPrice = false;
 
@@ -228,6 +248,37 @@ export default function ProductOrderForm({
       ) {
         baseLastPrice = Number(matched.lastPrice);
         hasBaseLastPrice = true;
+      } else if (
+        currentProduct.fixedQuantities &&
+        currentProduct.fixedQuantities.length > 0
+      ) {
+        const sorted = [...currentProduct.fixedQuantities].sort(
+          (a, b) => Number(a.qty) - Number(b.qty),
+        );
+        const exactOrBelow = [...sorted]
+          .reverse()
+          .find((fq) => numQty >= Number(fq.qty));
+        if (
+          exactOrBelow &&
+          exactOrBelow.lastPrice !== undefined &&
+          exactOrBelow.lastPrice !== "" &&
+          !isNaN(Number(exactOrBelow.lastPrice)) &&
+          Number(exactOrBelow.lastPrice) > 0
+        ) {
+          baseLastPrice =
+            (Number(exactOrBelow.lastPrice) / Number(exactOrBelow.qty)) * numQty;
+          hasBaseLastPrice = true;
+        } else if (
+          sorted[0] &&
+          sorted[0].lastPrice !== undefined &&
+          sorted[0].lastPrice !== "" &&
+          !isNaN(Number(sorted[0].lastPrice)) &&
+          Number(sorted[0].lastPrice) > 0
+        ) {
+          baseLastPrice =
+            (Number(sorted[0].lastPrice) / Number(sorted[0].qty)) * numQty;
+          hasBaseLastPrice = true;
+        }
       }
     } else if (
       currentProduct.quantityPricingTiers &&
@@ -251,14 +302,7 @@ export default function ProductOrderForm({
       }
     }
 
-    const optLastTotal = calculation?.optionsLastPriceTotal || 0;
-    const hasCustomOptionLastPrice = optLastTotal > 0;
-
-    // If Last Price is set by Variation Custom Options, don't add Particular Quantity Last Price;
-    // if not, put the Last Price of Particular Quantity Prices.
-    if (hasCustomOptionLastPrice) {
-      return Math.round(optLastTotal);
-    } else if (hasBaseLastPrice) {
+    if (hasBaseLastPrice) {
       return Math.round(baseLastPrice);
     }
 
@@ -270,6 +314,8 @@ export default function ProductOrderForm({
     currentProduct,
     calculation?.optionsTotal,
     calculation?.optionsLastPriceTotal,
+    calculation?.combinationLastPrice,
+    calculation?.finalLastPrice,
     calculation?.baseUnitPrice,
   ]);
 
