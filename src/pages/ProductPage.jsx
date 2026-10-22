@@ -13,11 +13,20 @@ import StickerCalculator from "@/components/product/StickerCalculator";
 
 export default function ProductPage() {
   const { slug } = useParams();
-  const { getProductBySlug, getCategoryBySlug } = useData();
+  const { getProductBySlug, getCategoryBySlug, loading } = useData();
   const rawProduct = getProductBySlug(slug);
   const category = rawProduct ? getCategoryBySlug(rawProduct.categoryId) : null;
 
   const [selectedVariantName, setSelectedVariantName] = useState("");
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm font-medium text-slate-500">Loading product from MongoDB...</p>
+      </div>
+    );
+  }
 
   if (!rawProduct) {
     return (

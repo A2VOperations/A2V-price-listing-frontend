@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiSearch, FiX, FiArrowRight, FiTag, FiBox } from "react-icons/fi";
-import { searchProducts } from "@/data/products";
+import { useData } from "@/context/DataContext";
 import ProductImage from "./ProductImage";
 
 export default function SearchModal({ isOpen, onClose }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const { searchProducts } = useData();
 
   useEffect(() => {
-    if (query.trim()) {
+    if (query.trim() && searchProducts) {
       setResults(searchProducts(query));
     } else {
       setResults([]);
     }
-  }, [query]);
+  }, [query, searchProducts]);
 
   // Handle ESC key press
   useEffect(() => {

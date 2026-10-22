@@ -44,14 +44,14 @@ export default function AdminLayout({ children }) {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold tracking-tight">Admin & Backend Manager</h1>
+              <h1 className="text-xl font-bold tracking-tight">Admin & Database Manager</h1>
               {isBackendConnected ? (
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                  <FiCheckCircle className="w-3 h-3" /> Live Backend API
+                  <FiCheckCircle className="w-3 h-3" /> Live MongoDB Database
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                  <FiAlertCircle className="w-3 h-3" /> Offline / Static Storage
+                <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold bg-red-500/20 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full">
+                  <FiAlertCircle className="w-3 h-3" /> MongoDB Disconnected
                 </span>
               )}
             </div>

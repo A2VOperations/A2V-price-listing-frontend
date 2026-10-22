@@ -7,9 +7,33 @@ import { useQuote } from "@/context/QuoteContext";
 import { useData } from "@/context/DataContext";
 
 export default function DashboardPage() {
-  const { categories, products } = useData();
+  const { categories, products, loading, error, refreshData } = useData();
   const { itemCount, totalQuoteAmount } = useQuote();
   const [searchTerm, setSearchTerm] = useState("");
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm font-medium text-slate-500">Loading catalog from MongoDB database...</p>
+      </div>
+    );
+  }
+
+  if (error && categories.length === 0) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl text-center space-y-3 max-w-lg mx-auto my-12">
+        <h3 className="text-base font-bold">MongoDB Connection Error</h3>
+        <p className="text-xs text-red-600">{error}</p>
+        <button
+          onClick={refreshData}
+          className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
 
   const featuredProducts = products
     .filter((p) => p.categoryId === "visiting-cards")

@@ -129,6 +129,9 @@ export default function ProductManager() {
   const [formData, setFormData] = useState(defaultFormState);
   const [newVariantInput, setNewVariantInput] = useState("");
   const [newMainOptionName, setNewMainOptionName] = useState("");
+  const [expandedVariants, setExpandedVariants] = useState({});
+  const [editingVariantName, setEditingVariantName] = useState(null);
+  const [tempVariantName, setTempVariantName] = useState("");
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -152,6 +155,9 @@ export default function ProductManager() {
     });
     setManualImageUrl("");
     setActiveTab("general");
+    setExpandedVariants({});
+    setEditingVariantName(null);
+    setTempVariantName("");
     setIsModalOpen(true);
   };
 
@@ -255,6 +261,9 @@ export default function ProductManager() {
     });
     setManualImageUrl("");
     setActiveTab("general");
+    setExpandedVariants({});
+    setEditingVariantName(null);
+    setTempVariantName("");
     setIsModalOpen(true);
   };
 
@@ -360,6 +369,25 @@ export default function ProductManager() {
       variantDetails: updatedDetails,
     }));
     setNewVariantInput("");
+    setExpandedVariants((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+  };
+
+  const toggleVariantExpand = (name) => {
+    setExpandedVariants((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  const handleExpandAllVariants = (expand = true) => {
+    const next = {};
+    formData.variantCombinations.forEach((v) => {
+      next[v] = expand;
+    });
+    setExpandedVariants(next);
   };
 
   const handleRemoveVariantCombination = (name) => {
@@ -368,11 +396,79 @@ export default function ProductManager() {
     );
     const updatedDetails = { ...formData.variantDetails };
     delete updatedDetails[name];
+    setExpandedVariants((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
     setFormData((prev) => ({
       ...prev,
       variantCombinations: updatedCombos,
       variantDetails: updatedDetails,
     }));
+    if (editingVariantName === name) {
+      setEditingVariantName(null);
+    }
+  };
+
+  const handleRenameVariantCombination = (oldName, newName) => {
+    const trimmed = (newName || "").trim();
+    if (!trimmed) {
+      alert("Variation name cannot be empty.");
+      return false;
+    }
+    if (trimmed === oldName) {
+      return true;
+    }
+    if (formData.variantCombinations.includes(trimmed)) {
+      alert(`A variant named "${trimmed}" already exists.`);
+      return false;
+    }
+
+    const updatedCombos = formData.variantCombinations.map((v) =>
+      v === oldName ? trimmed : v,
+    );
+    const updatedDetails = { ...formData.variantDetails };
+    if (updatedDetails[oldName]) {
+      updatedDetails[trimmed] = { ...updatedDetails[oldName] };
+      delete updatedDetails[oldName];
+    } else {
+      updatedDetails[trimmed] = {
+        code: `${formData.code || "VAR"}-1`,
+        basePrice: formData.basePrice || 0,
+        description: `${trimmed} featuring precision finishes and custom specifications.`,
+        quantityType: formData.quantityType || "incremental",
+        minQuantity: formData.minQuantity || 1000,
+        quantityStep: formData.quantityStep || 1000,
+        fixedQuantities: JSON.parse(
+          JSON.stringify(formData.fixedQuantities || []),
+        ),
+        specifications: { ...formData.specifications },
+        quantityPricingTiers: JSON.parse(
+          JSON.stringify(formData.quantityPricingTiers || []),
+        ),
+        options: [],
+      };
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      variantCombinations: updatedCombos,
+      variantDetails: updatedDetails,
+    }));
+
+    setExpandedVariants((prev) => {
+      const next = { ...prev };
+      if (next[oldName] !== undefined) {
+        next[trimmed] = next[oldName];
+        delete next[oldName];
+      } else {
+        next[trimmed] = true;
+      }
+      return next;
+    });
+
+    return true;
   };
 
   // Main Product Fixed Quantity Handlers (Dropdown Selection Mode)
@@ -1328,10 +1424,31 @@ export default function ProductManager() {
                       </div>
 
                       <div className="space-y-4">
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                          Active Sub-Sub Variations (
-                          {formData.variantCombinations.length})
-                        </h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                            Active Sub-Sub Variations (
+                            {formData.variantCombinations.length})
+                          </h4>
+                          {formData.variantCombinations.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleExpandAllVariants(true)}
+                                className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 hover:underline"
+                              >
+                                Expand All
+                              </button>
+                              <span className="text-slate-300">•</span>
+                              <button
+                                type="button"
+                                onClick={() => handleExpandAllVariants(false)}
+                                className="text-[10px] font-bold text-slate-500 hover:text-slate-800 hover:underline"
+                              >
+                                Collapse All
+                              </button>
+                            </div>
+                          )}
+                        </div>
 
                         {formData.variantCombinations.length === 0 ? (
                           <p className="text-xs text-slate-400 italic">
@@ -1346,35 +1463,179 @@ export default function ProductManager() {
                               const variantPricingTiers =
                                 variantObj.quantityPricingTiers || [];
                               const variantOptions = variantObj.options || [];
+                              const isExpanded = !!expandedVariants[variantName];
 
                               return (
                                 <div
                                   key={variantName}
-                                  className="p-5 rounded-xl border border-indigo-200 bg-white shadow-xs space-y-4"
+                                  className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                                    isExpanded
+                                      ? "p-4 sm:p-5 border-indigo-300 bg-white shadow-sm ring-1 ring-indigo-200/50"
+                                      : "p-3 sm:p-4 border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-200 hover:shadow-xs"
+                                  }`}
                                 >
-                                  {/* Sub-sub Variation Card Header */}
-                                  <div className="flex items-center justify-between border-b border-indigo-100 pb-3">
-                                    <span className="font-extrabold text-xs text-indigo-950 flex items-center gap-2 uppercase tracking-wide">
-                                      <FiChevronRight className="w-4 h-4 text-indigo-600" />
-                                      {variantName}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        handleRemoveVariantCombination(
-                                          variantName,
-                                        )
-                                      }
-                                      className="p-1 text-slate-400 hover:text-rose-600 rounded"
-                                      title="Remove Sub-sub Variation"
-                                    >
-                                      <FiTrash2 className="w-4 h-4" />
-                                    </button>
+                                  {/* Sub-sub Variation Card Header (Click to Open / Close) */}
+                                  <div
+                                    onClick={() => toggleVariantExpand(variantName)}
+                                    className="flex items-center justify-between cursor-pointer select-none group/header"
+                                  >
+                                    <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
+                                      <div
+                                        className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                                          isExpanded
+                                            ? "rotate-90 bg-indigo-600 text-white shadow-xs"
+                                            : "bg-indigo-100 text-indigo-700 group-hover/header:bg-indigo-200"
+                                        }`}
+                                      >
+                                        <FiChevronRight className="w-3.5 h-3.5" />
+                                      </div>
+                                      {editingVariantName === variantName ? (
+                                        <div
+                                          className="flex items-center gap-1.5"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <input
+                                            type="text"
+                                            autoFocus
+                                            value={tempVariantName}
+                                            onChange={(e) =>
+                                              setTempVariantName(e.target.value)
+                                            }
+                                            onKeyDown={(e) => {
+                                              if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                if (
+                                                  handleRenameVariantCombination(
+                                                    variantName,
+                                                    tempVariantName,
+                                                  )
+                                                ) {
+                                                  setEditingVariantName(null);
+                                                }
+                                              } else if (e.key === "Escape") {
+                                                setEditingVariantName(null);
+                                              }
+                                            }}
+                                            className="px-2 py-0.5 text-xs border border-indigo-400 rounded-md font-bold text-indigo-950 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs min-w-[200px]"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (
+                                                handleRenameVariantCombination(
+                                                  variantName,
+                                                  tempVariantName,
+                                                )
+                                              ) {
+                                                setEditingVariantName(null);
+                                              }
+                                            }}
+                                            className="p-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-xs transition-colors"
+                                            title="Save Name"
+                                          >
+                                            <FiCheck className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setEditingVariantName(null)
+                                            }
+                                            className="p-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md transition-colors"
+                                            title="Cancel"
+                                          >
+                                            <FiX className="w-3.5 h-3.5" />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-1.5 group/title">
+                                          <span className="font-extrabold text-xs text-indigo-950 uppercase tracking-wide truncate">
+                                            {variantName}
+                                          </span>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setEditingVariantName(variantName);
+                                              setTempVariantName(variantName);
+                                            }}
+                                            className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-100 rounded-md transition-colors"
+                                            title="Edit Variation Name"
+                                          >
+                                            <FiEdit2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      )}
+                                      {variantObj.code && (
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-700 font-mono">
+                                          {variantObj.code}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2.5 shrink-0 ml-2">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleRemoveVariantCombination(
+                                            variantName,
+                                          );
+                                        }}
+                                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
+                                        title="Remove Sub-sub Variation"
+                                      >
+                                        <FiTrash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
                                   </div>
 
-                                  {/* Individual Settings for this specific Sub-sub Variation */}
-                                  <div className="space-y-3">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                  {/* Collapsible Animated Container */}
+                                  <div
+                                    className={`grid transition-all duration-300 ease-in-out ${
+                                      isExpanded
+                                        ? "grid-rows-[1fr] opacity-100 pt-4 border-t border-indigo-100 mt-3"
+                                        : "grid-rows-[0fr] opacity-0"
+                                    }`}
+                                  >
+                                    <div className="overflow-hidden space-y-4">
+                                      {/* Individual Settings for this specific Sub-sub Variation */}
+                                      <div className="space-y-3">
+                                        <div>
+                                          <label className="block text-[10px] text-indigo-800 font-extrabold uppercase mb-1 flex items-center justify-between">
+                                            <span>Sub-Sub Variation Name *</span>
+                                            <span className="text-[9px] text-slate-400 font-normal lowercase">
+                                              press Enter or click away to save
+                                            </span>
+                                          </label>
+                                          <input
+                                            type="text"
+                                            key={`name-field-${variantName}`}
+                                            defaultValue={variantName}
+                                            onKeyDown={(e) => {
+                                              if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                handleRenameVariantCombination(
+                                                  variantName,
+                                                  e.target.value,
+                                                );
+                                              }
+                                            }}
+                                            onBlur={(e) => {
+                                              if (
+                                                e.target.value.trim() &&
+                                                e.target.value.trim() !== variantName
+                                              ) {
+                                                handleRenameVariantCombination(
+                                                  variantName,
+                                                  e.target.value,
+                                                );
+                                              }
+                                            }}
+                                            className="w-full px-2.5 py-1.5 text-xs border border-indigo-200 rounded-md font-bold text-indigo-950 bg-indigo-50/40 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                          />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                       <div>
                                         <label className="block text-[10px] text-slate-500 font-bold uppercase mb-1">
                                           Individual Code
@@ -2147,7 +2408,9 @@ export default function ProductManager() {
                                     ))}
                                   </div>
                                 </div>
-                              );
+                              </div>
+                            </div>
+                          );
                             })}
                           </div>
                         )}

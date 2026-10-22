@@ -9,7 +9,7 @@ import { FiSearch, FiLayers, FiGrid, FiList } from "react-icons/fi";
 
 export default function CategoryPage() {
   const { slug } = useParams();
-  const { getCategoryBySlug, getProductsByCategory } = useData();
+  const { getCategoryBySlug, getProductsByCategory, loading } = useData();
   const category =
     getCategoryBySlug(slug) ||
     (slug === "standie" || slug === "standee" ? getCategoryBySlug("flex-board") : null);
@@ -26,6 +26,15 @@ export default function CategoryPage() {
     category?.slug === "stickers";
 
   const [activeTab, setActiveTab] = useState("calculator"); // 'calculator' | 'products'
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm font-medium text-slate-500">Loading category from MongoDB...</p>
+      </div>
+    );
+  }
 
   if (!category) {
     return (

@@ -1,6 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { categories as initialCategories } from "@/data/categories";
-import initialProducts from "@/data/products.json";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
   fetchCategoriesApi,
   createCategoryApi,
@@ -15,128 +13,72 @@ import {
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const [categories, setCategories] = useState(initialCategories);
-  const [products, setProducts] = useState(initialProducts);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadDataFromApi = async () => {
+  const loadDataFromApi = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const [fetchedCats, fetchedProds] = await Promise.all([
         fetchCategoriesApi(),
         fetchProductsApi(),
       ]);
 
-      // Merge fetched categories with initial fallback so newly added static items are never dropped
-      const catsMap = new Map();
-      initialCategories.forEach((c) => catsMap.set(c.id, c));
-      if (Array.isArray(fetchedCats)) {
-        fetchedCats.forEach((c) => {
-          const existing = catsMap.get(c.id);
-          catsMap.set(c.id, existing ? { ...existing, ...c } : c);
-        });
-      }
-      const finalCats = Array.from(catsMap.values());
-
-      // Merge fetched products with initial fallback so standee and any newly registered items are preserved
-      const prodsMap = new Map();
-      initialProducts.forEach((p) => prodsMap.set(p.id, p));
-      if (Array.isArray(fetchedProds)) {
-        fetchedProds.forEach((p) => {
-          const existing = prodsMap.get(p.id);
-          prodsMap.set(p.id, existing ? { ...existing, ...p } : p);
-        });
-      }
-      const finalProds = Array.from(prodsMap.values());
-
-      setCategories(finalCats);
-      setProducts(finalProds);
+      setCategories(Array.isArray(fetchedCats) ? fetchedCats : []);
+      setProducts(Array.isArray(fetchedProds) ? fetchedProds : []);
       setIsBackendConnected(true);
-      setError(null);
     } catch (err) {
-      console.warn("Backend API not reachable, falling back to static dataset:", err.message);
+      console.error("MongoDB Backend API connection failed:", err.message);
       setIsBackendConnected(false);
-      // Keep initialCategories and initialProducts as fallback
+      setError(err.message || "Failed to load data from MongoDB backend.");
+      setCategories([]);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadDataFromApi();
-  }, []);
+  }, [loadDataFromApi]);
 
   const addCategory = async (categoryData) => {
-    if (isBackendConnected) {
-      const newCat = await createCategoryApi(categoryData);
-      setCategories((prev) => [...prev, newCat]);
-      return newCat;
-    } else {
-      const newCat = {
-        ...categoryData,
-        id: categoryData.id || categoryData.slug || Date.now().toString(),
-      };
-      setCategories((prev) => [...prev, newCat]);
-      return newCat;
-    }
+    const newCat = await createCategoryApi(categoryData);
+    setCategories((prev) => [...prev, newCat]);
+    return newCat;
   };
 
   const updateCategory = async (id, categoryData) => {
-    if (isBackendConnected) {
-      const updatedCat = await updateCategoryApi(id, categoryData);
-      setCategories((prev) =>
-        prev.map((c) => (c.id === id || c.slug === id ? updatedCat : c))
-      );
-      return updatedCat;
-    } else {
-      setCategories((prev) =>
-        prev.map((c) => (c.id === id || c.slug === id ? { ...c, ...categoryData } : c))
-      );
-      return { id, ...categoryData };
-    }
+    const updatedCat = await updateCategoryApi(id, categoryData);
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id || c.slug === id ? updatedCat : c))
+    );
+    return updatedCat;
   };
 
   const deleteCategory = async (id) => {
-    if (isBackendConnected) {
-      await deleteCategoryApi(id);
-    }
+    await deleteCategoryApi(id);
     setCategories((prev) => prev.filter((c) => c.id !== id && c.slug !== id));
   };
 
   const addProduct = async (productData) => {
-    if (isBackendConnected) {
-      const newProd = await createProductApi(productData);
-      setProducts((prev) => [...prev, newProd]);
-      return newProd;
-    } else {
-      const newProd = {
-        ...productData,
-        id: productData.id || `AP-${Date.now()}`,
-      };
-      setProducts((prev) => [...prev, newProd]);
-      return newProd;
-    }
+    const newProd = await createProductApi(productData);
+    setProducts((prev) => [...prev, newProd]);
+    return newProd;
   };
 
   const updateProduct = async (id, productData) => {
-    if (isBackendConnected) {
-      const updatedProd = await updateProductApi(id, productData);
-      setProducts((prev) => prev.map((p) => (p.id === id ? updatedProd : p)));
-      return updatedProd;
-    } else {
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, ...productData } : p))
-      );
-      return { id, ...productData };
-    }
+    const updatedProd = await updateProductApi(id, productData);
+    setProducts((prev) => prev.map((p) => (p.id === id ? updatedProd : p)));
+    return updatedProd;
   };
 
   const deleteProduct = async (id) => {
-    if (isBackendConnected) {
-      await deleteProductApi(id);
-    }
+    await deleteProductApi(id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
