@@ -94,7 +94,8 @@ export function calculateProductPrice({
     }
   }
 
-  let optionsTotal = 0;
+    let optionsTotal = 0;
+  let optionsLastPriceTotal = 0;
   const optionDetails = [];
 
   // 2. Option Price Adjustments from product config
@@ -117,21 +118,88 @@ export function calculateProductPrice({
         const foundVal = group.values?.find((v) => v.label === valLabel);
         if (foundVal) {
           let adjustment = 0;
-          const baseReferenceQty =
-            product.quantityType === "select" &&
-            Array.isArray(product.fixedQuantities) &&
-            product.fixedQuantities.length > 0
-              ? Number(product.fixedQuantities[0].qty) || 1000
-              : product.minQuantity && product.minQuantity > 0
-              ? product.minQuantity
-              : 1;
-          const qtyRatio = effectiveQty / baseReferenceQty;
+          let optLastPrice = 0;
 
-          if (foundVal.priceAdjustment !== undefined) {
-            adjustment += foundVal.priceAdjustment * qtyRatio;
-          }
-          if (foundVal.percentageAdjustment) {
-            adjustment += (unitPrice * foundVal.percentageAdjustment) / 100;
+          // Check if choice has quantity-specific customization (Quantity, Particular Price, Last Price)
+          if (
+            Array.isArray(foundVal.quantityPrices) &&
+            foundVal.quantityPrices.length > 0
+          ) {
+            const matched = foundVal.quantityPrices.find(
+              (qp) => Number(qp.qty) === effectiveQty
+            );
+            if (matched) {
+              adjustment = Number(matched.price) || 0;
+              if (
+                matched.lastPrice !== undefined &&
+                matched.lastPrice !== null &&
+                matched.lastPrice !== "" &&
+                !isNaN(Number(matched.lastPrice))
+              ) {
+                optLastPrice = Number(matched.lastPrice);
+              }
+            } else {
+              // Find nearest or tier below
+              const sorted = [...foundVal.quantityPrices].sort(
+                (a, b) => Number(a.qty) - Number(b.qty)
+              );
+              const exactOrBelow = [...sorted]
+                .reverse()
+                .find((qp) => effectiveQty >= Number(qp.qty));
+              if (exactOrBelow) {
+                adjustment =
+                  (Number(exactOrBelow.price) / Number(exactOrBelow.qty)) *
+                  effectiveQty;
+                if (
+                  exactOrBelow.lastPrice !== undefined &&
+                  exactOrBelow.lastPrice !== "" &&
+                  !isNaN(Number(exactOrBelow.lastPrice))
+                ) {
+                  optLastPrice =
+                    (Number(exactOrBelow.lastPrice) /
+                      Number(exactOrBelow.qty)) *
+                    effectiveQty;
+                }
+              } else if (sorted[0]) {
+                adjustment =
+                  (Number(sorted[0].price) / Number(sorted[0].qty)) *
+                  effectiveQty;
+                if (
+                  sorted[0].lastPrice !== undefined &&
+                  sorted[0].lastPrice !== "" &&
+                  !isNaN(Number(sorted[0].lastPrice))
+                ) {
+                  optLastPrice =
+                    (Number(sorted[0].lastPrice) / Number(sorted[0].qty)) *
+                    effectiveQty;
+                }
+              }
+            }
+          } else {
+            // Standard / flat adjustment fallback
+            const baseReferenceQty =
+              product.quantityType === "select" &&
+              Array.isArray(product.fixedQuantities) &&
+              product.fixedQuantities.length > 0
+                ? Number(product.fixedQuantities[0].qty) || 1000
+                : product.minQuantity && product.minQuantity > 0
+                ? product.minQuantity
+                : 1;
+            const qtyRatio = effectiveQty / baseReferenceQty;
+
+            if (foundVal.priceAdjustment !== undefined) {
+              adjustment += foundVal.priceAdjustment * qtyRatio;
+            }
+            if (foundVal.percentageAdjustment) {
+              adjustment += (unitPrice * foundVal.percentageAdjustment) / 100;
+            }
+            if (
+              foundVal.lastPrice !== undefined &&
+              foundVal.lastPrice !== "" &&
+              !isNaN(Number(foundVal.lastPrice))
+            ) {
+              optLastPrice = Number(foundVal.lastPrice) * qtyRatio;
+            }
           }
 
           if (adjustment > 0) {
@@ -142,6 +210,9 @@ export function calculateProductPrice({
               adjustment: Math.round(adjustment * 100) / 100,
             });
             processedKeys.add(optKey);
+          }
+          if (optLastPrice > 0) {
+            optionsLastPriceTotal += optLastPrice;
           }
           break;
         }
@@ -168,6 +239,7 @@ export function calculateProductPrice({
     quantity: effectiveQty,
     baseUnitPrice: Math.round(unitPrice * 100) / 100,
     optionsTotal: Math.round(optionsTotal * 100) / 100,
+    optionsLastPriceTotal: Math.round(optionsLastPriceTotal * 100) / 100,
     optionDetails,
     subtotal,
     gstRate,

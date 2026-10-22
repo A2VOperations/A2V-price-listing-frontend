@@ -211,6 +211,9 @@ export default function ProductOrderForm({
     const numQty = Number(quantity);
     if (!numQty || numQty <= 0) return null;
 
+    let baseLastPrice = 0;
+    let hasBaseLastPrice = false;
+
     if (isSelectQty) {
       const matched = currentProduct.fixedQuantities?.find(
         (fq) => Number(fq.qty) === numQty,
@@ -223,9 +226,8 @@ export default function ProductOrderForm({
         !isNaN(Number(matched.lastPrice)) &&
         Number(matched.lastPrice) > 0
       ) {
-        const baseLastPrice = Number(matched.lastPrice);
-        const optionsTotal = calculation?.optionsTotal || 0;
-        return Math.round(baseLastPrice + optionsTotal);
+        baseLastPrice = Number(matched.lastPrice);
+        hasBaseLastPrice = true;
       }
     } else if (
       currentProduct.quantityPricingTiers &&
@@ -244,11 +246,22 @@ export default function ProductOrderForm({
         !isNaN(Number(applicableTier.lastPrice)) &&
         Number(applicableTier.lastPrice) > 0
       ) {
-        const unitLastPrice = Number(applicableTier.lastPrice);
-        const optionsTotal = calculation?.optionsTotal || 0;
-        return Math.round(unitLastPrice * effQty + optionsTotal);
+        baseLastPrice = Number(applicableTier.lastPrice) * effQty;
+        hasBaseLastPrice = true;
       }
     }
+
+    const optLastTotal = calculation?.optionsLastPriceTotal || 0;
+    const optRegTotal = calculation?.optionsTotal || 0;
+    const finalOptionsLast = optLastTotal > 0 ? optLastTotal : optRegTotal;
+
+    if (hasBaseLastPrice) {
+      return Math.round(baseLastPrice + finalOptionsLast);
+    } else if (optLastTotal > 0) {
+      const baseStandard = calculation?.baseUnitPrice || 0;
+      return Math.round(baseStandard + optLastTotal);
+    }
+
     return null;
   }, [
     isFormValid,
@@ -256,6 +269,8 @@ export default function ProductOrderForm({
     isSelectQty,
     currentProduct,
     calculation?.optionsTotal,
+    calculation?.optionsLastPriceTotal,
+    calculation?.baseUnitPrice,
   ]);
 
   // Specific discount calculation as per price
