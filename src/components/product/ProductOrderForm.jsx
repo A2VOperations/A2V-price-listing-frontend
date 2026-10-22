@@ -475,31 +475,8 @@ export default function ProductOrderForm({
               </div>
             </div>
 
-            {/* Discount Input & Steppers & Preset Quick Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-orange-100">
-              <div className="flex items-center space-x-1.5">
-                <span className="text-[11px] font-semibold text-slate-500">
-                  Quick:
-                </span>
-                {(discountMode === "percent"
-                  ? [5, 10, 15, 20, 25]
-                  : [50, 100, 200, 500, 1000]
-                ).map((val) => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => setDiscount(val)}
-                    className={`px-2 py-0.5 text-[11px] font-bold rounded-md border transition-all ${
-                      Number(discount) === val
-                        ? "bg-orange-100 border-orange-400 text-orange-800"
-                        : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
-                    }`}
-                  >
-                    {discountMode === "percent" ? `${val}%` : `₹${val}`}
-                  </button>
-                ))}
-              </div>
-
+            {/* Discount Input & Steppers */}
+            <div className="flex items-center justify-end gap-2 pt-1 border-t border-orange-100">
               <div className="flex items-center space-x-2">
                 <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
                   <button

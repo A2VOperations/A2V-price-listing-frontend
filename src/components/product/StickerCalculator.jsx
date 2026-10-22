@@ -1058,24 +1058,7 @@ export default function StickerCalculator({ product }) {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center space-x-1">
-                    {(discountMode === "percent" ? [5, 10, 15, 20] : [50, 100, 200, 500]).map((val) => (
-                      <button
-                        key={val}
-                        type="button"
-                        onClick={() => setManualDiscount(val)}
-                        className={`px-2 py-0.5 text-[10px] font-bold rounded border transition-colors ${
-                          Number(manualDiscount) === val
-                            ? "bg-orange-600 border-orange-500 text-white"
-                            : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
-                        }`}
-                      >
-                        {discountMode === "percent" ? `${val}%` : `₹${val}`}
-                      </button>
-                    ))}
-                  </div>
-
+                <div className="flex items-center justify-end gap-2">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center border border-slate-700 rounded-lg overflow-hidden bg-slate-800">
                       <span className="pl-2 text-xs text-slate-400">
