@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   FiGrid,
   FiMaximize,
@@ -13,9 +13,15 @@ import {
   FiRotateCw,
   FiPlus,
   FiMinus,
+  FiTag,
+  FiDownload,
+  FiUser,
+  FiPhone,
+  FiFileText,
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import StickerSheetPreview from "./StickerSheetPreview";
+import { generateStickerQuotationPdf } from "@/lib/generateQuotationPdf";
 
 const SHEET_SIZES = [
   {
@@ -94,7 +100,24 @@ const LAMINATIONS = [
 ];
 
 export default function StickerCalculator({ product }) {
-  const { addToQuote } = useQuote();
+  const { addToQuote, clientInfo, updateClientInfo } = useQuote();
+
+  // Client Details & Quotation States
+  const [clientName, setClientName] = useState(clientInfo?.clientName || "");
+  const [clientPhone, setClientPhone] = useState(clientInfo?.phone || "");
+  const [manualDiscount, setManualDiscount] = useState("");
+  const [discountMode, setDiscountMode] = useState("amount"); // 'amount' | 'percent'
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
+
+  useEffect(() => {
+    if (clientInfo?.clientName && !clientName) {
+      setClientName(clientInfo.clientName);
+    }
+    if (clientInfo?.phone && !clientPhone) {
+      setClientPhone(clientInfo.phone);
+    }
+  }, [clientInfo]);
 
   // 1. Sheet Size State (12*18 or 13*19)
   const [selectedSheetId, setSelectedSheetId] = useState("12x18");
@@ -201,15 +224,31 @@ export default function StickerCalculator({ product }) {
     }
 
     // Tier discount on volume sheets
-    let discountPct = 0;
-    if (sheetsNeeded >= 100) discountPct = 0.20;
-    else if (sheetsNeeded >= 50) discountPct = 0.15;
-    else if (sheetsNeeded >= 25) discountPct = 0.10;
-    else if (sheetsNeeded >= 10) discountPct = 0.05;
+    let volumeDiscountPct = 0;
+    if (sheetsNeeded >= 100) volumeDiscountPct = 0.20;
+    else if (sheetsNeeded >= 50) volumeDiscountPct = 0.15;
+    else if (sheetsNeeded >= 25) volumeDiscountPct = 0.10;
+    else if (sheetsNeeded >= 10) volumeDiscountPct = 0.05;
 
     const baseTotal = sheetsNeeded * costPerSheet;
-    const discountAmount = Math.round(baseTotal * discountPct);
-    const totalAmount = Math.round(baseTotal - discountAmount);
+
+    let discountAmount = 0;
+    let effectiveDiscountPct = 0;
+
+    if (manualDiscount !== "" && !isNaN(Number(manualDiscount))) {
+      const numDisc = Math.max(0, Number(manualDiscount));
+      discountAmount =
+        discountMode === "percent"
+          ? Math.round((baseTotal * Math.min(100, numDisc)) / 100)
+          : Math.min(baseTotal, numDisc);
+      effectiveDiscountPct =
+        baseTotal > 0 ? Math.round((discountAmount / baseTotal) * 100) : 0;
+    } else {
+      discountAmount = Math.round(baseTotal * volumeDiscountPct);
+      effectiveDiscountPct = Math.round(volumeDiscountPct * 100);
+    }
+
+    const totalAmount = Math.max(0, Math.round(baseTotal - discountAmount));
     const pricePerSticker = actualStickers > 0 ? (totalAmount / actualStickers).toFixed(2) : 0;
     const effectiveSheetCost = sheetsNeeded > 0 ? (totalAmount / sheetsNeeded).toFixed(2) : 0;
 
@@ -218,7 +257,8 @@ export default function StickerCalculator({ product }) {
       actualStickers,
       stickersPerSheet,
       costPerSheet,
-      discountPct,
+      baseTotal,
+      discountPct: effectiveDiscountPct,
       discountAmount,
       totalAmount,
       pricePerSticker,
@@ -236,6 +276,8 @@ export default function StickerCalculator({ product }) {
     selectedCutId,
     selectedLaminationId,
     selectedSheetId,
+    manualDiscount,
+    discountMode,
   ]);
 
   // Handle Preset Size Selection
@@ -289,6 +331,10 @@ export default function StickerCalculator({ product }) {
 
   // Add to Quote
   const handleAddToQuote = () => {
+    if (clientName || clientPhone) {
+      updateClientInfo({ clientName, phone: clientPhone });
+    }
+
     const customProduct = {
       id: product?.id || `sticker-custom-${Date.now()}`,
       code: product?.code || "STK-CALC",
@@ -310,9 +356,14 @@ export default function StickerCalculator({ product }) {
       "Bleed Gap": `${gap}"`,
       "Side Margin": `${sideMargin}"`,
       "Cost Per Sticker": `₹${calculation.pricePerSticker}`,
+      ...(calculation.discountAmount > 0
+        ? { "Discount Applied": `- Rs. ${calculation.discountAmount.toLocaleString()}/-` }
+        : {}),
     };
 
     const calcData = {
+      subtotal: calculation.baseTotal,
+      discount: calculation.discountAmount,
       baseAmount: calculation.totalAmount,
       totalAmount: calculation.totalAmount,
       quantity: calculation.actualStickers,
@@ -327,6 +378,46 @@ export default function StickerCalculator({ product }) {
     setAddedSuccess(true);
     setTimeout(() => setAddedSuccess(false), 3000);
   };
+
+  const handleDownloadPdf = () => {
+    setIsGeneratingPdf(true);
+    try {
+      if (clientName || clientPhone) {
+        updateClientInfo({ clientName, phone: clientPhone });
+      }
+
+      generateStickerQuotationPdf({
+        productName: product?.name || "Custom Stickers & Labels",
+        sheetName: activeSheetDef.name,
+        stickerWidth,
+        stickerHeight,
+        shape: shape.charAt(0).toUpperCase() + shape.slice(1),
+        materialName: calculation.material.name,
+        cutName: calculation.cut.name,
+        laminationName: calculation.lam.name,
+        sheetsNeeded: calculation.sheetsNeeded,
+        actualStickers: calculation.actualStickers,
+        stickersPerSheet: calculation.stickersPerSheet,
+        costPerSheet: calculation.costPerSheet,
+        grossSubtotal: calculation.baseTotal,
+        validDiscount: calculation.discountAmount,
+        totalAmount: calculation.totalAmount,
+        pricePerSticker: calculation.pricePerSticker,
+        clientInfo: {
+          clientName: clientName.trim() || clientInfo?.clientName || "Walk-in Client",
+          phone: clientPhone.trim() || clientInfo?.phone || "",
+        },
+      });
+
+      setPdfSuccess(true);
+      setTimeout(() => setPdfSuccess(false), 3000);
+    } catch (err) {
+      console.error("Sticker PDF generation failed:", err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
 
   return (
     <div className="space-y-8">
@@ -939,23 +1030,148 @@ export default function StickerCalculator({ product }) {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleAddToQuote}
-                className="w-full py-3 px-4 rounded-xl font-black text-sm bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg transition-all flex items-center justify-center gap-2"
-              >
-                {addedSuccess ? (
-                  <>
-                    <FiCheckCircle className="w-5 h-5 text-emerald-300" />
-                    <span>Added to Quote Successfully!</span>
-                  </>
-                ) : (
-                  <>
-                    <FiPlusCircle className="w-5 h-5" />
-                    <span>Add {calculation.actualStickers} Stickers to Quote</span>
-                  </>
-                )}
-              </button>
+              {/* Specific Discount as per Price Section */}
+              <div className="pt-3 border-t border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-orange-300 flex items-center gap-1.5">
+                    <FiTag className="w-3.5 h-3.5" /> Special Discount as per Price:
+                  </span>
+                  <div className="flex items-center bg-slate-800 rounded p-0.5 border border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setDiscountMode("amount")}
+                      className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                        discountMode === "amount" ? "bg-orange-600 text-white" : "text-slate-400"
+                      }`}
+                    >
+                      ₹ Flat
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDiscountMode("percent")}
+                      className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                        discountMode === "percent" ? "bg-orange-600 text-white" : "text-slate-400"
+                      }`}
+                    >
+                      % Percent
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center space-x-1">
+                    {(discountMode === "percent" ? [5, 10, 15, 20] : [50, 100, 200, 500]).map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setManualDiscount(val)}
+                        className={`px-2 py-0.5 text-[10px] font-bold rounded border transition-colors ${
+                          Number(manualDiscount) === val
+                            ? "bg-orange-600 border-orange-500 text-white"
+                            : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                        }`}
+                      >
+                        {discountMode === "percent" ? `${val}%` : `₹${val}`}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center border border-slate-700 rounded-lg overflow-hidden bg-slate-800">
+                      <span className="pl-2 text-xs text-slate-400">
+                        {discountMode === "percent" ? "%" : "₹"}
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        max={discountMode === "percent" ? 100 : calculation.baseTotal}
+                        value={manualDiscount}
+                        onChange={(e) => setManualDiscount(e.target.value)}
+                        placeholder="0"
+                        className="w-16 px-2 py-1 text-xs text-center font-bold text-white bg-transparent focus:outline-none"
+                      />
+                    </div>
+                    {manualDiscount !== "" && Number(manualDiscount) > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setManualDiscount("")}
+                        className="px-2 py-1 text-[10px] font-bold text-rose-400 hover:text-rose-300 bg-slate-800 rounded border border-slate-700"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Client Information for Quotation */}
+              <div className="pt-3 border-t border-slate-800 space-y-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 block">
+                  <FiUser className="w-3.5 h-3.5 text-orange-400" />
+                  Client Info (For Official Quotation PDF):
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Client / Company Name"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons: Download PDF & Add to Quote */}
+              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {pdfSuccess ? (
+                    <>
+                      <FiCheckCircle className="w-4 h-4 text-emerald-400" />
+                      <span className="text-emerald-300">Quotation Downloaded!</span>
+                    </>
+                  ) : isGeneratingPdf ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Generating PDF...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiDownload className="w-4 h-4 text-orange-400" />
+                      <span>Download Quotation</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleAddToQuote}
+                  className="w-full py-2.5 px-3 rounded-xl font-black text-xs bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {addedSuccess ? (
+                    <>
+                      <FiCheckCircle className="w-4 h-4 text-emerald-300" />
+                      <span>Added to Quote!</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiPlusCircle className="w-4 h-4" />
+                      <span>Add to Quote (₹{calculation.totalAmount.toLocaleString()})</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

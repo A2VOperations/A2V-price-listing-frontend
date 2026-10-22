@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { FiPackage, FiLayers, FiCheck, FiInfo, FiSliders, FiTool, FiCheckCircle, FiEdit3, FiTag, FiFileText, FiDownload, FiPlus, FiTrash2 } from "react-icons/fi";
+import React, { useState, useMemo, useEffect } from "react";
+import { FiPackage, FiLayers, FiCheck, FiInfo, FiSliders, FiTool, FiCheckCircle, FiEdit3, FiTag, FiFileText, FiDownload, FiPlus, FiTrash2, FiUser, FiPhone } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import FlexFramePreview from "./FlexFramePreview";
 import { generateFlexQuotationPdf } from "@/lib/generateQuotationPdf";
@@ -19,9 +19,21 @@ const BOARD_TYPES = [
 ];
 
 export default function FlexBoardOrderForm({ product, onVariantSelect }) {
-  const { addToQuote } = useQuote();
+  const { addToQuote, clientInfo, updateClientInfo } = useQuote();
 
   // State
+  const [clientName, setClientName] = useState(clientInfo?.clientName || "");
+  const [clientPhone, setClientPhone] = useState(clientInfo?.phone || "");
+
+  useEffect(() => {
+    if (clientInfo?.clientName && !clientName) {
+      setClientName(clientInfo.clientName);
+    }
+    if (clientInfo?.phone && !clientPhone) {
+      setClientPhone(clientInfo.phone);
+    }
+  }, [clientInfo]);
+
   const [selectedMaterialLabel, setSelectedMaterialLabel] = useState(
     FLEX_MATERIALS[0].label
   );
@@ -303,6 +315,10 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
   const handleGeneratePdf = () => {
     setIsGeneratingPdf(true);
     try {
+      if (clientName || clientPhone) {
+        updateClientInfo({ clientName, phone: clientPhone });
+      }
+
       generateFlexQuotationPdf({
         activeMaterial,
         validHeight,
@@ -330,6 +346,10 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         grossSubtotal,
         validDiscount,
         totalAmount,
+        clientInfo: {
+          clientName: clientName.trim() || clientInfo?.clientName || "Walk-in Client",
+          phone: clientPhone.trim() || clientInfo?.phone || "",
+        },
       });
       setPdfGeneratedSuccess(true);
       setTimeout(() => setPdfGeneratedSuccess(false), 3000);
@@ -339,6 +359,7 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
       setIsGeneratingPdf(false);
     }
   };
+
 
   return (
     <form onSubmit={handleAddOrder} className="space-y-6 text-slate-800">
@@ -1296,7 +1317,43 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             Rs. {totalAmount.toLocaleString()}/-
           </span>
         </div>
+
+        {/* CLIENT INFORMATION FOR OFFICIAL QUOTATION */}
+        <div className="p-3.5 sm:px-4 bg-slate-50/80 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <FiUser className="w-3.5 h-3.5 text-orange-600" />
+              Client Details (For Official Quotation PDF):
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">Personalized Estimate</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="relative">
+              <FiUser className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Client / Company Name"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-orange-600 focus:outline-none"
+              />
+            </div>
+
+            <div className="relative">
+              <FiPhone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="tel"
+                placeholder="Client Phone Number"
+                value={clientPhone}
+                onChange={(e) => setClientPhone(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-orange-600 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
 
       {/* ACTION BUTTONS: GENERATE QUOTATION PDF & ADD ORDER */}
       <div className="space-y-2 pt-1">

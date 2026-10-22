@@ -1147,12 +1147,6 @@ export function generateRollUpStandieQuotationPdf(data) {
     });
   }
 
-  rows.push({
-    desc: "Pre-Fitted Cassette Assembly & Quality Check",
-    spec: "Internal spring tensioned, banner snapped to top profile, tested & packed",
-    total: "INCLUDED",
-  });
-
   let currentY = tableY + tableHeaderH;
   const rowHeight = 11.5;
 
@@ -1506,14 +1500,6 @@ export function generateStandieHutQuotationPdf(data) {
         "High stability metal folding hinges connecting front & back frames",
       amount: `Rs. ${hingesCost.toLocaleString()}`,
     },
-    {
-      num: "4",
-      title: "Safety Stay Chain & Leg Clearance",
-      subtitle: `Elevated +${legClearance} Ft (${Math.round(legClearance * 12)} Inches) bottom legs added + limiting chain`,
-      spec: "Included Standard",
-      subSpec: "Bottom legs added below banner to protect from dirt and moisture",
-      amount: "INCLUDED",
-    },
   ];
 
   let currentY = tableY + tableHeaderH;
@@ -1711,3 +1697,726 @@ export function generateStandieHutQuotationPdf(data) {
     return null;
   }
 }
+
+/**
+ * Generate Official Quotation PDF for General Products (Pamphlets, Visiting Cards, Posters, Flyers, Brochures, Letterheads, Envelopes, etc.)
+ */
+export function generateGeneralProductQuotationPdf(data) {
+  const {
+    productName = "Commercial Printing Order",
+    productCode = "",
+    selectedVariant = "",
+    selectedOptions = {},
+    quantity = 1,
+    unitName = "Pieces",
+    applicableCost = 0,
+    validDiscount = 0,
+    totalAmount = 0,
+    clientInfo = {},
+    specifications = {},
+  } = data;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 15;
+  const contentWidth = 180;
+  const rightEdge = margin + contentWidth;
+  const quoteRef = `Q-PRD-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // 0. OUTER PAGE BORDER / FRAME
+  doc.setDrawColor(203, 213, 225); // slate-300
+  doc.setLineWidth(0.6);
+  doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
+
+  // 1. TOP HEADER BANNER (Deep Navy with Orange Accent)
+  const headerY = 14;
+  const headerHeight = 25;
+
+  // Base Dark Blue / Navy
+  doc.setFillColor(11, 25, 44); // #0B192C deep navy
+  doc.rect(margin, headerY, contentWidth, headerHeight, "F");
+
+  // Warm Orange Accent Triangle on the right
+  doc.setFillColor(194, 65, 12); // #C2410C orange-700
+  doc.triangle(
+    rightEdge - 30,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F"
+  );
+
+  // Logo: "A2V" in bold White, "PRINTS" in Orange
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A2V", margin + 7, headerY + 12);
+
+  const a2vWidth = doc.getTextWidth("A2V ");
+  doc.setTextColor(249, 115, 22); // #F97316 orange-500
+  doc.text("PRINTS", margin + 7 + a2vWidth, headerY + 12);
+
+  // Orange underline accent beneath A2V
+  doc.setDrawColor(234, 88, 12); // #EA580C orange-600
+  doc.setLineWidth(1.2);
+  doc.line(
+    margin + 7,
+    headerY + 14.5,
+    margin + 7 + a2vWidth + 4,
+    headerY + 14.5
+  );
+
+  // Subtitle
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(226, 232, 240); // slate-200
+  doc.text(
+    "Commercial Offset & Digital Printing Solutions",
+    margin + 7,
+    headerY + 20
+  );
+
+  // Right Header: Document icon in orange
+  const iconX = rightEdge - 78;
+  const iconY = headerY + 5;
+  doc.setDrawColor(249, 115, 22); // orange-500
+  doc.setLineWidth(0.8);
+  doc.roundedRect(iconX, iconY, 8.5, 11, 1, 1, "D");
+  doc.line(iconX + 2, iconY + 3.2, iconX + 6.5, iconY + 3.2);
+  doc.line(iconX + 2, iconY + 5.7, iconX + 6.5, iconY + 5.7);
+  doc.line(iconX + 2, iconY + 8.2, iconX + 5, iconY + 8.2);
+
+  // Right Header: Text
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("OFFICIAL QUOTATION", rightEdge - 5, headerY + 9, {
+    align: "right",
+  });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(254, 215, 170); // orange-200
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" }
+  );
+
+  // 2. CLIENT & SPECIFICATIONS SUMMARY CARD
+  const cardY = headerY + 30;
+  const cardHeight = 28;
+
+  doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
+  doc.setDrawColor(254, 215, 170); // #FED7AA orange-200
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, cardY, contentWidth, cardHeight, 2, 2, "FD");
+
+  // Left Section: QUOTATION PREPARED FOR
+  doc.setDrawColor(234, 88, 12); // orange-600
+  doc.setLineWidth(0.7);
+  doc.circle(margin + 8, cardY + 7, 2, "D");
+  doc.line(margin + 5.5, cardY + 12.5, margin + 10.5, cardY + 12.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12); // orange-700
+  doc.text("QUOTATION PREPARED FOR:", margin + 14, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42); // slate-900
+  const clientNameStr =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
+  doc.text(clientNameStr, margin + 14, cardY + 14);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139); // slate-500
+  const contactText =
+    [clientInfo?.phone ? `Phone: ${clientInfo.phone}` : null, clientInfo?.email]
+      .filter(Boolean)
+      .join("  |  ") || "Contact: N/A";
+  doc.text(contactText, margin + 14, cardY + 21);
+
+  // Right Section: SPECIFICATION SUMMARY
+  const rightColX = margin + 95;
+  doc.setDrawColor(234, 88, 12); // orange-600
+  doc.setLineWidth(0.7);
+  doc.roundedRect(rightColX, cardY + 4.5, 5, 6.5, 0.6, 0.6, "D");
+  doc.line(rightColX + 1.2, cardY + 6.8, rightColX + 3.8, cardY + 6.8);
+  doc.line(rightColX + 1.2, cardY + 8.4, rightColX + 3.8, cardY + 8.4);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12); // orange-700
+  doc.text("PRODUCT OVERVIEW:", rightColX + 8, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(51, 65, 85); // slate-700
+  doc.text(
+    `Product: ${productName}${productCode ? ` (#${productCode})` : ""}`,
+    rightColX + 8,
+    cardY + 13
+  );
+
+  const cleanVariant = selectedVariant ? String(selectedVariant).slice(0, 42) : productName;
+  doc.text(
+    `Selected: ${cleanVariant}`,
+    rightColX + 8,
+    cardY + 18
+  );
+  doc.text(
+    `Quantity: ${Number(quantity).toLocaleString()} ${unitName || "Pieces"}`,
+    rightColX + 8,
+    cardY + 23
+  );
+
+  // 3. ITEMIZED COST BREAKDOWN TABLE (Product Name, Quantity, Price only)
+  const tableY = cardY + 34;
+  const col1W = 12; // #
+  const col2W = 108; // Product Name
+  const col3W = 30; // Quantity
+  const col4W = 30; // Price (Rs.)
+
+  const x1 = margin;
+  const x2 = x1 + col1W;
+  const x3 = x2 + col2W;
+  const x4 = x3 + col3W;
+  const x5 = rightEdge;
+
+  // Table Header
+  const tableHeaderH = 9;
+  doc.setFillColor(11, 25, 44); // #0B192C navy
+  doc.rect(margin, tableY, contentWidth, tableHeaderH, "F");
+
+  doc.setDrawColor(30, 41, 59);
+  doc.setLineWidth(0.4);
+  doc.line(x2, tableY, x2, tableY + tableHeaderH);
+  doc.line(x3, tableY, x3, tableY + tableHeaderH);
+  doc.line(x4, tableY, x4, tableY + tableHeaderH);
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.text("#", (x1 + x2) / 2, tableY + 6, { align: "center" });
+  doc.text("PRODUCT NAME", x2 + 4, tableY + 6);
+  doc.text("QUANTITY", (x3 + x4) / 2, tableY + 6, { align: "center" });
+  doc.text("PRICE (Rs.)", x5 - 4, tableY + 6, { align: "right" });
+
+  // Product Name Formatting
+  const fullProductName = selectedVariant
+    ? selectedVariant.toLowerCase().includes(productName.toLowerCase())
+      ? selectedVariant
+      : `${productName} - ${selectedVariant}`
+    : productName;
+
+  const optionsSubtitle = Object.entries(selectedOptions || {})
+    .filter(([_, val]) => Boolean(val))
+    .map(([key, val]) => `${key}: ${val}`)
+    .join("  |  ");
+
+  const rowHeight = optionsSubtitle ? 14 : 10;
+  let currentY = tableY + tableHeaderH;
+
+  // Row Background
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin, currentY, contentWidth, rowHeight, "F");
+
+  // Grid Borders
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.line(x1, currentY + rowHeight, x5, currentY + rowHeight);
+  doc.line(x1, currentY, x1, currentY + rowHeight);
+  doc.line(x2, currentY, x2, currentY + rowHeight);
+  doc.line(x3, currentY, x3, currentY + rowHeight);
+  doc.line(x4, currentY, x4, currentY + rowHeight);
+  doc.line(x5, currentY, x5, currentY + rowHeight);
+
+  // #
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text("1", (x1 + x2) / 2, currentY + (optionsSubtitle ? 7.5 : 6), {
+    align: "center",
+  });
+
+  // PRODUCT NAME
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  const truncatedName = doc.splitTextToSize(fullProductName, col2W - 8)[0] || fullProductName;
+  doc.text(truncatedName, x2 + 4, currentY + (optionsSubtitle ? 5.5 : 6));
+
+  if (optionsSubtitle) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    const truncatedOptions = doc.splitTextToSize(optionsSubtitle, col2W - 8)[0] || optionsSubtitle;
+    doc.text(truncatedOptions, x2 + 4, currentY + 10.5);
+  }
+
+  // QUANTITY
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(30, 41, 59);
+  doc.text(
+    `${Number(quantity).toLocaleString()} ${unitName || "Pieces"}`,
+    (x3 + x4) / 2,
+    currentY + (optionsSubtitle ? 7.5 : 6),
+    { align: "center" }
+  );
+
+  // PRICE (Rs.)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    `Rs. ${applicableCost.toLocaleString()}/-`,
+    x5 - 4,
+    currentY + (optionsSubtitle ? 7.5 : 6),
+    { align: "right" }
+  );
+
+  currentY += rowHeight;
+
+  // Table Outer Border
+  doc.setDrawColor(11, 25, 44);
+  doc.setLineWidth(0.4);
+  doc.rect(margin, tableY, contentWidth, currentY - tableY, "D");
+
+  // 4. BOTTOM SECTION: TOTALS SUMMARY (RIGHT-ALIGNED)
+  const bottomSectionY = currentY + 10;
+  const totalsBoxW = 88;
+  const totalsBoxX = rightEdge - totalsBoxW;
+
+  // Applicable Cost
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(30, 41, 59);
+  doc.text("Applicable Cost:", totalsBoxX + 2, bottomSectionY + 6);
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    `Rs. ${applicableCost.toLocaleString()}/-`,
+    rightEdge - 3,
+    bottomSectionY + 6,
+    { align: "right" }
+  );
+
+  let totalsPayableY = bottomSectionY + 12;
+
+  // Special Discount Row
+  if (validDiscount > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(234, 88, 12); // orange-600
+    doc.text("Special Discount:", totalsBoxX + 2, bottomSectionY + 14);
+    doc.setFontSize(9);
+    doc.text(
+      `- Rs. ${validDiscount.toLocaleString()}/-`,
+      rightEdge - 3,
+      bottomSectionY + 14,
+      { align: "right" }
+    );
+    totalsPayableY = bottomSectionY + 20;
+  }
+
+  // Row: TOTAL AMOUNT PAYABLE Box (Rounded Orange)
+  const payableBoxH = 13;
+  doc.setFillColor(255, 247, 237); // #FFF7ED orange-50
+  doc.setDrawColor(234, 88, 12); // #EA580C orange-600
+  doc.setLineWidth(0.8);
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD"
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12); // orange-700
+  doc.text("AMOUNT PAYABLE:", totalsBoxX + 3.5, totalsPayableY + 8);
+
+  doc.setFontSize(11);
+  doc.setTextColor(194, 65, 12); // orange-700
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 3.5,
+    totalsPayableY + 8.5,
+    { align: "right" }
+  );
+
+  // 5. SAVE & DOWNLOAD FILE
+  const sanitizedName = (productName || "Product").replace(/[^a-zA-Z0-9]/g, "_");
+  const filename = `A2V_Quotation_${sanitizedName}_${quoteRef}.pdf`;
+  doc.save(filename);
+
+  try {
+    return doc.output("bloburl");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generate Official Quotation PDF for Stickers & Labels (Sticker Sheet Calculator)
+ */
+export function generateStickerQuotationPdf(data) {
+  const {
+    productName = "Stickers & Labels Printing",
+    sheetName = "12 × 18 Inches",
+    stickerWidth = 2,
+    stickerHeight = 2,
+    shape = "Rectangle",
+    materialName = "Chromo Paper (Gloss Gumming)",
+    cutName = "Half Cut / Kiss Cut",
+    laminationName = "No Lamination",
+    sheetsNeeded = 25,
+    actualStickers = 1000,
+    stickersPerSheet = 40,
+    costPerSheet = 20,
+    grossSubtotal = 500,
+    validDiscount = 0,
+    totalAmount = 500,
+    pricePerSticker = 0.5,
+    clientInfo = {},
+  } = data;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 15;
+  const contentWidth = 180;
+  const rightEdge = margin + contentWidth;
+  const quoteRef = `Q-STK-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // 0. OUTER PAGE BORDER / FRAME
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
+
+  // 1. TOP HEADER BANNER
+  const headerY = 14;
+  const headerHeight = 25;
+  doc.setFillColor(11, 25, 44);
+  doc.rect(margin, headerY, contentWidth, headerHeight, "F");
+
+  doc.setFillColor(194, 65, 12);
+  doc.triangle(
+    rightEdge - 30,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F"
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A2V", margin + 7, headerY + 12);
+
+  const a2vWidth = doc.getTextWidth("A2V ");
+  doc.setTextColor(249, 115, 22);
+  doc.text("PRINTS", margin + 7 + a2vWidth, headerY + 12);
+
+  doc.setDrawColor(234, 88, 12);
+  doc.setLineWidth(1.2);
+  doc.line(
+    margin + 7,
+    headerY + 14.5,
+    margin + 7 + a2vWidth + 4,
+    headerY + 14.5
+  );
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(226, 232, 240);
+  doc.text(
+    "Custom Stickers, Product Labels & Decals Solutions",
+    margin + 7,
+    headerY + 20
+  );
+
+  // Right Header Text
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("STICKERS ESTIMATE", rightEdge - 5, headerY + 9, { align: "right" });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(254, 215, 170);
+  doc.text(
+    `Ref: ${quoteRef}  |  Date: ${dateStr}`,
+    rightEdge - 5,
+    headerY + 16,
+    { align: "right" }
+  );
+
+  // 2. CLIENT & SPECIFICATIONS SUMMARY CARD
+  const cardY = headerY + 30;
+  const cardHeight = 28;
+
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(254, 215, 170);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, cardY, contentWidth, cardHeight, 2, 2, "FD");
+
+  // Left Section: Prepared For
+  doc.setDrawColor(234, 88, 12);
+  doc.setLineWidth(0.7);
+  doc.circle(margin + 8, cardY + 7, 2, "D");
+  doc.line(margin + 5.5, cardY + 12.5, margin + 10.5, cardY + 12.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("QUOTATION PREPARED FOR:", margin + 14, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  const clientNameStr =
+    clientInfo?.clientName ||
+    clientInfo?.companyName ||
+    "Walk-in Client / Customer";
+  doc.text(clientNameStr, margin + 14, cardY + 14);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  const contactText =
+    [clientInfo?.phone ? `Phone: ${clientInfo.phone}` : null, clientInfo?.email]
+      .filter(Boolean)
+      .join("  |  ") || "Contact: N/A";
+  doc.text(contactText, margin + 14, cardY + 21);
+
+  // Right Section: Specs Summary
+  const rightColX = margin + 95;
+  doc.setDrawColor(234, 88, 12);
+  doc.setLineWidth(0.7);
+  doc.roundedRect(rightColX, cardY + 4.5, 5, 6.5, 0.6, 0.6, "D");
+  doc.line(rightColX + 1.2, cardY + 6.8, rightColX + 3.8, cardY + 6.8);
+  doc.line(rightColX + 1.2, cardY + 8.4, rightColX + 3.8, cardY + 8.4);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("STICKER SPECIFICATIONS:", rightColX + 8, cardY + 7.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(51, 65, 85);
+  doc.text(
+    `Size: ${stickerWidth}" × ${stickerHeight}" (${shape})`,
+    rightColX + 8,
+    cardY + 13
+  );
+  doc.text(
+    `Sheet Size: ${sheetName} (${stickersPerSheet} pcs/sheet)`,
+    rightColX + 8,
+    cardY + 18
+  );
+  doc.text(
+    `Yield: ${Number(actualStickers).toLocaleString()} Stickers (${sheetsNeeded} Sheets)`,
+    rightColX + 8,
+    cardY + 23
+  );
+
+  // 3. TABLE (Product Name, Quantity, Price only)
+  const tableY = cardY + 34;
+  const col1W = 12; // #
+  const col2W = 108; // Product Name
+  const col3W = 30; // Quantity
+  const col4W = 30; // Price (Rs.)
+
+  const x1 = margin;
+  const x2 = x1 + col1W;
+  const x3 = x2 + col2W;
+  const x4 = x3 + col3W;
+  const x5 = rightEdge;
+
+  const tableHeaderH = 9;
+  doc.setFillColor(11, 25, 44);
+  doc.rect(margin, tableY, contentWidth, tableHeaderH, "F");
+
+  doc.setDrawColor(30, 41, 59);
+  doc.setLineWidth(0.4);
+  doc.line(x2, tableY, x2, tableY + tableHeaderH);
+  doc.line(x3, tableY, x3, tableY + tableHeaderH);
+  doc.line(x4, tableY, x4, tableY + tableHeaderH);
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.text("#", (x1 + x2) / 2, tableY + 6, { align: "center" });
+  doc.text("PRODUCT NAME", x2 + 4, tableY + 6);
+  doc.text("QUANTITY", (x3 + x4) / 2, tableY + 6, { align: "center" });
+  doc.text("PRICE (Rs.)", x5 - 4, tableY + 6, { align: "right" });
+
+  const fullStickerName = `${productName} - ${materialName}`;
+  const stickerSubtitle = `${stickerWidth}" × ${stickerHeight}" (${shape})  |  ${cutName}${laminationName && laminationName !== "No Lamination" ? `  |  ${laminationName}` : ""}`;
+
+  const rowHeight = stickerSubtitle ? 14 : 10;
+  let currentY = tableY + tableHeaderH;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin, currentY, contentWidth, rowHeight, "F");
+
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.line(x1, currentY + rowHeight, x5, currentY + rowHeight);
+  doc.line(x1, currentY, x1, currentY + rowHeight);
+  doc.line(x2, currentY, x2, currentY + rowHeight);
+  doc.line(x3, currentY, x3, currentY + rowHeight);
+  doc.line(x4, currentY, x4, currentY + rowHeight);
+  doc.line(x5, currentY, x5, currentY + rowHeight);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text("1", (x1 + x2) / 2, currentY + (stickerSubtitle ? 7.5 : 6), { align: "center" });
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  const truncatedStickerName = doc.splitTextToSize(fullStickerName, col2W - 8)[0] || fullStickerName;
+  doc.text(truncatedStickerName, x2 + 4, currentY + (stickerSubtitle ? 5.5 : 6));
+
+  if (stickerSubtitle) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    const truncatedSubtitle = doc.splitTextToSize(stickerSubtitle, col2W - 8)[0] || stickerSubtitle;
+    doc.text(truncatedSubtitle, x2 + 4, currentY + 10.5);
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(30, 41, 59);
+  doc.text(
+    `${Number(actualStickers).toLocaleString()} Stickers (${sheetsNeeded} Sheets)`,
+    (x3 + x4) / 2,
+    currentY + (stickerSubtitle ? 7.5 : 6),
+    { align: "center" }
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}/-`,
+    x5 - 4,
+    currentY + (stickerSubtitle ? 7.5 : 6),
+    { align: "right" }
+  );
+
+  currentY += rowHeight;
+
+  doc.setDrawColor(11, 25, 44);
+  doc.setLineWidth(0.4);
+  doc.rect(margin, tableY, contentWidth, currentY - tableY, "D");
+
+  // 4. BOTTOM SECTION: TOTALS SUMMARY (RIGHT-ALIGNED)
+  const bottomSectionY = currentY + 10;
+  const totalsBoxW = 88;
+  const totalsBoxX = rightEdge - totalsBoxW;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(30, 41, 59);
+  doc.text("Applicable Cost:", totalsBoxX + 2, bottomSectionY + 6);
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    `Rs. ${grossSubtotal.toLocaleString()}/-`,
+    rightEdge - 3,
+    bottomSectionY + 6,
+    { align: "right" }
+  );
+
+  let totalsPayableY = bottomSectionY + 12;
+
+  if (validDiscount > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(234, 88, 12);
+    doc.text("Special Discount:", totalsBoxX + 2, bottomSectionY + 14);
+    doc.setFontSize(9);
+    doc.text(
+      `- Rs. ${validDiscount.toLocaleString()}/-`,
+      rightEdge - 3,
+      bottomSectionY + 14,
+      { align: "right" }
+    );
+    totalsPayableY = bottomSectionY + 20;
+  }
+
+  const payableBoxH = 13;
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(234, 88, 12);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(
+    totalsBoxX,
+    totalsPayableY,
+    totalsBoxW,
+    payableBoxH,
+    2,
+    2,
+    "FD"
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("AMOUNT PAYABLE:", totalsBoxX + 3.5, totalsPayableY + 8);
+
+  doc.setFontSize(11);
+  doc.setTextColor(194, 65, 12);
+  doc.text(
+    `Rs. ${totalAmount.toLocaleString()}/-`,
+    rightEdge - 3.5,
+    totalsPayableY + 8.5,
+    { align: "right" }
+  );
+
+  const filename = `A2V_Quotation_Stickers_${quoteRef}.pdf`;
+  doc.save(filename);
+
+  try {
+    return doc.output("bloburl");
+  } catch {
+    return null;
+  }
+}
+
