@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useData } from "@/context/DataContext";
 import AdminLayout from "./AdminLayout";
 import ProductImage from "@/components/common/ProductImage";
-import {  uploadMultipleImagesApi } from "@/services/api";
+import { uploadMultipleImagesApi } from "@/services/api";
 import {
   FiPlus,
   FiEdit2,
@@ -24,7 +24,8 @@ import {
 } from "react-icons/fi";
 
 export default function ProductManager() {
-  const { categories, products, addProduct, updateProduct, deleteProduct } = useData();
+  const { categories, products, addProduct, updateProduct, deleteProduct } =
+    useData();
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
@@ -43,14 +44,16 @@ export default function ProductManager() {
       products
         .filter((p) => !selectedCategory || p.categoryId === selectedCategory)
         .map((p) => p.subCategory)
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   // Filter products
   const filteredProducts = products.filter((p) => {
-    const matchesCategory = !selectedCategory || p.categoryId === selectedCategory;
-    const matchesSubCategory = !selectedSubCategory || p.subCategory === selectedSubCategory;
+    const matchesCategory =
+      !selectedCategory || p.categoryId === selectedCategory;
+    const matchesSubCategory =
+      !selectedSubCategory || p.subCategory === selectedSubCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       !searchQuery ||
@@ -74,7 +77,6 @@ export default function ProductManager() {
     quantityType: "incremental",
     minQuantity: 1000,
     quantityStep: 1000,
-    productionTime: "3-7 Days",
     basePrice: 1800,
     unitName: "Cards",
     fixedQuantities: [
@@ -103,12 +105,8 @@ export default function ProductManager() {
       "Latest Komori offset printing technology",
       "Equipped Post Printing Unit",
     ],
-    productSpecialization: [
-      "Premium finish and high durability",
-    ],
-    importantNotes: [
-      "High resolution imagery required",
-    ],
+    productSpecialization: ["Premium finish and high durability"],
+    importantNotes: ["High resolution imagery required"],
     fileRequirements: {
       formats: ["PDF", "CDR", "AI"],
       minDpi: 300,
@@ -162,8 +160,8 @@ export default function ProductManager() {
     const existingImages = Array.isArray(product.images)
       ? product.images
       : product.image
-      ? [product.image]
-      : [];
+        ? [product.image]
+        : [];
 
     const defaultFixedQuantities = [
       { qty: 1000, price: product.basePrice || 1800 },
@@ -176,7 +174,8 @@ export default function ProductManager() {
     ];
 
     const activeFixedQuantities =
-      Array.isArray(product.fixedQuantities) && product.fixedQuantities.length > 0
+      Array.isArray(product.fixedQuantities) &&
+      product.fixedQuantities.length > 0
         ? product.fixedQuantities
         : defaultFixedQuantities;
 
@@ -184,11 +183,16 @@ export default function ProductManager() {
     if (product.variantDetails && typeof product.variantDetails === "object") {
       Object.entries(product.variantDetails).forEach(([vName, vData]) => {
         let vFixed =
-          Array.isArray(vData.fixedQuantities) && vData.fixedQuantities.length > 0
+          Array.isArray(vData.fixedQuantities) &&
+          vData.fixedQuantities.length > 0
             ? vData.fixedQuantities
             : null;
 
-        if (!vFixed && Array.isArray(vData.quantityPricingTiers) && vData.quantityPricingTiers.length > 0) {
+        if (
+          !vFixed &&
+          Array.isArray(vData.quantityPricingTiers) &&
+          vData.quantityPricingTiers.length > 0
+        ) {
           vFixed = vData.quantityPricingTiers.map((tier) => ({
             qty: Number(tier.minQty),
             price: Math.round(Number(tier.minQty) * Number(tier.pricePerUnit)),
@@ -211,9 +215,7 @@ export default function ProductManager() {
         normalizedVariantDetails[vName] = {
           ...vData,
           quantityType:
-            vData.quantityType ||
-            product.quantityType ||
-            "incremental",
+            vData.quantityType || product.quantityType || "incremental",
           fixedQuantities: vFixed,
         };
       });
@@ -231,13 +233,13 @@ export default function ProductManager() {
       description: product.description || "",
       quantityType:
         product.quantityType ||
-        (Array.isArray(product.fixedQuantities) && product.fixedQuantities.length > 0
+        (Array.isArray(product.fixedQuantities) &&
+        product.fixedQuantities.length > 0
           ? "select"
           : "incremental"),
       fixedQuantities: activeFixedQuantities,
       minQuantity: product.minQuantity ?? 1000,
       quantityStep: product.quantityStep ?? 1000,
-      productionTime: product.productionTime || "",
       basePrice: product.basePrice ?? 0,
       unitName: product.unitName || "Units",
       pricingModel: product.pricingModel || "quantity_tiered",
@@ -267,8 +269,8 @@ export default function ProductManager() {
           const currentList = Array.isArray(prev.images)
             ? prev.images
             : prev.image
-            ? [prev.image]
-            : [];
+              ? [prev.image]
+              : [];
           const combined = Array.from(new Set([...currentList, ...urls]));
           return {
             ...prev,
@@ -295,7 +297,8 @@ export default function ProductManager() {
   const handleRemoveImage = (imgUrl) => {
     setFormData((prev) => {
       const updatedImages = (prev.images || []).filter((u) => u !== imgUrl);
-      const newPrimary = prev.image === imgUrl ? (updatedImages[0] || "") : prev.image;
+      const newPrimary =
+        prev.image === imgUrl ? updatedImages[0] || "" : prev.image;
       return {
         ...prev,
         image: newPrimary,
@@ -311,8 +314,8 @@ export default function ProductManager() {
       const currentList = Array.isArray(prev.images)
         ? prev.images
         : prev.image
-        ? [prev.image]
-        : [];
+          ? [prev.image]
+          : [];
       const combined = Array.from(new Set([...currentList, url]));
       return {
         ...prev,
@@ -338,13 +341,16 @@ export default function ProductManager() {
         code: `${formData.code || "VAR"}-${formData.variantCombinations.length + 1}`,
         basePrice: formData.basePrice,
         description: `${name} featuring precision finishes and custom specifications.`,
-        productionTime: formData.productionTime || "Within 3 days",
         quantityType: formData.quantityType || "incremental",
         minQuantity: formData.minQuantity,
         quantityStep: formData.quantityStep,
-        fixedQuantities: JSON.parse(JSON.stringify(formData.fixedQuantities || [])),
+        fixedQuantities: JSON.parse(
+          JSON.stringify(formData.fixedQuantities || []),
+        ),
         specifications: { ...formData.specifications },
-        quantityPricingTiers: JSON.parse(JSON.stringify(formData.quantityPricingTiers || [])),
+        quantityPricingTiers: JSON.parse(
+          JSON.stringify(formData.quantityPricingTiers || []),
+        ),
         options: [], // Custom options for this sub-sub category
       },
     };
@@ -357,7 +363,9 @@ export default function ProductManager() {
   };
 
   const handleRemoveVariantCombination = (name) => {
-    const updatedCombos = formData.variantCombinations.filter((v) => v !== name);
+    const updatedCombos = formData.variantCombinations.filter(
+      (v) => v !== name,
+    );
     const updatedDetails = { ...formData.variantDetails };
     delete updatedDetails[name];
     setFormData((prev) => ({
@@ -371,14 +379,19 @@ export default function ProductManager() {
   const handleAddFixedQuantity = () => {
     const list = formData.fixedQuantities || [];
     const lastItem = list[list.length - 1];
-    const nextQty = lastItem ? Number(lastItem.qty) + (formData.quantityStep || 1000) : (formData.minQuantity || 1000);
+    const nextQty = lastItem
+      ? Number(lastItem.qty) + (formData.quantityStep || 1000)
+      : formData.minQuantity || 1000;
     const nextPrice = lastItem
       ? Math.round(Number(lastItem.price) * 1.5)
-      : (formData.basePrice || 1800);
+      : formData.basePrice || 1800;
 
     setFormData((prev) => ({
       ...prev,
-      fixedQuantities: [...(prev.fixedQuantities || []), { qty: nextQty, price: nextPrice }],
+      fixedQuantities: [
+        ...(prev.fixedQuantities || []),
+        { qty: nextQty, price: nextPrice },
+      ],
     }));
   };
 
@@ -396,7 +409,9 @@ export default function ProductManager() {
   const handleRemoveFixedQuantity = (index) => {
     setFormData((prev) => ({
       ...prev,
-      fixedQuantities: (prev.fixedQuantities || []).filter((_, i) => i !== index),
+      fixedQuantities: (prev.fixedQuantities || []).filter(
+        (_, i) => i !== index,
+      ),
     }));
   };
 
@@ -421,14 +436,15 @@ export default function ProductManager() {
   // Sub-Sub Variant Fixed Quantity Handlers
   const handleAddVariantFixedQuantity = (variantName) => {
     const details = formData.variantDetails[variantName] || {};
-    const list = details.fixedQuantities && details.fixedQuantities.length > 0
-      ? details.fixedQuantities
-      : formData.fixedQuantities || [];
+    const list =
+      details.fixedQuantities && details.fixedQuantities.length > 0
+        ? details.fixedQuantities
+        : formData.fixedQuantities || [];
     const lastItem = list[list.length - 1];
     const nextQty = lastItem ? Number(lastItem.qty) + 1000 : 1000;
     const nextPrice = lastItem
       ? Math.round(Number(lastItem.price) * 1.5)
-      : (details.basePrice || formData.basePrice || 1800);
+      : details.basePrice || formData.basePrice || 1800;
 
     const updated = [...list, { qty: nextQty, price: nextPrice }];
     const updatedDetails = {
@@ -442,7 +458,12 @@ export default function ProductManager() {
     setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
   };
 
-  const handleUpdateVariantFixedQuantity = (variantName, index, field, value) => {
+  const handleUpdateVariantFixedQuantity = (
+    variantName,
+    index,
+    field,
+    value,
+  ) => {
     const details = formData.variantDetails[variantName] || {};
     const updated = [...(details.fixedQuantities || [])];
     updated[index] = { ...updated[index], [field]: Number(value) || 0 };
@@ -455,7 +476,9 @@ export default function ProductManager() {
 
   const handleRemoveVariantFixedQuantity = (variantName, index) => {
     const details = formData.variantDetails[variantName] || {};
-    const updated = (details.fixedQuantities || []).filter((_, i) => i !== index);
+    const updated = (details.fixedQuantities || []).filter(
+      (_, i) => i !== index,
+    );
     const updatedDetails = {
       ...formData.variantDetails,
       [variantName]: { ...details, fixedQuantities: updated },
@@ -470,7 +493,9 @@ export default function ProductManager() {
       [variantName]: {
         ...details,
         quantityType: "select",
-        fixedQuantities: JSON.parse(JSON.stringify(formData.fixedQuantities || [])),
+        fixedQuantities: JSON.parse(
+          JSON.stringify(formData.fixedQuantities || []),
+        ),
       },
     };
     setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
@@ -505,11 +530,14 @@ export default function ProductManager() {
     const currentTiers = details.quantityPricingTiers || [];
     const lastTier = currentTiers[currentTiers.length - 1];
     const newMinQty = lastTier
-      ? lastTier.minQty + (details.quantityStep || formData.quantityStep || 1000)
-      : (details.minQuantity || formData.minQuantity || 1000);
+      ? lastTier.minQty +
+        (details.quantityStep || formData.quantityStep || 1000)
+      : details.minQuantity || formData.minQuantity || 1000;
     const newPrice = lastTier
       ? Math.max(0.01, Number((lastTier.pricePerUnit * 0.9).toFixed(2)))
-      : (details.basePrice ? Number((details.basePrice / (newMinQty || 1000)).toFixed(2)) : 1.0);
+      : details.basePrice
+        ? Number((details.basePrice / (newMinQty || 1000)).toFixed(2))
+        : 1.0;
 
     const updatedTiers = [
       ...currentTiers,
@@ -558,7 +586,9 @@ export default function ProductManager() {
 
   const handleRemoveVariantOption = (variantName, optionIdx) => {
     const details = formData.variantDetails[variantName] || {};
-    const updatedOptions = (details.options || []).filter((_, i) => i !== optionIdx);
+    const updatedOptions = (details.options || []).filter(
+      (_, i) => i !== optionIdx,
+    );
     const updatedDetails = {
       ...formData.variantDetails,
       [variantName]: {
@@ -589,9 +619,9 @@ export default function ProductManager() {
     const details = formData.variantDetails[variantName] || {};
     const updatedOptions = [...(details.options || [])];
     if (updatedOptions[optionIdx] && updatedOptions[optionIdx].values) {
-      updatedOptions[optionIdx].values = updatedOptions[optionIdx].values.filter(
-        (_, i) => i !== valueIdx
-      );
+      updatedOptions[optionIdx].values = updatedOptions[
+        optionIdx
+      ].values.filter((_, i) => i !== valueIdx);
     }
     const updatedDetails = {
       ...formData.variantDetails,
@@ -624,7 +654,10 @@ export default function ProductManager() {
   const handleAddMainOptionValue = (optionIdx) => {
     const updatedOptions = [...formData.options];
     if (updatedOptions[optionIdx]) {
-      updatedOptions[optionIdx].values.push({ label: "New Choice", priceAdjustment: 0 });
+      updatedOptions[optionIdx].values.push({
+        label: "New Choice",
+        priceAdjustment: 0,
+      });
     }
     setFormData((prev) => ({ ...prev, options: updatedOptions }));
   };
@@ -632,9 +665,9 @@ export default function ProductManager() {
   const handleRemoveMainOptionValue = (optionIdx, valIdx) => {
     const updatedOptions = [...formData.options];
     if (updatedOptions[optionIdx]) {
-      updatedOptions[optionIdx].values = updatedOptions[optionIdx].values.filter(
-        (_, i) => i !== valIdx
-      );
+      updatedOptions[optionIdx].values = updatedOptions[
+        optionIdx
+      ].values.filter((_, i) => i !== valIdx);
     }
     setFormData((prev) => ({ ...prev, options: updatedOptions }));
   };
@@ -649,9 +682,10 @@ export default function ProductManager() {
     try {
       setIsSubmitting(true);
       const generatedSlug =
-        formData.slug.trim() || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        formData.slug.trim() ||
+        formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const allCleanImages = Array.from(
-        new Set([formData.image, ...(formData.images || [])].filter(Boolean))
+        new Set([formData.image, ...(formData.images || [])].filter(Boolean)),
       );
 
       const payload = {
@@ -678,7 +712,7 @@ export default function ProductManager() {
   const handleDelete = async (product) => {
     if (
       window.confirm(
-        `Are you sure you want to delete product "${product.name}"? This action cannot be undone.`
+        `Are you sure you want to delete product "${product.name}"? This action cannot be undone.`,
       )
     ) {
       try {
@@ -700,7 +734,9 @@ export default function ProductManager() {
                 Product & Sub-category Manager
               </h2>
               <p className="text-xs text-slate-500">
-                Edit products, sub-categories, individual sub-sub variation details (prices, descriptions, codes, specs), and custom select options.
+                Edit products, sub-categories, individual sub-sub variation
+                details (prices, descriptions, codes, specs), and custom select
+                options.
               </p>
             </div>
 
@@ -744,7 +780,9 @@ export default function ProductManager() {
                 onChange={(e) => setSelectedSubCategory(e.target.value)}
                 className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium"
               >
-                <option value="">All Sub-Categories ({allSubCategories.length})</option>
+                <option value="">
+                  All Sub-Categories ({allSubCategories.length})
+                </option>
                 {allSubCategories.map((sub) => (
                   <option key={sub} value={sub}>
                     {sub}
@@ -797,7 +835,10 @@ export default function ProductManager() {
                   </tr>
                 ) : (
                   filteredProducts.map((p) => (
-                    <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                    <tr
+                      key={p.id}
+                      className="hover:bg-slate-50 transition-colors"
+                    >
                       <td className="p-3">
                         <div className="w-10 h-10 rounded overflow-hidden border border-slate-200 bg-slate-100">
                           <ProductImage
@@ -807,7 +848,9 @@ export default function ProductManager() {
                           />
                         </div>
                       </td>
-                      <td className="p-3 font-mono font-bold text-orange-600">#{p.code}</td>
+                      <td className="p-3 font-mono font-bold text-orange-600">
+                        #{p.code}
+                      </td>
                       <td className="p-3 font-bold text-slate-900">{p.name}</td>
                       <td className="p-3 text-slate-500">{p.categoryId}</td>
                       <td className="p-3">
@@ -816,7 +859,8 @@ export default function ProductManager() {
                         </span>
                       </td>
                       <td className="p-3">
-                        {p.variantCombinations && p.variantCombinations.length > 0 ? (
+                        {p.variantCombinations &&
+                        p.variantCombinations.length > 0 ? (
                           <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[11px] font-bold">
                             {p.variantCombinations.length} sub-sub options
                           </span>
@@ -830,7 +874,10 @@ export default function ProductManager() {
                         </span>
                       </td>
                       <td className="p-3 font-bold text-slate-900">
-                        ₹{p.basePrice} <span className="text-[10px] text-slate-400 font-normal">/ {p.unitName}</span>
+                        ₹{p.basePrice}{" "}
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          / {p.unitName}
+                        </span>
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end space-x-2">
@@ -867,10 +914,13 @@ export default function ProductManager() {
                 <div>
                   <h3 className="text-sm font-bold flex items-center gap-2">
                     <FiEdit2 className="w-4 h-4 text-orange-400" />
-                    {editingProduct ? `Edit Product: ${editingProduct.name}` : "Create New Product"}
+                    {editingProduct
+                      ? `Edit Product: ${editingProduct.name}`
+                      : "Create New Product"}
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Modify categories, sub-categories, individual sub-sub variation prices, descriptions, specs, and options.
+                    Modify categories, sub-categories, individual sub-sub
+                    variation prices, descriptions, specs, and options.
                   </p>
                 </div>
                 <button
@@ -904,8 +954,8 @@ export default function ProductManager() {
                       : "border-transparent text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  <FiSliders className="w-4 h-4" /> Sub-Sub Variations & Individual Details (
-                  {formData.variantCombinations.length})
+                  <FiSliders className="w-4 h-4" /> Sub-Sub Variations &
+                  Individual Details ({formData.variantCombinations.length})
                 </button>
 
                 <button
@@ -917,7 +967,8 @@ export default function ProductManager() {
                       : "border-transparent text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  <FiLayers className="w-4 h-4" /> Select Detail Options ({formData.options.length})
+                  <FiLayers className="w-4 h-4" /> Select Detail Options (
+                  {formData.options.length})
                 </button>
 
                 <button
@@ -934,7 +985,10 @@ export default function ProductManager() {
               </div>
 
               {/* Modal Body with Tab Contents */}
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+              <form
+                onSubmit={handleSubmit}
+                className="flex-1 flex flex-col overflow-hidden"
+              >
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
                   {/* TAB 1: General Info */}
                   {activeTab === "general" && (
@@ -948,7 +1002,9 @@ export default function ProductManager() {
                             type="text"
                             required
                             value={formData.code}
-                            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, code: e.target.value })
+                            }
                             placeholder="e.g. VC-001"
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
@@ -968,7 +1024,9 @@ export default function ProductManager() {
                                 name: e.target.value,
                                 slug:
                                   formData.slug ||
-                                  e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                                  e.target.value
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9]+/g, "-"),
                               })
                             }
                             placeholder="e.g. 500 GSM + Velvet Card"
@@ -983,7 +1041,9 @@ export default function ProductManager() {
                           <input
                             type="text"
                             value={formData.slug}
-                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, slug: e.target.value })
+                            }
                             placeholder="e.g. 500-gsm-velvet-card"
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
@@ -997,7 +1057,12 @@ export default function ProductManager() {
                           </label>
                           <select
                             value={formData.categoryId}
-                            onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                categoryId: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           >
                             {categories.map((c) => (
@@ -1016,31 +1081,23 @@ export default function ProductManager() {
                             type="text"
                             required
                             value={formData.subCategory}
-                            onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                subCategory: e.target.value,
+                              })
+                            }
                             placeholder="e.g. 500 GSM CARDS (QTY. 500 CARDS)"
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-semibold text-amber-800"
                           />
                           <p className="text-[10px] text-slate-400 mt-1">
-                            Matches sub-headings on Category Page (e.g., 500 GSM, 400 GSM CARDS).
+                            Matches sub-headings on Category Page (e.g., 500
+                            GSM, 400 GSM CARDS).
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Base Price (₹)
-                          </label>
-                          <input
-                            type="number"
-                            value={formData.basePrice}
-                            onChange={(e) =>
-                              setFormData({ ...formData, basePrice: Number(e.target.value) })
-                            }
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-900"
-                          />
-                        </div>
-
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-bold text-slate-700 mb-1">
                             Unit Name
@@ -1048,7 +1105,12 @@ export default function ProductManager() {
                           <input
                             type="text"
                             value={formData.unitName}
-                            onChange={(e) => setFormData({ ...formData, unitName: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                unitName: e.target.value,
+                              })
+                            }
                             placeholder="Cards / Pouches / Pcs"
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
@@ -1062,23 +1124,11 @@ export default function ProductManager() {
                             type="number"
                             value={formData.minQuantity}
                             onChange={(e) =>
-                              setFormData({ ...formData, minQuantity: Number(e.target.value) })
+                              setFormData({
+                                ...formData,
+                                minQuantity: Number(e.target.value),
+                              })
                             }
-                            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Production Time
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.productionTime}
-                            onChange={(e) =>
-                              setFormData({ ...formData, productionTime: e.target.value })
-                            }
-                            placeholder="e.g. 3 days"
                             className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                           />
                         </div>
@@ -1091,7 +1141,12 @@ export default function ProductManager() {
                         <textarea
                           rows={3}
                           value={formData.description}
-                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              description: e.target.value,
+                            })
+                          }
                           placeholder="Enter product description..."
                           className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         />
@@ -1103,17 +1158,24 @@ export default function ProductManager() {
                           <div>
                             <label className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
                               <FiImage className="w-4 h-4 text-orange-600" />
-                              Product Images & Media Gallery ({formData.images?.length || (formData.image ? 1 : 0)})
+                              Product Images & Media Gallery (
+                              {formData.images?.length ||
+                                (formData.image ? 1 : 0)}
+                              )
                             </label>
                             <p className="text-[11px] text-slate-500 mt-0.5">
-                              Upload multiple images at once. Images automatically upload to <strong>Cloudinary CDN</strong>.
+                              Upload multiple images at once. Images
+                              automatically upload to{" "}
+                              <strong>Cloudinary CDN</strong>.
                             </p>
                           </div>
 
                           <label className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white rounded-lg cursor-pointer transition-colors shadow-xs">
                             <FiUploadCloud className="w-4 h-4" />
                             <span>
-                              {uploadingImage ? "Uploading to Cloudinary..." : "Upload Multiple Images"}
+                              {uploadingImage
+                                ? "Uploading to Cloudinary..."
+                                : "Upload Multiple Images"}
                             </span>
                             <input
                               type="file"
@@ -1152,16 +1214,21 @@ export default function ProductManager() {
 
                         {/* Images Grid */}
                         <div className="space-y-2">
-                          {(!formData.images || formData.images.length === 0) && !formData.image ? (
+                          {(!formData.images || formData.images.length === 0) &&
+                          !formData.image ? (
                             <p className="text-xs text-slate-400 italic py-2 text-center bg-white rounded-lg border border-dashed border-slate-200">
-                              No product images added yet. Upload files above or add an image URL.
+                              No product images added yet. Upload files above or
+                              add an image URL.
                             </p>
                           ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
                               {Array.from(
                                 new Set(
-                                  [formData.image, ...(formData.images || [])].filter(Boolean)
-                                )
+                                  [
+                                    formData.image,
+                                    ...(formData.images || []),
+                                  ].filter(Boolean),
+                                ),
                               ).map((imgUrl, idx) => {
                                 const isPrimary = formData.image === imgUrl;
                                 return (
@@ -1184,12 +1251,15 @@ export default function ProductManager() {
                                     {/* Primary Badge */}
                                     {isPrimary ? (
                                       <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-orange-600 text-white text-[9px] font-extrabold uppercase rounded shadow-xs flex items-center gap-0.5">
-                                        <FiStar className="w-2.5 h-2.5 fill-current" /> Primary
+                                        <FiStar className="w-2.5 h-2.5 fill-current" />{" "}
+                                        Primary
                                       </span>
                                     ) : (
                                       <button
                                         type="button"
-                                        onClick={() => handleSetPrimaryImage(imgUrl)}
+                                        onClick={() =>
+                                          handleSetPrimaryImage(imgUrl)
+                                        }
                                         className="absolute top-1.5 left-1.5 opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 bg-slate-900/80 hover:bg-orange-600 text-white text-[9px] font-bold rounded shadow-xs"
                                         title="Make this the primary display image"
                                       >
@@ -1225,10 +1295,18 @@ export default function ProductManager() {
                     <div className="space-y-6">
                       <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
                         <h4 className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-2">
-                          <FiSliders className="w-4 h-4" /> Manage Sub-Sub Categories & Individual Prices / Descriptions
+                          <FiSliders className="w-4 h-4" /> Manage Sub-Sub
+                          Categories & Individual Prices / Descriptions
                         </h4>
                         <p className="text-xs text-indigo-700 leading-relaxed">
-                          Each sub-sub variation below populates the <strong>"SELECT PRODUCT"</strong> dropdown on the product page and can have its own <strong>individual price, description, code, production time, min qty, specs, and custom options</strong>!
+                          Each sub-sub variation below populates the{" "}
+                          <strong>"SELECT PRODUCT"</strong> dropdown on the
+                          product page and can have its own{" "}
+                          <strong>
+                            individual price, description, code, min qty,
+                            specs, and custom options
+                          </strong>
+                          !
                         </p>
 
                         <div className="flex items-center gap-2 pt-2">
@@ -1251,18 +1329,22 @@ export default function ProductManager() {
 
                       <div className="space-y-4">
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                          Active Sub-Sub Variations ({formData.variantCombinations.length})
+                          Active Sub-Sub Variations (
+                          {formData.variantCombinations.length})
                         </h4>
 
                         {formData.variantCombinations.length === 0 ? (
                           <p className="text-xs text-slate-400 italic">
-                            No sub-sub variations added yet. Standard product options will be used.
+                            No sub-sub variations added yet. Standard product
+                            options will be used.
                           </p>
                         ) : (
                           <div className="space-y-4">
                             {formData.variantCombinations.map((variantName) => {
-                              const variantObj = formData.variantDetails[variantName] || {};
-                              const variantPricingTiers = variantObj.quantityPricingTiers || [];
+                              const variantObj =
+                                formData.variantDetails[variantName] || {};
+                              const variantPricingTiers =
+                                variantObj.quantityPricingTiers || [];
                               const variantOptions = variantObj.options || [];
 
                               return (
@@ -1278,7 +1360,11 @@ export default function ProductManager() {
                                     </span>
                                     <button
                                       type="button"
-                                      onClick={() => handleRemoveVariantCombination(variantName)}
+                                      onClick={() =>
+                                        handleRemoveVariantCombination(
+                                          variantName,
+                                        )
+                                      }
                                       className="p-1 text-slate-400 hover:text-rose-600 rounded"
                                       title="Remove Sub-sub Variation"
                                     >
@@ -1288,7 +1374,7 @@ export default function ProductManager() {
 
                                   {/* Individual Settings for this specific Sub-sub Variation */}
                                   <div className="space-y-3">
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                       <div>
                                         <label className="block text-[10px] text-slate-500 font-bold uppercase mb-1">
                                           Individual Code
@@ -1297,7 +1383,9 @@ export default function ProductManager() {
                                           type="text"
                                           value={variantObj.code || ""}
                                           onChange={(e) => {
-                                            const updatedDetails = { ...formData.variantDetails };
+                                            const updatedDetails = {
+                                              ...formData.variantDetails,
+                                            };
                                             updatedDetails[variantName] = {
                                               ...updatedDetails[variantName],
                                               code: e.target.value,
@@ -1318,9 +1406,14 @@ export default function ProductManager() {
                                         </label>
                                         <input
                                           type="number"
-                                          value={variantObj.basePrice ?? formData.basePrice}
+                                          value={
+                                            variantObj.basePrice ??
+                                            formData.basePrice
+                                          }
                                           onChange={(e) => {
-                                            const updatedDetails = { ...formData.variantDetails };
+                                            const updatedDetails = {
+                                              ...formData.variantDetails,
+                                            };
                                             updatedDetails[variantName] = {
                                               ...updatedDetails[variantName],
                                               basePrice: Number(e.target.value),
@@ -1334,28 +1427,6 @@ export default function ProductManager() {
                                         />
                                       </div>
 
-                                      <div>
-                                        <label className="block text-[10px] text-slate-500 font-bold uppercase mb-1">
-                                          Individual Production Time
-                                        </label>
-                                        <input
-                                          type="text"
-                                          value={variantObj.productionTime || formData.productionTime}
-                                          onChange={(e) => {
-                                            const updatedDetails = { ...formData.variantDetails };
-                                            updatedDetails[variantName] = {
-                                              ...updatedDetails[variantName],
-                                              productionTime: e.target.value,
-                                            };
-                                            setFormData((prev) => ({
-                                              ...prev,
-                                              variantDetails: updatedDetails,
-                                            }));
-                                          }}
-                                          placeholder="e.g. 3 days"
-                                          className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded font-medium"
-                                        />
-                                      </div>
                                     </div>
 
                                     {/* Individual Description for this Sub-sub Variation */}
@@ -1367,7 +1438,9 @@ export default function ProductManager() {
                                         rows={2}
                                         value={variantObj.description || ""}
                                         onChange={(e) => {
-                                          const updatedDetails = { ...formData.variantDetails };
+                                          const updatedDetails = {
+                                            ...formData.variantDetails,
+                                          };
                                           updatedDetails[variantName] = {
                                             ...updatedDetails[variantName],
                                             description: e.target.value,
@@ -1389,10 +1462,14 @@ export default function ProductManager() {
                                       <div>
                                         <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                                           <FiTag className="w-3.5 h-3.5 text-orange-600" />
-                                          {variantName} — Quantity Selection Mode & Pricing
+                                          {variantName} — Quantity Selection
+                                          Mode & Pricing
                                         </label>
                                         <p className="text-[10px] text-slate-500 mt-0.5">
-                                          Choose whether this variation uses <strong>Increment (+/-)</strong> or <strong>Selecting (Dropdown)</strong> with custom prices.
+                                          Choose whether this variation uses{" "}
+                                          <strong>Increment (+/-)</strong> or{" "}
+                                          <strong>Selecting (Dropdown)</strong>{" "}
+                                          with custom prices.
                                         </p>
                                       </div>
 
@@ -1401,51 +1478,73 @@ export default function ProductManager() {
                                         <button
                                           type="button"
                                           onClick={() => {
-                                            const updatedDetails = { ...formData.variantDetails };
+                                            const updatedDetails = {
+                                              ...formData.variantDetails,
+                                            };
                                             updatedDetails[variantName] = {
                                               ...variantObj,
                                               quantityType: "incremental",
                                             };
-                                            setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              variantDetails: updatedDetails,
+                                            }));
                                           }}
                                           className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
-                                            (variantObj.quantityType || formData.quantityType) !== "select"
+                                            (variantObj.quantityType ||
+                                              formData.quantityType) !==
+                                            "select"
                                               ? "bg-white text-orange-700 shadow-2xs"
                                               : "text-slate-600 hover:text-slate-900"
                                           }`}
                                         >
                                           <FiSliders className="w-3 h-3" />
-                                          <span>Increment (+ / -)</span>
+                                          <span>Increment</span>
                                         </button>
                                         <button
                                           type="button"
                                           onClick={() => {
-                                            const updatedDetails = { ...formData.variantDetails };
+                                            const updatedDetails = {
+                                              ...formData.variantDetails,
+                                            };
                                             const existingFixed =
-                                              variantObj.fixedQuantities && variantObj.fixedQuantities.length > 0
+                                              variantObj.fixedQuantities &&
+                                              variantObj.fixedQuantities
+                                                .length > 0
                                                 ? variantObj.fixedQuantities
-                                                : JSON.parse(JSON.stringify(formData.fixedQuantities || []));
+                                                : JSON.parse(
+                                                    JSON.stringify(
+                                                      formData.fixedQuantities ||
+                                                        [],
+                                                    ),
+                                                  );
                                             updatedDetails[variantName] = {
                                               ...variantObj,
                                               quantityType: "select",
                                               fixedQuantities: existingFixed,
                                             };
-                                            setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              variantDetails: updatedDetails,
+                                            }));
                                           }}
                                           className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all flex items-center gap-1 ${
-                                            (variantObj.quantityType || formData.quantityType) === "select"
+                                            (variantObj.quantityType ||
+                                              formData.quantityType) ===
+                                            "select"
                                               ? "bg-orange-600 text-white shadow-2xs"
                                               : "text-slate-600 hover:text-slate-900"
                                           }`}
                                         >
                                           <FiList className="w-3 h-3" />
-                                          <span>Selecting (Dropdown)</span>
+                                          <span>Selecting</span>
                                         </button>
                                       </div>
                                     </div>
 
                                     {/* If Select Dropdown is active for this variant */}
-                                    {(variantObj.quantityType || formData.quantityType) === "select" ? (
+                                    {(variantObj.quantityType ||
+                                      formData.quantityType) === "select" ? (
                                       <div className="space-y-3 bg-white p-3.5 rounded-xl border border-orange-200 shadow-2xs">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
                                           <div>
@@ -1454,57 +1553,76 @@ export default function ProductManager() {
                                                 Dropdown Selection Active
                                               </span>
                                               <span className="text-xs font-bold text-slate-800">
-                                                Particular Quantity Prices ({variantObj.fixedQuantities?.length || 0})
+                                                Particular Quantity Prices (
+                                                {variantObj.fixedQuantities
+                                                  ?.length || 0}
+                                                )
                                               </span>
                                             </div>
                                             <p className="text-[10px] text-slate-500 mt-0.5">
-                                              Set the exact prices customers pay when selecting each quantity for {variantName}.
+                                              Set the exact prices customers pay
+                                              when selecting each quantity for{" "}
+                                              {variantName}.
                                             </p>
                                           </div>
 
                                           <div className="flex items-center gap-1.5 flex-wrap">
                                             <button
                                               type="button"
-                                              onClick={() => handleLoadStandardQuantitiesToVariant(variantName)}
+                                              onClick={() =>
+                                                handleLoadStandardQuantitiesToVariant(
+                                                  variantName,
+                                                )
+                                              }
                                               className="px-2 py-1 text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 rounded border border-amber-200 transition-colors"
                                               title="Auto-populate standard 1000 - 16000 quantities"
                                             >
-                                              ⚡ Load Standard (1k-16k)
+                                            ⚡ Load Standard 
                                             </button>
+                                        
                                             <button
                                               type="button"
-                                              onClick={() => handleCopyProductQuantitiesToVariant(variantName)}
-                                              className="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 transition-colors"
-                                              title="Copy quantities & prices from general product"
-                                            >
-                                              📋 Copy from General
-                                            </button>
-                                            <button
-                                              type="button"
-                                              onClick={() => handleAddVariantFixedQuantity(variantName)}
+                                              onClick={() =>
+                                                handleAddVariantFixedQuantity(
+                                                  variantName,
+                                                )
+                                              }
                                               className="px-2 py-1 text-[10px] font-bold bg-orange-600 hover:bg-orange-500 text-white rounded transition-colors flex items-center gap-1 shadow-2xs"
                                             >
-                                              <FiPlus className="w-3 h-3" /> Add Qty
+                                              <FiPlus className="w-3 h-3" /> Add
+                                              Qty
                                             </button>
                                           </div>
                                         </div>
 
-                                        {(!variantObj.fixedQuantities || variantObj.fixedQuantities.length === 0) ? (
+                                        {!variantObj.fixedQuantities ||
+                                        variantObj.fixedQuantities.length ===
+                                          0 ? (
                                           <div className="p-3 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200 space-y-1.5">
                                             <p className="text-xs text-slate-500 font-medium">
-                                              No quantity options configured for {variantName}.
+                                              No quantity options configured for{" "}
+                                              {variantName}.
                                             </p>
                                             <div className="flex items-center justify-center gap-2">
                                               <button
                                                 type="button"
-                                                onClick={() => handleLoadStandardQuantitiesToVariant(variantName)}
+                                                onClick={() =>
+                                                  handleLoadStandardQuantitiesToVariant(
+                                                    variantName,
+                                                  )
+                                                }
                                                 className="px-2.5 py-1 text-[11px] font-bold bg-orange-600 text-white rounded-lg shadow-xs"
                                               >
-                                                Load Standard Quantities (1k - 16k)
+                                                Load Standard Quantities (1k -
+                                                16k)
                                               </button>
                                               <button
                                                 type="button"
-                                                onClick={() => handleCopyProductQuantitiesToVariant(variantName)}
+                                                onClick={() =>
+                                                  handleCopyProductQuantitiesToVariant(
+                                                    variantName,
+                                                  )
+                                                }
                                                 className="px-2.5 py-1 text-[11px] font-bold bg-slate-200 text-slate-800 rounded-lg"
                                               >
                                                 Copy from General
@@ -1517,93 +1635,115 @@ export default function ProductManager() {
                                               <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
                                                 <tr>
                                                   <th className="p-2">
-                                                    Quantity ({formData.unitName || "Units"})
+                                                    Quantity (
+                                                    {formData.unitName ||
+                                                      "Units"}
+                                                    )
                                                   </th>
-                                                  <th className="p-2">Particular Price (₹)</th>
-                                                  <th className="p-2 hidden sm:table-cell">Rate / Unit</th>
-                                                  <th className="p-2 text-right">Action</th>
+                                                  <th className="p-2">
+                                                    Particular Price (₹)
+                                                  </th>
+                                                  <th className="p-2 hidden sm:table-cell">
+                                                    Rate / Unit
+                                                  </th>
+                                                  <th className="p-2 text-right">
+                                                    Action
+                                                  </th>
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-slate-100 bg-white">
-                                                {variantObj.fixedQuantities.map((item, qIdx) => {
-                                                  const unitRate = item.qty > 0 ? (item.price / item.qty).toFixed(2) : 0;
-                                                  return (
-                                                    <tr key={qIdx} className="hover:bg-orange-50/20 transition-colors">
-                                                      <td className="p-2">
-                                                        <input
-                                                          type="number"
-                                                          value={item.qty}
-                                                          onChange={(e) =>
-                                                            handleUpdateVariantFixedQuantity(variantName, qIdx, "qty", e.target.value)
-                                                          }
-                                                          className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-slate-900 focus:ring-1 focus:ring-orange-500 focus:outline-none"
-                                                          placeholder="1000"
-                                                        />
-                                                      </td>
-                                                      <td className="p-2">
-                                                        <div className="flex items-center gap-1">
-                                                          <span className="text-slate-400 font-bold">₹</span>
+                                                {variantObj.fixedQuantities.map(
+                                                  (item, qIdx) => {
+                                                    const unitRate =
+                                                      item.qty > 0
+                                                        ? (
+                                                            item.price /
+                                                            item.qty
+                                                          ).toFixed(2)
+                                                        : 0;
+                                                    return (
+                                                      <tr
+                                                        key={qIdx}
+                                                        className="hover:bg-orange-50/20 transition-colors"
+                                                      >
+                                                        <td className="p-2">
                                                           <input
                                                             type="number"
-                                                            value={item.price}
+                                                            value={item.qty}
                                                             onChange={(e) =>
-                                                              handleUpdateVariantFixedQuantity(variantName, qIdx, "price", e.target.value)
+                                                              handleUpdateVariantFixedQuantity(
+                                                                variantName,
+                                                                qIdx,
+                                                                "qty",
+                                                                e.target.value,
+                                                              )
                                                             }
-                                                            className="w-full max-w-[130px] px-2 py-1 text-xs border border-orange-300 rounded font-black text-orange-950 bg-orange-50/30 focus:ring-1 focus:ring-orange-500 focus:outline-none"
-                                                            placeholder="1800"
+                                                            className="w-full max-w-[130px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-slate-900 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                            placeholder="1000"
                                                           />
-                                                        </div>
-                                                      </td>
-                                                      <td className="p-2 text-slate-500 text-[11px] font-mono hidden sm:table-cell">
-                                                        ₹{unitRate} / {formData.unitName?.slice(0, -1) || "unit"}
-                                                      </td>
-                                                      <td className="p-2 text-right">
-                                                        <button
-                                                          type="button"
-                                                          onClick={() => handleRemoveVariantFixedQuantity(variantName, qIdx)}
-                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                                                          title="Remove Quantity"
-                                                        >
-                                                          <FiTrash2 className="w-3.5 h-3.5" />
-                                                        </button>
-                                                      </td>
-                                                    </tr>
-                                                  );
-                                                })}
+                                                        </td>
+                                                        <td className="p-2">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-slate-400 font-bold">
+                                                              ₹
+                                                            </span>
+                                                            <input
+                                                              type="number"
+                                                              value={item.price}
+                                                              onChange={(e) =>
+                                                                handleUpdateVariantFixedQuantity(
+                                                                  variantName,
+                                                                  qIdx,
+                                                                  "price",
+                                                                  e.target
+                                                                    .value,
+                                                                )
+                                                              }
+                                                              className="w-full max-w-[130px] px-2 py-1 text-xs border border-orange-300 rounded font-black text-orange-950 bg-orange-50/30 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                                              placeholder="1800"
+                                                            />
+                                                          </div>
+                                                        </td>
+                                                        <td className="p-2 text-slate-500 text-[11px] font-mono hidden sm:table-cell">
+                                                          ₹{unitRate} /{" "}
+                                                          {formData.unitName?.slice(
+                                                            0,
+                                                            -1,
+                                                          ) || "unit"}
+                                                        </td>
+                                                        <td className="p-2 text-right">
+                                                          <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                              handleRemoveVariantFixedQuantity(
+                                                                variantName,
+                                                                qIdx,
+                                                              )
+                                                            }
+                                                            className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                            title="Remove Quantity"
+                                                          >
+                                                            <FiTrash2 className="w-3.5 h-3.5" />
+                                                          </button>
+                                                        </td>
+                                                      </tr>
+                                                    );
+                                                  },
+                                                )}
                                               </tbody>
                                             </table>
                                           </div>
                                         )}
-
-                                        {/* Dropdown Live Preview Box for this Variant */}
-                                        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                                          <div className="flex items-center gap-1.5">
-                                            <span className="text-[10px] font-bold text-slate-600 uppercase">
-                                              Live Storefront Preview:
-                                            </span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                                              <FiTag className="w-3.5 h-3.5 text-orange-600" /> Qty.
-                                            </span>
-                                            <select
-                                              disabled
-                                              className="px-2 py-1 text-xs bg-white border border-slate-300 rounded font-semibold text-slate-700 opacity-90 cursor-default"
-                                            >
-                                              <option>--Select--</option>
-                                              {(variantObj.fixedQuantities || []).map((fq, idx) => (
-                                                <option key={idx}>{fq.qty}</option>
-                                              ))}
-                                            </select>
-                                          </div>
-                                        </div>
                                       </div>
                                     ) : (
                                       /* If Incremental Mode for this variant */
                                       <div className="space-y-3 bg-white p-3 rounded-lg border border-slate-200 text-xs">
                                         <div className="flex items-center gap-2 text-slate-700">
                                           <FiSliders className="w-4 h-4 text-slate-500" />
-                                          <span className="font-bold">Incremental Counter & Tiers for {variantName}</span>
+                                          <span className="font-bold">
+                                            Incremental Counter & Tiers for{" "}
+                                            {variantName}
+                                          </span>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1613,14 +1753,26 @@ export default function ProductManager() {
                                             </label>
                                             <input
                                               type="number"
-                                              value={variantObj.minQuantity || formData.minQuantity || 1000}
+                                              value={
+                                                variantObj.minQuantity ||
+                                                formData.minQuantity ||
+                                                1000
+                                              }
                                               onChange={(e) => {
-                                                const updatedDetails = { ...formData.variantDetails };
+                                                const updatedDetails = {
+                                                  ...formData.variantDetails,
+                                                };
                                                 updatedDetails[variantName] = {
                                                   ...variantObj,
-                                                  minQuantity: Number(e.target.value),
+                                                  minQuantity: Number(
+                                                    e.target.value,
+                                                  ),
                                                 };
-                                                setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                                setFormData((prev) => ({
+                                                  ...prev,
+                                                  variantDetails:
+                                                    updatedDetails,
+                                                }));
                                               }}
                                               className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded font-mono"
                                             />
@@ -1632,14 +1784,26 @@ export default function ProductManager() {
                                             </label>
                                             <input
                                               type="number"
-                                              value={variantObj.quantityStep || formData.quantityStep || 1000}
+                                              value={
+                                                variantObj.quantityStep ||
+                                                formData.quantityStep ||
+                                                1000
+                                              }
                                               onChange={(e) => {
-                                                const updatedDetails = { ...formData.variantDetails };
+                                                const updatedDetails = {
+                                                  ...formData.variantDetails,
+                                                };
                                                 updatedDetails[variantName] = {
                                                   ...variantObj,
-                                                  quantityStep: Number(e.target.value),
+                                                  quantityStep: Number(
+                                                    e.target.value,
+                                                  ),
                                                 };
-                                                setFormData((prev) => ({ ...prev, variantDetails: updatedDetails }));
+                                                setFormData((prev) => ({
+                                                  ...prev,
+                                                  variantDetails:
+                                                    updatedDetails,
+                                                }));
                                               }}
                                               className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded font-mono"
                                             />
@@ -1651,102 +1815,166 @@ export default function ProductManager() {
                                           <div className="flex items-center justify-between">
                                             <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1">
                                               <FiDollarSign className="w-3 h-3 text-emerald-600" />
-                                              Tiers ({variantPricingTiers.length})
+                                              Tiers (
+                                              {variantPricingTiers.length})
                                             </span>
                                             <button
                                               type="button"
-                                              onClick={() => handleAddVariantPricingTier(variantName)}
+                                              onClick={() =>
+                                                handleAddVariantPricingTier(
+                                                  variantName,
+                                                )
+                                              }
                                               className="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded border border-emerald-200 transition-colors flex items-center gap-1"
                                             >
-                                              <FiPlus className="w-3 h-3" /> Add Tier
+                                              <FiPlus className="w-3 h-3" /> Add
+                                              Tier
                                             </button>
                                           </div>
 
                                           {variantPricingTiers.length === 0 ? (
                                             <p className="text-[10px] text-slate-400 italic bg-slate-50 p-2 rounded border border-dashed border-slate-200">
-                                              No variation-specific pricing tiers configured. Base price calculation will be used.
+                                              No variation-specific pricing
+                                              tiers configured. Base price
+                                              calculation will be used.
                                             </p>
                                           ) : (
                                             <div className="overflow-x-auto rounded border border-slate-200">
                                               <table className="w-full text-left text-xs">
                                                 <thead className="bg-slate-100 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
                                                   <tr>
-                                                    <th className="p-2">Min Quantity ({formData.unitName || "Units"})</th>
-                                                    <th className="p-2">Price Per Unit (₹)</th>
-                                                    <th className="p-2 text-right">Action</th>
+                                                    <th className="p-2">
+                                                      Min Quantity (
+                                                      {formData.unitName ||
+                                                        "Units"}
+                                                      )
+                                                    </th>
+                                                    <th className="p-2">
+                                                      Price Per Unit (₹)
+                                                    </th>
+                                                    <th className="p-2 text-right">
+                                                      Action
+                                                    </th>
                                                   </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 bg-white">
-                                                  {variantPricingTiers.map((tier, tIdx) => (
-                                                    <tr key={tIdx} className="hover:bg-slate-50/50">
-                                                      <td className="p-2">
-                                                        <input
-                                                          type="number"
-                                                          value={tier.minQty}
-                                                          onChange={(e) => {
-                                                            const updatedTiers = [...variantPricingTiers];
-                                                            updatedTiers[tIdx] = {
-                                                              ...updatedTiers[tIdx],
-                                                              minQty: Number(e.target.value),
-                                                            };
-                                                            const updatedDetails = {
-                                                              ...formData.variantDetails,
-                                                              [variantName]: {
-                                                                ...variantObj,
-                                                                quantityPricingTiers: updatedTiers,
-                                                              },
-                                                            };
-                                                            setFormData((prev) => ({
-                                                              ...prev,
-                                                              variantDetails: updatedDetails,
-                                                            }));
-                                                          }}
-                                                          className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-mono"
-                                                          placeholder="1000"
-                                                        />
-                                                      </td>
-                                                      <td className="p-2">
-                                                        <div className="flex items-center gap-1">
-                                                          <span className="text-slate-400 text-xs font-bold">₹</span>
+                                                  {variantPricingTiers.map(
+                                                    (tier, tIdx) => (
+                                                      <tr
+                                                        key={tIdx}
+                                                        className="hover:bg-slate-50/50"
+                                                      >
+                                                        <td className="p-2">
                                                           <input
                                                             type="number"
-                                                            step="any"
-                                                            value={tier.pricePerUnit}
+                                                            value={tier.minQty}
                                                             onChange={(e) => {
-                                                              const updatedTiers = [...variantPricingTiers];
-                                                              updatedTiers[tIdx] = {
-                                                                ...updatedTiers[tIdx],
-                                                                pricePerUnit: Number(e.target.value),
+                                                              const updatedTiers =
+                                                                [
+                                                                  ...variantPricingTiers,
+                                                                ];
+                                                              updatedTiers[
+                                                                tIdx
+                                                              ] = {
+                                                                ...updatedTiers[
+                                                                  tIdx
+                                                                ],
+                                                                minQty: Number(
+                                                                  e.target
+                                                                    .value,
+                                                                ),
                                                               };
-                                                              const updatedDetails = {
-                                                                ...formData.variantDetails,
-                                                                [variantName]: {
-                                                                  ...variantObj,
-                                                                  quantityPricingTiers: updatedTiers,
-                                                                },
-                                                              };
-                                                              setFormData((prev) => ({
-                                                                ...prev,
-                                                                variantDetails: updatedDetails,
-                                                              }));
+                                                              const updatedDetails =
+                                                                {
+                                                                  ...formData.variantDetails,
+                                                                  [variantName]:
+                                                                    {
+                                                                      ...variantObj,
+                                                                      quantityPricingTiers:
+                                                                        updatedTiers,
+                                                                    },
+                                                                };
+                                                              setFormData(
+                                                                (prev) => ({
+                                                                  ...prev,
+                                                                  variantDetails:
+                                                                    updatedDetails,
+                                                                }),
+                                                              );
                                                             }}
-                                                            className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-emerald-700 bg-white"
-                                                            placeholder="1.50"
+                                                            className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-mono"
+                                                            placeholder="1000"
                                                           />
-                                                        </div>
-                                                      </td>
-                                                      <td className="p-2 text-right">
-                                                        <button
-                                                          type="button"
-                                                          onClick={() => handleRemoveVariantPricingTier(variantName, tIdx)}
-                                                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                                                          title="Remove Tier"
-                                                        >
-                                                          <FiTrash2 className="w-3.5 h-3.5" />
-                                                        </button>
-                                                      </td>
-                                                    </tr>
-                                                  ))}
+                                                        </td>
+                                                        <td className="p-2">
+                                                          <div className="flex items-center gap-1">
+                                                            <span className="text-slate-400 text-xs font-bold">
+                                                              ₹
+                                                            </span>
+                                                            <input
+                                                              type="number"
+                                                              step="any"
+                                                              value={
+                                                                tier.pricePerUnit
+                                                              }
+                                                              onChange={(e) => {
+                                                                const updatedTiers =
+                                                                  [
+                                                                    ...variantPricingTiers,
+                                                                  ];
+                                                                updatedTiers[
+                                                                  tIdx
+                                                                ] = {
+                                                                  ...updatedTiers[
+                                                                    tIdx
+                                                                  ],
+                                                                  pricePerUnit:
+                                                                    Number(
+                                                                      e.target
+                                                                        .value,
+                                                                    ),
+                                                                };
+                                                                const updatedDetails =
+                                                                  {
+                                                                    ...formData.variantDetails,
+                                                                    [variantName]:
+                                                                      {
+                                                                        ...variantObj,
+                                                                        quantityPricingTiers:
+                                                                          updatedTiers,
+                                                                      },
+                                                                  };
+                                                                setFormData(
+                                                                  (prev) => ({
+                                                                    ...prev,
+                                                                    variantDetails:
+                                                                      updatedDetails,
+                                                                  }),
+                                                                );
+                                                              }}
+                                                              className="w-full max-w-[120px] px-2 py-1 text-xs border border-slate-300 rounded font-bold text-emerald-700 bg-white"
+                                                              placeholder="1.50"
+                                                            />
+                                                          </div>
+                                                        </td>
+                                                        <td className="p-2 text-right">
+                                                          <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                              handleRemoveVariantPricingTier(
+                                                                variantName,
+                                                                tIdx,
+                                                              )
+                                                            }
+                                                            className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                            title="Remove Tier"
+                                                          >
+                                                            <FiTrash2 className="w-3.5 h-3.5" />
+                                                          </button>
+                                                        </td>
+                                                      </tr>
+                                                    ),
+                                                  )}
                                                 </tbody>
                                               </table>
                                             </div>
@@ -1761,20 +1989,26 @@ export default function ProductManager() {
                                     <div className="flex items-center justify-between">
                                       <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1">
                                         <FiTag className="w-3.5 h-3.5 text-indigo-600" />
-                                        Variation Custom Options ({variantOptions.length})
+                                        Variation Custom Options (
+                                        {variantOptions.length})
                                       </span>
                                       <button
                                         type="button"
                                         onClick={() => {
                                           const optName = prompt(
                                             `Enter Custom Option Name for "${variantName}":`,
-                                            "Printing"
+                                            "Printing",
                                           );
-                                          if (optName) handleAddVariantOption(variantName, optName);
+                                          if (optName)
+                                            handleAddVariantOption(
+                                              variantName,
+                                              optName,
+                                            );
                                         }}
                                         className="px-2 py-1 text-[11px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200 transition-colors flex items-center gap-1"
                                       >
-                                        <FiPlus className="w-3 h-3" /> Add Detail Option
+                                        <FiPlus className="w-3 h-3" /> Add
+                                        Detail Option
                                       </button>
                                     </div>
 
@@ -1788,10 +2022,17 @@ export default function ProductManager() {
                                             type="text"
                                             value={opt.name}
                                             onChange={(e) => {
-                                              const updatedOptions = [...variantOptions];
-                                              updatedOptions[oIdx].name = e.target.value;
-                                              const updatedDetails = { ...formData.variantDetails };
-                                              updatedDetails[variantName].options = updatedOptions;
+                                              const updatedOptions = [
+                                                ...variantOptions,
+                                              ];
+                                              updatedOptions[oIdx].name =
+                                                e.target.value;
+                                              const updatedDetails = {
+                                                ...formData.variantDetails,
+                                              };
+                                              updatedDetails[
+                                                variantName
+                                              ].options = updatedOptions;
                                               setFormData((prev) => ({
                                                 ...prev,
                                                 variantDetails: updatedDetails,
@@ -1802,7 +2043,10 @@ export default function ProductManager() {
                                           <button
                                             type="button"
                                             onClick={() =>
-                                              handleRemoveVariantOption(variantName, oIdx)
+                                              handleRemoveVariantOption(
+                                                variantName,
+                                                oIdx,
+                                              )
                                             }
                                             className="p-1 text-slate-400 hover:text-rose-600 rounded"
                                           >
@@ -1811,72 +2055,88 @@ export default function ProductManager() {
                                         </div>
 
                                         <div className="space-y-1.5">
-                                          {(opt.values || []).map((val, vIdx) => (
-                                            <div
-                                              key={vIdx}
-                                              className="flex items-center gap-2 text-xs"
-                                            >
-                                              <input
-                                                type="text"
-                                                value={val.label}
-                                                onChange={(e) => {
-                                                  const updatedOptions = [...variantOptions];
-                                                  updatedOptions[oIdx].values[vIdx].label =
-                                                    e.target.value;
-                                                  const updatedDetails = {
-                                                    ...formData.variantDetails,
-                                                  };
-                                                  updatedDetails[variantName].options =
-                                                    updatedOptions;
-                                                  setFormData((prev) => ({
-                                                    ...prev,
-                                                    variantDetails: updatedDetails,
-                                                  }));
-                                                }}
-                                                placeholder="Label (e.g. Front & Back)"
-                                                className="flex-1 px-2 py-1 bg-white border border-slate-300 rounded"
-                                              />
-                                              <input
-                                                type="number"
-                                                value={val.priceAdjustment}
-                                                onChange={(e) => {
-                                                  const updatedOptions = [...variantOptions];
-                                                  updatedOptions[oIdx].values[
-                                                    vIdx
-                                                  ].priceAdjustment = Number(e.target.value);
-                                                  const updatedDetails = {
-                                                    ...formData.variantDetails,
-                                                  };
-                                                  updatedDetails[variantName].options =
-                                                    updatedOptions;
-                                                  setFormData((prev) => ({
-                                                    ...prev,
-                                                    variantDetails: updatedDetails,
-                                                  }));
-                                                }}
-                                                placeholder="₹ Adj"
-                                                className="w-20 px-2 py-1 bg-white border border-slate-300 rounded font-bold"
-                                              />
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  handleRemoveVariantOptionValue(
-                                                    variantName,
-                                                    oIdx,
-                                                    vIdx
-                                                  )
-                                                }
-                                                className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                                                title="Delete Choice"
+                                          {(opt.values || []).map(
+                                            (val, vIdx) => (
+                                              <div
+                                                key={vIdx}
+                                                className="flex items-center gap-2 text-xs"
                                               >
-                                                <FiX className="w-3.5 h-3.5" />
-                                              </button>
-                                            </div>
-                                          ))}
+                                                <input
+                                                  type="text"
+                                                  value={val.label}
+                                                  onChange={(e) => {
+                                                    const updatedOptions = [
+                                                      ...variantOptions,
+                                                    ];
+                                                    updatedOptions[oIdx].values[
+                                                      vIdx
+                                                    ].label = e.target.value;
+                                                    const updatedDetails = {
+                                                      ...formData.variantDetails,
+                                                    };
+                                                    updatedDetails[
+                                                      variantName
+                                                    ].options = updatedOptions;
+                                                    setFormData((prev) => ({
+                                                      ...prev,
+                                                      variantDetails:
+                                                        updatedDetails,
+                                                    }));
+                                                  }}
+                                                  placeholder="Label (e.g. Front & Back)"
+                                                  className="flex-1 px-2 py-1 bg-white border border-slate-300 rounded"
+                                                />
+                                                <input
+                                                  type="number"
+                                                  value={val.priceAdjustment}
+                                                  onChange={(e) => {
+                                                    const updatedOptions = [
+                                                      ...variantOptions,
+                                                    ];
+                                                    updatedOptions[oIdx].values[
+                                                      vIdx
+                                                    ].priceAdjustment = Number(
+                                                      e.target.value,
+                                                    );
+                                                    const updatedDetails = {
+                                                      ...formData.variantDetails,
+                                                    };
+                                                    updatedDetails[
+                                                      variantName
+                                                    ].options = updatedOptions;
+                                                    setFormData((prev) => ({
+                                                      ...prev,
+                                                      variantDetails:
+                                                        updatedDetails,
+                                                    }));
+                                                  }}
+                                                  placeholder="₹ Adj"
+                                                  className="w-20 px-2 py-1 bg-white border border-slate-300 rounded font-bold"
+                                                />
+                                                <button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    handleRemoveVariantOptionValue(
+                                                      variantName,
+                                                      oIdx,
+                                                      vIdx,
+                                                    )
+                                                  }
+                                                  className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                                                  title="Delete Choice"
+                                                >
+                                                  <FiX className="w-3.5 h-3.5" />
+                                                </button>
+                                              </div>
+                                            ),
+                                          )}
                                           <button
                                             type="button"
                                             onClick={() =>
-                                              handleAddVariantOptionValue(variantName, oIdx)
+                                              handleAddVariantOptionValue(
+                                                variantName,
+                                                oIdx,
+                                              )
                                             }
                                             className="text-[11px] font-bold text-indigo-600 hover:underline"
                                           >
@@ -1900,18 +2160,23 @@ export default function ProductManager() {
                     <div className="space-y-6">
                       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-3">
                         <h4 className="text-xs font-bold text-orange-950 uppercase tracking-wider flex items-center gap-2">
-                          <FiLayers className="w-4 h-4" /> Manage Custom Select Detail Options
+                          <FiLayers className="w-4 h-4" /> Manage Custom Select
+                          Detail Options
                         </h4>
                         <p className="text-xs text-orange-700 leading-relaxed">
-                          These options appear under the <strong>"SELECT DETAIL"</strong> section on the
-                          product page (e.g. <em>Printing Side</em>, <em>Corner Finishing</em>, <em>Foil Color</em>).
+                          These options appear under the{" "}
+                          <strong>"SELECT DETAIL"</strong> section on the
+                          product page (e.g. <em>Printing Side</em>,{" "}
+                          <em>Corner Finishing</em>, <em>Foil Color</em>).
                         </p>
 
                         <div className="flex items-center gap-2 pt-2">
                           <input
                             type="text"
                             value={newMainOptionName}
-                            onChange={(e) => setNewMainOptionName(e.target.value)}
+                            onChange={(e) =>
+                              setNewMainOptionName(e.target.value)
+                            }
                             placeholder="e.g. Corner Type, Foil Color, Printing"
                             className="flex-1 px-3 py-2 text-xs border border-orange-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                           />
@@ -1942,9 +2207,15 @@ export default function ProductManager() {
                                     type="text"
                                     value={opt.name}
                                     onChange={(e) => {
-                                      const updatedOptions = [...formData.options];
-                                      updatedOptions[optionIdx].name = e.target.value;
-                                      setFormData((prev) => ({ ...prev, options: updatedOptions }));
+                                      const updatedOptions = [
+                                        ...formData.options,
+                                      ];
+                                      updatedOptions[optionIdx].name =
+                                        e.target.value;
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        options: updatedOptions,
+                                      }));
                                     }}
                                     className="font-bold text-xs text-slate-900 px-2 py-1 border border-slate-300 rounded"
                                   />
@@ -1953,8 +2224,11 @@ export default function ProductManager() {
                                       type="checkbox"
                                       checked={opt.required !== false}
                                       onChange={(e) => {
-                                        const updatedOptions = [...formData.options];
-                                        updatedOptions[optionIdx].required = e.target.checked;
+                                        const updatedOptions = [
+                                          ...formData.options,
+                                        ];
+                                        updatedOptions[optionIdx].required =
+                                          e.target.checked;
                                         setFormData((prev) => ({
                                           ...prev,
                                           options: updatedOptions,
@@ -1966,7 +2240,9 @@ export default function ProductManager() {
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => handleRemoveMainOption(optionIdx)}
+                                  onClick={() =>
+                                    handleRemoveMainOption(optionIdx)
+                                  }
                                   className="p-1 text-slate-400 hover:text-rose-600 rounded"
                                 >
                                   <FiTrash2 className="w-4 h-4" />
@@ -1979,14 +2255,20 @@ export default function ProductManager() {
                                   Dropdown Choices & Price Adjustments
                                 </label>
                                 {(opt.values || []).map((val, valIdx) => (
-                                  <div key={valIdx} className="flex items-center space-x-2 text-xs">
+                                  <div
+                                    key={valIdx}
+                                    className="flex items-center space-x-2 text-xs"
+                                  >
                                     <input
                                       type="text"
                                       value={val.label}
                                       onChange={(e) => {
-                                        const updatedOptions = [...formData.options];
-                                        updatedOptions[optionIdx].values[valIdx].label =
-                                          e.target.value;
+                                        const updatedOptions = [
+                                          ...formData.options,
+                                        ];
+                                        updatedOptions[optionIdx].values[
+                                          valIdx
+                                        ].label = e.target.value;
                                         setFormData((prev) => ({
                                           ...prev,
                                           options: updatedOptions,
@@ -2001,10 +2283,14 @@ export default function ProductManager() {
                                         type="number"
                                         value={val.priceAdjustment}
                                         onChange={(e) => {
-                                          const updatedOptions = [...formData.options];
+                                          const updatedOptions = [
+                                            ...formData.options,
+                                          ];
                                           updatedOptions[optionIdx].values[
                                             valIdx
-                                          ].priceAdjustment = Number(e.target.value);
+                                          ].priceAdjustment = Number(
+                                            e.target.value,
+                                          );
                                           setFormData((prev) => ({
                                             ...prev,
                                             options: updatedOptions,
@@ -2017,7 +2303,10 @@ export default function ProductManager() {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        handleRemoveMainOptionValue(optionIdx, valIdx)
+                                        handleRemoveMainOptionValue(
+                                          optionIdx,
+                                          valIdx,
+                                        )
                                       }
                                       className="p-1 text-slate-400 hover:text-rose-600 rounded"
                                     >
@@ -2027,10 +2316,13 @@ export default function ProductManager() {
                                 ))}
                                 <button
                                   type="button"
-                                  onClick={() => handleAddMainOptionValue(optionIdx)}
+                                  onClick={() =>
+                                    handleAddMainOptionValue(optionIdx)
+                                  }
                                   className="text-xs font-bold text-orange-600 hover:underline inline-flex items-center gap-1 pt-1"
                                 >
-                                  <FiPlus className="w-3.5 h-3.5" /> Add Dropdown Choice
+                                  <FiPlus className="w-3.5 h-3.5" /> Add
+                                  Dropdown Choice
                                 </button>
                               </div>
                             </div>
@@ -2049,27 +2341,32 @@ export default function ProductManager() {
                           Key Specifications
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {Object.entries(formData.specifications).map(([key, val]) => (
-                            <div key={key} className="flex items-center space-x-2">
-                              <span className="text-xs font-bold text-slate-600 w-32 truncate">
-                                {key}:
-                              </span>
-                              <input
-                                type="text"
-                                value={val}
-                                onChange={(e) => {
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    specifications: {
-                                      ...prev.specifications,
-                                      [key]: e.target.value,
-                                    },
-                                  }));
-                                }}
-                                className="flex-1 px-2.5 py-1.5 text-xs border border-slate-300 rounded"
-                              />
-                            </div>
-                          ))}
+                          {Object.entries(formData.specifications).map(
+                            ([key, val]) => (
+                              <div
+                                key={key}
+                                className="flex items-center space-x-2"
+                              >
+                                <span className="text-xs font-bold text-slate-600 w-32 truncate">
+                                  {key}:
+                                </span>
+                                <input
+                                  type="text"
+                                  value={val}
+                                  onChange={(e) => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      specifications: {
+                                        ...prev.specifications,
+                                        [key]: e.target.value,
+                                      },
+                                    }));
+                                  }}
+                                  className="flex-1 px-2.5 py-1.5 text-xs border border-slate-300 rounded"
+                                />
+                              </div>
+                            ),
+                          )}
                         </div>
                       </div>
 
@@ -2084,7 +2381,9 @@ export default function ProductManager() {
                           onChange={(e) =>
                             setFormData((prev) => ({
                               ...prev,
-                              importantNotes: e.target.value.split("\n").filter(Boolean),
+                              importantNotes: e.target.value
+                                .split("\n")
+                                .filter(Boolean),
                             }))
                           }
                           className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
@@ -2113,7 +2412,9 @@ export default function ProductManager() {
                       className="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
                     >
                       <FiCheck className="w-4 h-4" />
-                      {editingProduct ? "Save Product Changes" : "Create Product"}
+                      {editingProduct
+                        ? "Save Product Changes"
+                        : "Create Product"}
                     </button>
                   </div>
                 </div>

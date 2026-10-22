@@ -102,8 +102,6 @@ export default function SearchModal({ isOpen, onClose }) {
                       <span>
                         Min: {product.minQuantity} {product.unitName || "Units"}
                       </span>
-                      <span>•</span>
-                      <span>Time: {product.productionTime}</span>
                     </div>
                   </div>
                   <div className="text-right ml-4 flex-shrink-0">

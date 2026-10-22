@@ -207,7 +207,6 @@ app.post("/api/products", (req, res) => {
     description: req.body.description || "",
     minQuantity: Number(req.body.minQuantity) || 1000,
     quantityStep: Number(req.body.quantityStep) || 1000,
-    productionTime: req.body.productionTime || "3-7 Days",
     basePrice: Number(req.body.basePrice) || 0,
     unitName: req.body.unitName || "Cards",
     pricingModel: req.body.pricingModel || "quantity_tiered",

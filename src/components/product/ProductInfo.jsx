@@ -47,30 +47,30 @@ export default function ProductInfo({ product }) {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {product.specifications &&
-                Object.entries(product.specifications).map(([key, val]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100 gap-2"
-                  >
-                    <span className="capitalize text-slate-500 font-medium shrink-0">
-                      {key.includes(" ") ? key : key.replace(/([A-Z])/g, " $1").trim()}
-                    </span>
-                    <span className="font-bold text-slate-900 text-right">{val}</span>
-                  </div>
-                ))}
+                Object.entries(product.specifications)
+                  .filter(
+                    ([key]) =>
+                      !key.toLowerCase().includes("production time") &&
+                      !key.toLowerCase().includes("production lead time")
+                  )
+                  .map(([key, val]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100 gap-2"
+                    >
+                      <span className="capitalize text-slate-500 font-medium shrink-0">
+                        {key.includes(" ") ? key : key.replace(/([A-Z])/g, " $1").trim()}
+                      </span>
+                      <span className="font-bold text-slate-900 text-right">{val}</span>
+                    </div>
+                  ))}
               {!product.specifications && (
-                <>
-                  <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-slate-500 font-medium">Production Lead Time</span>
-                    <span className="font-bold text-orange-600">{product.productionTime}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-slate-500 font-medium">Minimum Order Qty</span>
-                    <span className="font-bold text-slate-900">
-                      {product.minQuantity} {product.unitName || "Units"}
-                    </span>
-                  </div>
-                </>
+                <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="text-slate-500 font-medium">Minimum Order Qty</span>
+                  <span className="font-bold text-slate-900">
+                    {product.minQuantity} {product.unitName || "Units"}
+                  </span>
+                </div>
               )}
             </div>
           </div>

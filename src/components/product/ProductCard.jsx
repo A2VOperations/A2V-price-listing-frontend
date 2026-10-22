@@ -20,7 +20,6 @@ export default function ProductCard({ product }) {
       dieCutOption,
       textureOption,
       customizedDieCut,
-      productionTimeDisplay,
       extraNote,
     } = product.cardDisplay;
 
@@ -107,11 +106,6 @@ export default function ProductCard({ product }) {
             )}
             {customizedDieCut && (
               <div className="text-slate-600 font-normal leading-tight">{customizedDieCut}</div>
-            )}
-            {productionTimeDisplay && (
-              <div className="text-slate-500 font-normal pt-0.5 leading-tight">
-                {productionTimeDisplay}
-              </div>
             )}
           </div>
 

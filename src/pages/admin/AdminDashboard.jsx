@@ -136,7 +136,7 @@ export default function AdminDashboard() {
               </span>
               <h3 className="font-bold text-xs text-slate-800">Variations & Options</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                e.g. <em>500 GSM + Velvet + Die Cut</em>. Includes dropdown choices, custom pricing tiers, specs, and production times.
+                e.g. <em>500 GSM + Velvet + Die Cut</em>. Includes dropdown choices, custom pricing tiers, and specs.
               </p>
             </div>
           </div>
