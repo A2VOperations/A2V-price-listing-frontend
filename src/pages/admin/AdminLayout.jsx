@@ -22,7 +22,9 @@ export default function AdminLayout({ children }) {
   const { adminUsername, logout } = useAuth();
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to sign out from the Admin Portal?")) {
+    if (
+      window.confirm("Are you sure you want to sign out from the Admin Portal?")
+    ) {
       logout();
       navigate("/admin/login");
     }
@@ -44,7 +46,15 @@ export default function AdminLayout({ children }) {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold tracking-tight">Admin & Database Manager</h1>
+              <h1 className="text-xl font-bold tracking-tight">
+                Admin & Database Manager
+              </h1>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="inline-flex items-center gap-1 text-[11px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                <FiUser className="w-3 h-3 text-orange-400" /> Logged in:{" "}
+                <strong className="text-white">{adminUsername}</strong>
+              </span>
               {isBackendConnected ? (
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                   <FiCheckCircle className="w-3 h-3" /> Live MongoDB Database
@@ -55,14 +65,6 @@ export default function AdminLayout({ children }) {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="inline-flex items-center gap-1 text-[11px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                <FiUser className="w-3 h-3 text-orange-400" /> Logged in: <strong className="text-white">{adminUsername}</strong>
-              </span>
-              <p className="text-xs text-slate-400 hidden sm:inline">
-                • Manage categories, products, variants, prices, and images.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -72,7 +74,9 @@ export default function AdminLayout({ children }) {
             disabled={loading}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition-colors"
           >
-            <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <FiRefreshCw
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </button>
 
@@ -100,7 +104,8 @@ export default function AdminLayout({ children }) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
