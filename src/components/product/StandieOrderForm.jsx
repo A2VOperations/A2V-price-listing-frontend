@@ -66,12 +66,13 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const validWidth = Math.max(0.5, parseFloat(standeeWidth) || 3);
   const validLeg = Math.max(
     0,
-    Math.min(validHeight - 0.5, parseFloat(legClearance) || 1),
+    parseFloat(legClearance) || (legClearance === 0 ? 0 : 1),
   );
 
-  // Calculated Flex Display Size
-  const flexHeight = parseFloat((validHeight - validLeg).toFixed(2));
+  // Calculated Flex Display Size & Total Standee Height (+ Added legs)
+  const flexHeight = parseFloat(validHeight.toFixed(2));
   const flexWidth = validWidth;
+  const totalStandeeHeight = parseFloat((validHeight + validLeg).toFixed(2));
   const singleSideFlexArea = parseFloat((flexHeight * flexWidth).toFixed(2));
   const sidesMultiplier = isDoubleSided ? 2 : 1;
   const totalFlexPrintArea = parseFloat(
@@ -84,14 +85,15 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const validAngleRate = Math.max(0, parseFloat(angleRodRatePerFt) || 0);
   const validSupportRate = Math.max(0, parseFloat(supportRatePerPc) || 0);
 
-  // 1. Flex Cost: Area × Rate × Sides (default 4 × 3 = 12 × 25 × 2 = ₹600)
+  // 1. Flex Cost: Area × Rate × Sides (e.g. 5 × 3 = 15 × 30 × 2 = ₹900)
   const singleSideFlexCost = Math.round(singleSideFlexArea * validFlexRate);
   const flexCostTotal = Math.round(singleSideFlexCost * sidesMultiplier);
 
-  // 2. Iron Rod Frame Running Feet: (Height + Height + Width + Width) = 5+5+3+3 = 16 running ft
-  // Cost: 16 × 35 = ₹560
+  // 2. Iron Rod Frame Running Feet: (Total Height + Total Height + Width + Width)
+  // 2 Vertical side poles of (Height + Legs) each + Top & Bottom crossbars of Width each
+  // E.g. (6 + 6 + 3 + 3) = 18 running ft
   const ironRunningFt = parseFloat(
-    (validHeight * 2 + validWidth * 2).toFixed(2),
+    (totalStandeeHeight * 2 + validWidth * 2).toFixed(2),
   );
   const ironRodCostTotal = Math.round(ironRunningFt * validIronRate);
 
@@ -103,7 +105,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
   const validSupports = Math.max(0, parseInt(supportCount) || 0);
   const supportCostTotal = Math.round(validSupports * validSupportRate);
 
-  // Per Unit Subtotal: 560 + 100 + 320 + 600 = ₹1,580
+  // Per Unit Subtotal
   const unitTotal =
     ironRodCostTotal + angleRodCostTotal + supportCostTotal + flexCostTotal;
   const grossSubtotal = Math.round(unitTotal * quantity);
@@ -128,7 +130,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
     const quoteItem = {
       productId: product?.id || "STD-002",
       code: product?.code || "STD-002",
-      name: `Iron Frame Standee (${validWidth}×${validHeight} Ft, ${isDoubleSided ? "Double-Sided" : "Single-Sided"})`,
+      name: `Iron Frame Standee (${validWidth}×${validHeight} Ft Flex + ${validLeg} Ft Legs, ${isDoubleSided ? "Double-Sided" : "Single-Sided"})`,
       categoryId: "flex-board",
       subCategory: "STANDIE",
       unitPrice: unitTotal,
@@ -137,10 +139,11 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
       discount: validDiscount,
       total: netAmountPayable,
       specifications: {
-        "Total Standee Size": `${validWidth} ft (W) × ${validHeight} ft (H)`,
+        "Total Standee Height": `${totalStandeeHeight} ft (${validHeight} ft Board + ${validLeg} ft Legs)`,
+        "Total Standee Size": `${validWidth} ft (W) × ${totalStandeeHeight} ft (H)`,
         "Flex Display Area": `${flexWidth} ft × ${flexHeight} ft (${singleSideFlexArea} sq.ft. ${isDoubleSided ? "Both Sides × 2" : "Single Side"})`,
-        "Ground Leg Clearance": `${validLeg} ft`,
-        "Iron Pipe Frame": `${ironRunningFt} running ft (${validHeight}+${validHeight}+${validWidth}+${validWidth} ft) @ ₹${validIronRate}/ft (₹${ironRodCostTotal})`,
+        "Ground Leg Clearance": `${validLeg} ft (+ Added at bottom)`,
+        "Iron Pipe Frame": `${ironRunningFt} running ft (${totalStandeeHeight}+${totalStandeeHeight}+${validWidth}+${validWidth} ft) @ ₹${validIronRate}/ft (₹${ironRodCostTotal})`,
         "Angle legs": `${validAngleFt} ft @ ₹${validAngleRate}/ft (₹${angleRodCostTotal})`,
         "Support Rods": `${validSupports} supports @ ₹${validSupportRate}/pc (₹${supportCostTotal})`,
         "Flex Printing": `${activeMedia.name} @ ₹${validFlexRate}/sqft (₹${flexCostTotal})`,
@@ -157,9 +160,10 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
     setIsGeneratingPdf(true);
     try {
       generateStandieQuotationPdf({
-        standeeSize: `${validWidth} × ${validHeight} Ft`,
+        standeeSize: `${validWidth} × ${totalStandeeHeight} Ft`,
         validWidth,
         validHeight,
+        totalStandeeHeight,
         legClearance: validLeg,
         flexHeight,
         flexWidth,
@@ -268,7 +272,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                   </span>
                 </div>
                 <span className="text-[9px] text-slate-400 mt-0.5 block">
-                  Full frame height
+                  Flex display height
                 </span>
               </div>
 
@@ -304,7 +308,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                     type="number"
                     step="0.1"
                     min="0"
-                    max="4"
+                    max="6"
                     value={legClearance}
                     onChange={(e) => setLegClearance(e.target.value)}
                     className="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
@@ -314,7 +318,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                   </span>
                 </div>
                 <span className="text-[9px] text-slate-400 mt-0.5 block">
-                  Default 1 ft clearance
+                  Bottom legs clearance (+ Added)
                 </span>
               </div>
             </div>
@@ -334,7 +338,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                 </span>
               </div>
               <span className="text-[11px] font-mono text-amber-800 bg-white/70 px-2 py-0.5 rounded border border-amber-300">
-                Height ({validHeight}ft) - Legs ({validLeg}ft) = {flexHeight}ft
+                Height ({validHeight}ft) + Legs ({validLeg}ft) = {totalStandeeHeight}ft Total Frame
               </span>
             </div>
           </div>
@@ -355,12 +359,12 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
               <div className="flex justify-between items-center text-slate-700">
                 <span>Running Feet Formula:</span>
                 <span className="font-bold text-slate-900">
-                  {validHeight} + {validHeight} + {validWidth} + {validWidth} ={" "}
+                  {totalStandeeHeight} + {totalStandeeHeight} + {validWidth} + {validWidth} ={" "}
                   {ironRunningFt} Running Ft
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-sans">
-                (2 Vertical side poles of {validHeight}ft each + Top horizontal
+                (2 Vertical side poles of {totalStandeeHeight}ft each [{validHeight}ft board + {validLeg}ft legs] + Top horizontal
                 pipe of {validWidth}ft + Bottom crossbar of {validWidth}ft)
               </p>
             </div>
@@ -672,7 +676,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
         <div className="lg:col-span-5 space-y-6">
           {/* Visual Interactive Preview */}
           <StandiePreview
-            totalHeight={validHeight}
+            totalHeight={totalStandeeHeight}
             width={validWidth}
             legClearance={validLeg}
             flexHeight={flexHeight}
@@ -709,7 +713,7 @@ export default function StandieOrderForm({ product, onVariantSelect }) {
                     1. Iron Rod Frame:
                   </span>
                   <span className="text-[10px] text-slate-500 font-sans">
-                    {validHeight}+{validHeight}+{validWidth}+{validWidth} ={" "}
+                    {totalStandeeHeight}+{totalStandeeHeight}+{validWidth}+{validWidth} ={" "}
                     {ironRunningFt} ft × ₹{validIronRate}
                   </span>
                 </div>

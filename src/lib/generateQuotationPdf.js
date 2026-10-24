@@ -496,10 +496,11 @@ export function generateStandieQuotationPdf(data) {
     standeeSize = "5 × 3 Ft",
     validWidth = 3,
     validHeight = 5,
+    totalStandeeHeight,
     legClearance = 1,
-    flexHeight = 4,
+    flexHeight = 5,
     flexWidth = 3,
-    flexArea = 12,
+    flexArea = 15,
     isDoubleSided = true,
     mediaName = "Star Flex",
     flexRate = 30,
@@ -676,11 +677,15 @@ export function generateStandieQuotationPdf(data) {
   doc.setTextColor(194, 65, 12); // orange-700
   doc.text("STANDIE SPECIFICATION:", rightColX + 8, cardY + 7.5);
 
+  const calculatedTotalHeight =
+    totalStandeeHeight ||
+    parseFloat((parseFloat(validHeight) + parseFloat(legClearance)).toFixed(2));
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85); // slate-700
   doc.text(
-    `Standee Size: ${validWidth}ft (W) × ${validHeight}ft (H)`,
+    `Standee Size: ${validWidth}ft (W) × ${calculatedTotalHeight}ft (H) (${validHeight}ft Board + ${legClearance}ft Legs)`,
     rightColX + 8,
     cardY + 13,
   );
@@ -734,7 +739,7 @@ export function generateStandieQuotationPdf(data) {
     // 1. MS Iron Frame
     rows.push({
       desc: "MS Iron Rod Frame (Square Pipe)",
-      spec: `${validHeight}+${validHeight}+${validWidth}+${validWidth} = ${ironRunningFt} Ft @ Rs. ${ironRate}/ft`,
+      spec: `${calculatedTotalHeight}+${calculatedTotalHeight}+${validWidth}+${validWidth} = ${ironRunningFt} Ft @ Rs. ${ironRate}/ft`,
       total: `Rs. ${(ironCost * quantity).toLocaleString()}/-`,
     });
 

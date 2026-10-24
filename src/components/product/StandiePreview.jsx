@@ -2,16 +2,16 @@ import React from "react";
 import { FiMaximize2, FiLayers, FiShield, FiCheckCircle } from "react-icons/fi";
 
 export default function StandiePreview({
-  totalHeight = 5,
+  totalHeight,
   width = 3,
   legClearance = 1,
-  flexHeight = 4,
+  flexHeight = 5,
   flexWidth = 3,
-  flexArea = 12,
+  flexArea = 15,
   isDoubleSided = true,
   mediaName = "Star Flex",
   flexRate = 25,
-  ironRunningFt = 16,
+  ironRunningFt = 18,
   ironRate = 35,
   angleBaseFt = 2,
   angleRate = 50,
@@ -19,17 +19,17 @@ export default function StandiePreview({
   supportRate = 80,
   totalPrice = 1580,
 }) {
-  const numHeight = parseFloat(totalHeight) || 5;
-  const numWidth = parseFloat(width) || 3;
-  const numLeg = parseFloat(legClearance) || 1;
-  const numFlexH = Math.max(0.5, numHeight - numLeg);
+  const numLeg = parseFloat(legClearance) || 0;
+  const numFlexH = parseFloat(flexHeight) || 5;
+  const numHeight = parseFloat(totalHeight) || parseFloat((numFlexH + numLeg).toFixed(2));
+  const numWidth = parseFloat(width) || parseFloat(flexWidth) || 3;
 
   // Aspect ratio scaling for visual container
   const ratio = Math.max(0.35, Math.min(0.85, numWidth / numHeight));
   const containerWidthPx = Math.round(Math.max(220, Math.min(340, 260 * (ratio / 0.6))));
 
-  const flexPercentage = Math.max(40, Math.min(85, (numFlexH / numHeight) * 100));
-  const legPercentage = 100 - flexPercentage;
+  const flexPercentage = Math.max(40, Math.min(92, (numFlexH / numHeight) * 100));
+  const legPercentage = Math.max(0, 100 - flexPercentage);
 
   const flexCost = Math.round(flexArea * (isDoubleSided ? 2 : 1) * flexRate);
   const ironCost = Math.round(ironRunningFt * ironRate);
@@ -51,7 +51,7 @@ export default function StandiePreview({
           <div>
             <span className="font-bold text-slate-100">Iron Frame Standee Visualizer</span>
             <span className="text-[10px] text-slate-400 block font-mono">
-              Total: {numHeight}ft H × {numWidth}ft W • 1ft Ground Legs
+              Total: {numHeight}ft H × {numWidth}ft W • {numLeg}ft Ground Legs
             </span>
           </div>
         </div>
@@ -161,9 +161,9 @@ export default function StandiePreview({
                 className="w-full relative flex items-center justify-center"
                 style={{ height: `${legPercentage}%` }}
               >
-                {/* 1ft Leg Dimension Callout in center */}
+                {/* Leg Dimension Callout in center */}
                 <div className="px-2 py-0.5 rounded bg-slate-800/80 border border-slate-700 text-[9px] font-mono text-slate-300 flex items-center gap-1 shadow-xs">
-                  <span>↕ 1 FT STAND ROD / LEGS</span>
+                  <span>↕ {numLeg} FT STAND ROD / LEGS</span>
                 </div>
               </div>
             </div>
@@ -270,11 +270,11 @@ export default function StandiePreview({
       {/* Key Highlights Footer */}
       <div className="w-full grid grid-cols-3 gap-2 pt-3 border-t border-slate-800 text-[10.5px] text-center mt-3">
         <div className="flex flex-col items-center">
-          <span className="text-orange-400 font-bold">16 Running Ft</span>
+          <span className="text-orange-400 font-bold">{ironRunningFt} Running Ft</span>
           <span className="text-[9px] text-slate-400">Iron Square Pipe</span>
         </div>
         <div className="flex flex-col items-center border-x border-slate-800">
-          <span className="text-amber-400 font-bold">4 Support Rods</span>
+          <span className="text-amber-400 font-bold">{supportCount} Support Rods</span>
           <span className="text-[9px] text-slate-400">High Stability</span>
         </div>
         <div className="flex flex-col items-center">
