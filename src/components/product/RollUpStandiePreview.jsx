@@ -26,7 +26,7 @@ export default function RollUpStandiePreview({
   const numHeight = Math.min(6, Math.max(1, parseFloat(customHeight) || 6));
 
   // Dynamic visual container proportions based on height and width
-  const aspectRatio = numWidth / numHeight; // typically 2.5 / 6 ≈ 0.42, or 3.5 / 6 ≈ 0.58
+  const aspectRatio = numWidth / numHeight; // typically 2.5 / 6 ≈ 0.42, or 3 / 6 = 0.5
   // Set width in pixels adapted to aspect ratio
   const visualBannerWidth = Math.round(
     Math.max(170, Math.min(270, 190 * (numWidth / 2.5)))
@@ -279,7 +279,7 @@ export default function RollUpStandiePreview({
             <div className="h-2 w-0.5 bg-blue-500" />
             <div className="w-full border-t-2 border-dashed border-blue-500/60 relative flex items-center justify-center">
               <span className="bg-slate-900 px-2 py-0.5 rounded text-[9px] text-blue-400 font-black whitespace-nowrap shadow-xs border border-blue-500/30">
-                Fixed Width: {numWidth} Ft ({numWidth === 2.5 ? '30"' : '42"'})
+                Fixed Width: {numWidth} Ft ({numWidth === 2.5 ? '30"' : '36"'})
               </span>
             </div>
             <div className="h-2 w-0.5 bg-blue-500" />

@@ -4368,26 +4368,26 @@
     "isRollUpStandie": true,
     "isStandie": true,
     "image": "/products/standie/rollup-standie.jpg",
-    "standeeSize": "Custom Height × 2.5 / 3.5 Ft Fixed Width",
-    "standType": "Aluminium Roll-Up Standee Machine Base (2.5 & 3.5 Ft) with Custom Height Banner",
+    "standeeSize": "Custom Height × 2.5 / 3 Ft Fixed Width",
+    "standType": "Aluminium Roll-Up Standee Machine Base (2.5 & 3 Ft) with Custom Height Banner",
     "widthFt": 2.5,
     "heightFt": 6,
     "fixedWidths": [
       2.5,
-      3.5
+      3
     ],
     "basePrice": 1250,
-    "description": "Roll-Up Standee system featuring fixed width base machines in 2.5 Ft (30\") and 3.5 Ft (42\") with matching fixed flex banner width and customizable height (up to 6 Ft). Includes high-tension spring cassette, 3-section support pole, top snap rail, Star Flex printing @ ₹30/sqft, and padded travel bag. Standard 2.5 ft machine @ ₹1,250 and 3.5 ft machine @ ₹1,350.",
+    "description": "Roll-Up Standee system featuring fixed width base machines in 2.5 Ft (30\") and 3 Ft (36\") with matching fixed flex banner width and customizable height (up to 6 Ft). Includes high-tension spring cassette, 3-section support pole, top snap rail, Star Flex printing @ ₹30/sqft, and padded travel bag. Standard 2.5 ft machine @ ₹1,250 and 3 ft machine @ ₹1,350.",
     "minQuantity": 1,
     "quantityStep": 1,
     "unitName": "Standee(s)",
     "variantCombinations": [
       "2.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,700",
-      "3.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,980",
+      "3 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,890",
       "2.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,650",
-      "3.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,130",
+      "3 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,040",
       "2.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,250",
-      "3.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,350"
+      "3 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,350"
     ],
     "variantDetails": {
       "2.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,700": {
@@ -4396,11 +4396,11 @@
         "widthFt": 2.5,
         "description": "2.5 Ft fixed width standard roll-up machine (₹1,250) + 15 sqft Star Flex banner (₹450) @ ₹1,700"
       },
-      "3.5 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,980": {
+      "3 Ft Standard Roll-Up Machine + Star Flex Banner (Custom Height) - ₹1,890": {
         "code": "STD-102",
-        "basePrice": 1980,
-        "widthFt": 3.5,
-        "description": "3.5 Ft wide fixed width standard roll-up machine (₹1,350) + 21 sqft Star Flex banner (₹630) @ ₹1,980"
+        "basePrice": 1890,
+        "widthFt": 3,
+        "description": "3 Ft wide fixed width standard roll-up machine (₹1,350) + 18 sqft Star Flex banner (₹540) @ ₹1,890"
       },
       "2.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹1,650": {
         "code": "STD-103",
@@ -4408,11 +4408,11 @@
         "widthFt": 2.5,
         "description": "Luxury teardrop broad base 2.5 ft machine (₹1,200) + 15 sqft Star Flex banner (₹450) @ ₹1,650"
       },
-      "3.5 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,130": {
+      "3 Ft Luxury Broad Base Roll-Up Standee (Custom Height) - ₹2,040": {
         "code": "STD-104",
-        "basePrice": 2130,
-        "widthFt": 3.5,
-        "description": "Luxury teardrop broad base 3.5 ft machine (₹1,500) + 21 sqft Star Flex banner (₹630) @ ₹2,130"
+        "basePrice": 2040,
+        "widthFt": 3,
+        "description": "Luxury teardrop broad base 3 ft machine (₹1,500) + 18 sqft Star Flex banner (₹540) @ ₹2,040"
       },
       "2.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,250": {
         "code": "STD-105",
@@ -4420,17 +4420,17 @@
         "widthFt": 2.5,
         "description": "2.5 Ft standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹1,250"
       },
-      "3.5 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,350": {
+      "3 Ft Roll-Up Standee Machine Only (Hardware Base) - ₹1,350": {
         "code": "STD-106",
         "basePrice": 1350,
-        "widthFt": 3.5,
-        "description": "3.5 Ft wide standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹1,350"
+        "widthFt": 3,
+        "description": "3 Ft wide standard aluminium machine cassette with swivel feet & padded carry bag (no print) @ ₹1,350"
       }
     },
     "specifications": {
       "Product Category": "Aluminium Roll-Up Standee Machine & Banner System",
-      "Fixed Machine Widths": "2.5 Ft (30\") and 3.5 Ft (42\")",
-      "Flex Banner Width": "Fixed 2.5 Ft or 3.5 Ft (Matches Machine)",
+      "Fixed Machine Widths": "2.5 Ft (30\") and 3 Ft (36\")",
+      "Flex Banner Width": "Fixed 2.5 Ft or 3 Ft (Matches Machine)",
       "Display Height": "Customizable up to 6 Ft (Quick Presets: 3 Ft, 5 Ft, 6 Ft)",
       "Cassette Body": "Anodized aluminium alloy with internal spring tension cartridge",
       "Support Pole": "3-piece bungee corded vertical aluminium support pole",
@@ -4439,7 +4439,7 @@
       "Banner Printing": "Star Flex High Gloss (1440 DPI HD print @ ₹30/sqft)"
     },
     "ourSpecialization": [
-      "Fixed 2.5 Ft and 3.5 Ft width aluminium roll-up machine cassettes with matching fixed width flex",
+      "Fixed 2.5 Ft and 3 Ft width aluminium roll-up machine cassettes with matching fixed width flex",
       "Fully customizable display height for conferences, retail stores, backdrops, and exhibitions",
       "High-tension internal spring roller retraction mechanism ensures effortless banner pull-up",
       "High durability glossy Star Flex media ensures vibrant visuals",

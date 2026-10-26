@@ -493,7 +493,6 @@ export function generateFlexQuotationPdf(data) {
  */
 export function generateStandieQuotationPdf(data) {
   const {
-    standeeSize = "5 × 3 Ft",
     validWidth = 3,
     validHeight = 5,
     totalStandeeHeight,
@@ -518,16 +517,11 @@ export function generateStandieQuotationPdf(data) {
     mediaCostPerUnit = 0,
     activeStand,
     standCostPerUnit = 0,
-    activeLamination,
-    laminationCostPerUnit = 0,
-    activeDesign,
-    designCostTotal = 0,
     quantity = 1,
     grossSubtotal = 0,
     validDiscount = 0,
     totalAmount = 0,
     clientInfo = {},
-    productName = "Heavy-Duty MS Iron Frame Standee Display",
   } = data;
 
   const doc = new jsPDF({
@@ -1094,7 +1088,7 @@ export function generateRollUpStandieQuotationPdf(data) {
   doc.setFontSize(8);
   doc.setTextColor(51, 65, 85);
   doc.text(
-    `Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.5 ? '30"' : '42"'})`,
+    `Fixed Machine Width: ${machineWidth} Ft (${machineWidth === 2.5 ? '30"' : '36"'})`,
     rightColX + 8,
     cardY + 13,
   );

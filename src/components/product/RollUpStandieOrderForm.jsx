@@ -28,7 +28,7 @@ const MACHINE_OPTIONS = {
     description: "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
     defaultRates: {
       2.5: 1250,
-      3.5: 1350,
+      3: 1350,
     },
   },
   luxury: {
@@ -38,7 +38,7 @@ const MACHINE_OPTIONS = {
     description: "Heavy-duty teardrop wide-footprint cassette with chrome mirror endcaps, superior stability without swivel feet, and deluxe padded travel bag.",
     defaultRates: {
       2.5: 1200,
-      3.5: 1500,
+      3: 1500,
     },
   },
 };
@@ -49,7 +49,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Order mode: "complete" | "machine-only" | "banner-only"
   const [orderMode, setOrderMode] = useState("complete");
 
-  // Core Requirement: Fixed Machine & Flex Width: 2.5 ft or 3.5 ft
+  // Core Requirement: Fixed Machine & Flex Width: 2.5 ft or 3 ft
   const [fixedWidth, setFixedWidth] = useState(2.5);
 
   // Core Requirement: Customizable Height in Feet (default: standard 6 ft)
@@ -79,7 +79,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const includeBanner = orderMode === "complete" || orderMode === "banner-only";
 
   // Calculations
-  const validWidth = fixedWidth === 3.5 ? 3.5 : 2.5;
+  const validWidth = fixedWidth === 3 ? 3 : 2.5;
   const validHeight = Math.min(6, Math.max(1, parseFloat(customHeight) || 6));
 
   // Display Area in Square Feet = Fixed Width × Customizable Height
@@ -106,7 +106,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   // Handle Fixed Width change (updates machine default rate)
   const handleWidthChange = (newWidth) => {
     setFixedWidth(newWidth);
-    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3.5 ? 1350 : 1250);
+    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3 ? 1350 : 1250);
     setCustomMachineRate(newRate);
   };
 
@@ -144,7 +144,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
       discount: validDiscount,
       total: netAmountPayable,
       specifications: {
-        "Fixed Machine Width": `${validWidth} Ft (${validWidth === 2.5 ? '30"' : '42"'})`,
+        "Fixed Machine Width": `${validWidth} Ft (${validWidth === 2.5 ? '30"' : '36"'})`,
         "Custom Standee Height": `${validHeight} Ft (${Math.round(validHeight * 12)}")`,
         "Total Banner Area": `${totalAreaSqFt} Sq.Ft.`,
         "Roll-Up Standee Machine": includeMachine
@@ -221,7 +221,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
             Roll-Up Standee Machine & Banner System
           </h1>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Professional aluminium roll-up standee with fixed width base (<strong>2.5 Ft</strong> or <strong>3.5 Ft</strong>), customizable display height, heavy-duty spring roller mechanism, 1440 DPI anti-curl banner printing, and padded shoulder travel bag.
+            Professional aluminium roll-up standee with fixed width base (<strong>2.5 Ft</strong> or <strong>3 Ft</strong>), customizable display height, heavy-duty spring roller mechanism, 1440 DPI anti-curl banner printing, and padded shoulder travel bag.
           </p>
 
           {/* Quick Order Mode Selector */}
@@ -328,11 +328,11 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               </div>
             </div>
 
-            {/* Option B: 3.5 Ft Fixed Width */}
+            {/* Option B: 3 Ft Fixed Width */}
             <div
-              onClick={() => handleWidthChange(3.5)}
+              onClick={() => handleWidthChange(3)}
               className={`cursor-pointer rounded-xl p-4 border-2 transition-all relative ${
-                fixedWidth === 3.5
+                fixedWidth === 3
                   ? "border-blue-600 bg-blue-50/40 shadow-sm ring-2 ring-blue-500/20"
                   : "border-slate-200 hover:border-slate-300 bg-white"
               }`}
@@ -343,20 +343,20 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                     Wide Display
                   </span>
                   <h3 className="text-lg font-black text-slate-900">
-                    3.5 Ft Machine Base
+                    3 Ft Machine Base
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Width: <strong>3.5 Ft (42 Inches / 106 cm)</strong>
+                    Width: <strong>3 Ft (36 Inches / 91 cm)</strong>
                   </p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    fixedWidth === 3.5
+                    fixedWidth === 3
                       ? "border-blue-600 bg-blue-600 text-white"
                       : "border-slate-300"
                   }`}
                 >
-                  {fixedWidth === 3.5 && <FiCheckCircle className="w-3.5 h-3.5" />}
+                  {fixedWidth === 3 && <FiCheckCircle className="w-3.5 h-3.5" />}
                 </div>
               </div>
 
@@ -367,7 +367,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                  <span className="font-bold text-slate-800 font-mono">Fixed 3.5 Ft</span>
+                  <span className="font-bold text-slate-800 font-mono">Fixed 3 Ft</span>
                 </div>
               </div>
             </div>
