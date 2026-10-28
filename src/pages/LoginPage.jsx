@@ -77,7 +77,7 @@ export default function LoginPage() {
         setTempToken(res.tempToken);
         setMaskedEmail(res.email);
         setStep("otp");
-        setInfoMsg(`OTP code has been sent to ${res.email} via Supabase.`);
+        setInfoMsg(res.message || `OTP code has been sent to ${res.email} via Supabase.`);
         setResendCooldown(45); // 45 seconds cooldown for resend
       } else {
         // Direct login if OTP was bypassed
