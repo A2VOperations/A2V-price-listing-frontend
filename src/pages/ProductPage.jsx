@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import EmptyState from "@/components/common/EmptyState";
@@ -10,9 +10,13 @@ import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
 import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
+import StandieTypeTabs from "@/components/product/StandieTypeTabs";
+import { TbCalculator } from "react-icons/tb";
+import { FiArrowRight } from "react-icons/fi";
 
 export default function ProductPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { getProductBySlug, getCategoryBySlug, loading } = useData();
   const rawProduct = getProductBySlug(slug);
   const category = rawProduct ? getCategoryBySlug(rawProduct.categoryId) : null;
@@ -23,7 +27,9 @@ export default function ProductPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
         <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-sm font-medium text-slate-500">Loading product from MongoDB...</p>
+        <p className="text-sm font-medium text-slate-500">
+          Loading product from MongoDB...
+        </p>
       </div>
     );
   }
@@ -120,7 +126,17 @@ export default function ProductPage() {
   if (isSticker) {
     return (
       <div className="space-y-6">
-        <Breadcrumb items={breadcrumbItems} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <Breadcrumb items={breadcrumbItems} />
+          <Link
+            to="/calculators/stickers"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-200 transition-colors self-start sm:self-auto"
+          >
+            <TbCalculator className="w-3.5 h-3.5" />
+            <span>Open in Dedicated Calculators Section</span>
+            <FiArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
         <StickerCalculator product={product} />
         <ProductInfo product={product} />
       </div>
@@ -132,54 +148,90 @@ export default function ProductPage() {
     product.slug?.includes("rollup") ||
     (product.id === "STD-001" && !product.isIronStandie);
 
-  if (isRollUpStandie) {
-    return (
-      <div className="space-y-6">
-        <Breadcrumb items={breadcrumbItems} />
-        <RollUpStandieOrderForm product={product} />
-        <ProductInfo product={product} />
-      </div>
-    );
-  }
-
   const isHutStandie =
     product.isHutStandie ||
     product.id === "STD-003" ||
     product.slug?.includes("hut") ||
     product.name?.toLowerCase().includes("hut");
 
-  if (isHutStandie) {
-    return (
-      <div className="space-y-6">
-        <Breadcrumb items={breadcrumbItems} />
-        <StandieHutOrderForm product={product} />
-        <ProductInfo product={product} />
-      </div>
-    );
-  }
-
-  const isStandie =
+  const isIronStandie =
     product.isStandie ||
+    product.id === "STD-002" ||
     product.subCategory?.toUpperCase().includes("STANDIE") ||
     product.slug?.includes("standie");
 
-  if (isStandie) {
+  const isAnyStandie = isRollUpStandie || isHutStandie || isIronStandie;
+
+  if (isAnyStandie) {
+    let currentStandeeType = "rollup";
+    if (isHutStandie) currentStandeeType = "hut";
+    else if (isIronStandie && !isRollUpStandie) currentStandeeType = "iron-frame";
+
+    const handleSelectStandeeType = (typeId) => {
+      if (typeId === "rollup") navigate("/product/rollup-standie");
+      else if (typeId === "iron-frame") navigate("/product/iron-frame-standie");
+      else if (typeId === "hut") navigate("/product/standee-hut");
+    };
+
     return (
       <div className="space-y-6">
-        <Breadcrumb items={breadcrumbItems} />
-        <StandieOrderForm product={product} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <Breadcrumb items={breadcrumbItems} />
+          <Link
+            to="/calculators/standee"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors self-start sm:self-auto"
+          >
+            <TbCalculator className="w-3.5 h-3.5" />
+            <span>View in Standee Calculators Hub</span>
+            <FiArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Quick Standee Model Switcher Tabs */}
+        <StandieTypeTabs
+          activeType={currentStandeeType}
+          onSelectType={handleSelectStandeeType}
+        />
+
+        {currentStandeeType === "rollup" && (
+          <RollUpStandieOrderForm product={product} />
+        )}
+        {currentStandeeType === "iron-frame" && (
+          <StandieOrderForm product={product} />
+        )}
+        {currentStandeeType === "hut" && (
+          <StandieHutOrderForm product={product} />
+        )}
+
         <ProductInfo product={product} />
       </div>
     );
   }
 
+  const isFlexBoard =
+    product.isFlexBoard ||
+    product.categoryId === "flex-board" ||
+    product.slug?.includes("flex");
+
   return (
     <div className="space-y-6">
-      <Breadcrumb items={breadcrumbItems} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <Breadcrumb items={breadcrumbItems} />
+        {isFlexBoard && (
+          <Link
+            to="/calculators/flex-board"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-200 transition-colors self-start sm:self-auto"
+          >
+            <TbCalculator className="w-3.5 h-3.5" />
+            <span>Open in Price Calculators Section</span>
+            <FiArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8 items-start">
-        {/* Left Column: Gallery & Info */}
-         <div className="xl:col-span-7 space-y-6 min-w-0">
+        {/* Left Column: Interactive Form */}
+        <div className="xl:col-span-7 space-y-6 min-w-0">
           <ProductOrderForm
             product={product}
             onVariantSelect={(variantName) =>

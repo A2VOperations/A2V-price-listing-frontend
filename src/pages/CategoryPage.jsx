@@ -1,11 +1,19 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import ProductCard from "@/components/product/ProductCard";
 import EmptyState from "@/components/common/EmptyState";
 import StickerCalculator from "@/components/product/StickerCalculator";
-import { FiSearch, FiLayers, FiGrid, FiList } from "react-icons/fi";
+import {
+  FiSearch,
+  FiLayers,
+  FiGrid,
+  FiList,
+  FiMaximize2,
+  FiTv,
+} from "react-icons/fi";
+import { TbCalculator } from "react-icons/tb";
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -26,6 +34,12 @@ export default function CategoryPage() {
     category?.slug === "stickers-labels" ||
     category?.id === "stickers" ||
     category?.slug === "stickers";
+
+  const isFlexOrStandee =
+    category?.id === "flex-board" ||
+    category?.slug === "flex-board" ||
+    slug === "standie" ||
+    slug === "standee";
 
   const [activeTab, setActiveTab] = useState("calculator"); // 'calculator' | 'products'
 
@@ -93,7 +107,7 @@ export default function CategoryPage() {
           </div>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
             {category.description ||
-              "Browse all available sticker and label specifications, sheet layouts, GSM grades, and custom finishing options."}
+              "Browse all available specifications, sheet layouts, GSM grades, and custom finishing options."}
           </p>
         </div>
 
@@ -109,13 +123,71 @@ export default function CategoryPage() {
         </div>
       </div>
 
+      {/* Dedicated Calculators Section Alert Banners */}
+      {isFlexOrStandee && (
+        <div className="bg-gradient-to-r from-orange-50 via-white to-blue-50 rounded-2xl border border-orange-200/90 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-600 text-white font-mono shadow-xs">
+              <TbCalculator className="w-3.5 h-3.5" />
+              Dedicated Calculators Section
+            </span>
+            <h3 className="text-sm font-bold text-slate-900">
+              Flex Board &amp; Standee Interactive Price Calculators
+            </h3>
+            <p className="text-xs text-slate-600 max-w-2xl">
+              Flex Boards &amp; Standees have their own dedicated calculation tools with live dimensions, framing, and instant quotation PDF generation.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/calculators/flex-board"
+              className="px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <FiMaximize2 className="w-3.5 h-3.5" />
+              <span>Flex Board Calculator</span>
+            </Link>
+            <Link
+              to="/calculators/standee"
+              className="px-3.5 py-2 rounded-lg text-xs font-bold text-blue-900 bg-blue-100/80 hover:bg-blue-200/80 border border-blue-200 shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <FiTv className="w-3.5 h-3.5 text-blue-700" />
+              <span>Standee Calculator (3 Models)</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {isStickerCategory && (
+        <div className="bg-emerald-50/80 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="p-2 rounded-xl bg-emerald-600 text-white">
+              <TbCalculator className="w-4 h-4" />
+            </span>
+            <div>
+              <h4 className="text-xs font-bold text-slate-900">
+                Sticker Sheet Calculator (12×18 &amp; 13×19)
+              </h4>
+              <p className="text-[11px] text-slate-600">
+                Calculate nested sheet quantities, cuts, Chromo &amp; Vinyl media with instant quotation.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/calculators/stickers"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-colors self-start sm:self-auto"
+          >
+            Open in Calculators Section →
+          </Link>
+        </div>
+      )}
+
       {/* If Sticker Category: Render Tabs for Interactive Calculator & Catalog */}
       {isStickerCategory && (
         <div className="flex border-b border-slate-200 gap-3">
           <button
             type="button"
             onClick={() => setActiveTab("calculator")}
-            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
+            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
               activeTab === "calculator"
                 ? "border-orange-600 text-orange-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"
@@ -127,7 +199,7 @@ export default function CategoryPage() {
           <button
             type="button"
             onClick={() => setActiveTab("products")}
-            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
+            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
               activeTab === "products"
                 ? "border-orange-600 text-orange-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"

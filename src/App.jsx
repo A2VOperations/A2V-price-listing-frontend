@@ -1,55 +1,120 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import PageContainer from "@/components/layout/PageContainer";
 import DashboardPage from "@/pages/DashboardPage";
 import CategoryPage from "@/pages/CategoryPage";
 import ProductPage from "@/pages/ProductPage";
 import QuotesPage from "@/pages/QuotesPage";
-import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import CalculatorsPage from "@/pages/CalculatorsPage";
+import LoginPage from "@/pages/LoginPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import CategoryManager from "@/pages/admin/CategoryManager";
 import ProductManager from "@/pages/admin/ProductManager";
-import AdminProtectedRoute from "@/components/admin/AdminProtectedRoute";
+import UserManager from "@/pages/admin/UserManager";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function App() {
   return (
     <PageContainer>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/category/:slug" element={<CategoryPage />} />
-        <Route path="/product/:slug" element={<ProductPage />} />
-        <Route path="/quotes" element={<QuotesPage />} />
-        
-        {/* Admin Login */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
+        {/* Global Login Section */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
-        {/* Protected Admin Routes */}
+        {/* Protected Overall Project Storefront Routes (Accessible by both User and Admin) */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calculators"
+          element={
+            <ProtectedRoute>
+              <CalculatorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calculators/:type"
+          element={
+            <ProtectedRoute>
+              <CalculatorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calculator/:type"
+          element={
+            <ProtectedRoute>
+              <CalculatorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/category/:slug"
+          element={
+            <ProtectedRoute>
+              <CategoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product/:slug"
+          element={
+            <ProtectedRoute>
+              <ProductPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quotes"
+          element={
+            <ProtectedRoute>
+              <QuotesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Admin Routes (Only Accessible by Admin role) */}
         <Route
           path="/admin"
           element={
-            <AdminProtectedRoute>
+            <ProtectedRoute requireAdmin>
               <AdminDashboard />
-            </AdminProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/categories"
           element={
-            <AdminProtectedRoute>
+            <ProtectedRoute requireAdmin>
               <CategoryManager />
-            </AdminProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/products"
           element={
-            <AdminProtectedRoute>
+            <ProtectedRoute requireAdmin>
               <ProductManager />
-            </AdminProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute requireAdmin>
+              <UserManager />
+            </ProtectedRoute>
           }
         />
 
-        <Route path="*" element={<DashboardPage />} />
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PageContainer>
   );

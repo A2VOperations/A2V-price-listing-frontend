@@ -133,22 +133,93 @@ export async function uploadMultipleImagesApi(files) {
   return data.urls || (data.url ? [data.url] : []);
 }
 
-export async function adminLoginApi(username, password) {
+// ----------------- Authentication & User Management APIs -----------------
+
+export async function loginApi(username, password) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Invalid Login ID or Password");
+  if (!res.ok) throw new Error(data.message || "Invalid username or password");
   return data;
 }
 
-export async function verifyAdminTokenApi(token) {
-  const res = await fetch(`${API_BASE}/api/auth/verify`, {
+export async function verifyOtpApi(tempToken, otp) {
+  const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tempToken, otp }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to verify OTP code");
+  return data;
+}
+
+export async function resendOtpApi(tempToken) {
+  const res = await fetch(`${API_BASE}/api/auth/resend-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tempToken }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to resend OTP");
+  return data;
+}
+
+export async function fetchCurrentUserApi(token) {
+  const res = await fetch(`${API_BASE}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Invalid Token");
+  if (!res.ok) throw new Error(data.message || "Failed to authenticate session");
+  return data.user;
+}
+
+export async function fetchUsersApi(token) {
+  const res = await fetch(`${API_BASE}/api/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch users");
+  return data.data;
+}
+
+export async function createUserApi(userData, token) {
+  const res = await fetch(`${API_BASE}/api/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(userData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create user");
+  return data.data;
+}
+
+export async function updateUserApi(id, userData, token) {
+  const res = await fetch(`${API_BASE}/api/users/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(userData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update user");
+  return data.data;
+}
+
+export async function deleteUserApi(id, token) {
+  const res = await fetch(`${API_BASE}/api/users/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete user");
   return data;
 }
