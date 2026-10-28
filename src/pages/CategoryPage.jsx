@@ -12,12 +12,14 @@ export default function CategoryPage() {
   const { getCategoryBySlug, getProductsByCategory, loading } = useData();
   const category =
     getCategoryBySlug(slug) ||
-    (slug === "standie" || slug === "standee" ? getCategoryBySlug("flex-board") : null);
+    (slug === "standie" || slug === "standee"
+      ? getCategoryBySlug("flex-board")
+      : null);
   const allProducts = category ? getProductsByCategory(category.id) : [];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState(
-    slug === "standie" || slug === "standee" ? "STANDIE" : "all"
+    slug === "standie" || slug === "standee" ? "STANDIE" : "all",
   );
   const isStickerCategory =
     category?.id === "stickers-labels" ||
@@ -31,7 +33,9 @@ export default function CategoryPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
         <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-sm font-medium text-slate-500">Loading category from MongoDB...</p>
+        <p className="text-sm font-medium text-slate-500">
+          Loading category from MongoDB...
+        </p>
       </div>
     );
   }
@@ -201,7 +205,9 @@ export default function CategoryPage() {
             ];
 
             const entries = Object.entries(groupedProducts).filter(
-              ([subName]) => selectedSubCategory === "all" || subName === selectedSubCategory
+              ([subName]) =>
+                selectedSubCategory === "all" ||
+                subName === selectedSubCategory,
             );
 
             entries.sort((a, b) => {
@@ -224,12 +230,14 @@ export default function CategoryPage() {
               if (subCategoryName.toUpperCase().includes("STANDIE")) {
                 titleColor = "text-[#1D4ED8]";
                 borderColor = "border-[#2563EB]";
-                subtitle = "Portable aluminium roll-up standees with carry bags for exhibitions, retail counters, events & promotions.";
+                subtitle =
+                  "Portable aluminium roll-up standees with carry bags for exhibitions, retail counters, events & promotions.";
                 badgeColor = "bg-blue-100 text-blue-800";
               } else if (subCategoryName.toUpperCase().includes("FLEX BOARD")) {
                 titleColor = "text-[#C2410C]";
                 borderColor = "border-[#EA580C]";
-                subtitle = "Custom outdoor flex board printing with iron/wooden structure framing, support rods & on-site fitting.";
+                subtitle =
+                  "Custom outdoor flex board printing with iron/wooden structure framing, support rods & on-site fitting.";
                 badgeColor = "bg-orange-100 text-orange-800";
               } else if (subCategoryName.includes("500 GSM")) {
                 titleColor = "text-[#D97706]";
@@ -253,7 +261,9 @@ export default function CategoryPage() {
 
               return (
                 <div key={subCategoryName} className="space-y-4">
-                  <div className={`border-b-2 ${borderColor} pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1`}>
+                  <div
+                    className={`border-b-2 ${borderColor} pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1`}
+                  >
                     <div>
                       <div className="flex items-center gap-2">
                         <h2
@@ -261,12 +271,17 @@ export default function CategoryPage() {
                         >
                           {subCategoryName}
                         </h2>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${badgeColor}`}>
-                          {prods.length} {prods.length === 1 ? "Product" : "Products"}
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${badgeColor}`}
+                        >
+                          {prods.length}{" "}
+                          {prods.length === 1 ? "Product" : "Products"}
                         </span>
                       </div>
                       {subtitle && (
-                        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {subtitle}
+                        </p>
                       )}
                     </div>
                   </div>

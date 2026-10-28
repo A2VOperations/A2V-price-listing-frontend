@@ -430,7 +430,7 @@ export default function ProductOrderForm({
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-slate-300 overflow-hidden shadow-xs divide-y divide-slate-200">
+        <div className="bg-white rounded-lg border border-slate-300 overflow-hidden shadow-xs divide-y">
           {/* SELECT DETAIL Header */}
           <div className="px-4 py-3 bg-slate-50 font-black text-xs uppercase tracking-wider text-slate-900">
             SELECT DETAIL
@@ -439,7 +439,7 @@ export default function ProductOrderForm({
           {/* Quantity Row */}
           <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center space-x-2 font-bold text-orange-950">
-              <FiTag className="w-4 h-4 text-orange-600 flex-shrink-0" />
+              <FiTag className="w-4 h-4 text-orange-600 shrink-0" />
               <span>Qty.</span>
             </div>
 
@@ -482,7 +482,7 @@ export default function ProductOrderForm({
                     type="number"
                     min={minQty}
                     step={currentProduct.quantityStep || 100}
-                    value={quantity}
+                    value={quantity} 
                     onChange={(e) =>
                       setQuantity(
                         Math.max(

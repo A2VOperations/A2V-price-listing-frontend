@@ -16,7 +16,8 @@ const ROLLUP_MEDIA_TYPES = [
     name: "Star Flex",
     defaultRate: 30,
     tag: "High Gloss",
-    description: "High durability glossy flex with vivid color contrast and rich ink saturation.",
+    description:
+      "High durability glossy flex with vivid color contrast and rich ink saturation.",
   },
 ];
 
@@ -25,7 +26,8 @@ const MACHINE_OPTIONS = {
     id: "standard",
     name: "Standard Aluminium Roll-Up Machine Base",
     tag: "Standard Base",
-    description: "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
+    description:
+      "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
     defaultRates: {
       2.5: 1250,
       3: 1350,
@@ -35,7 +37,8 @@ const MACHINE_OPTIONS = {
     id: "luxury",
     name: "Luxury Broad Base Teardrop Roll-Up Machine",
     tag: "Luxury Broad Base",
-    description: "Heavy-duty teardrop wide-footprint cassette with chrome mirror endcaps, superior stability without swivel feet, and deluxe padded travel bag.",
+    description:
+      "Heavy-duty teardrop wide-footprint cassette with chrome mirror endcaps, superior stability without swivel feet, and deluxe padded travel bag.",
     defaultRates: {
       2.5: 1200,
       3: 1500,
@@ -75,7 +78,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Mode helpers
-  const includeMachine = orderMode === "complete" || orderMode === "machine-only";
+  const includeMachine =
+    orderMode === "complete" || orderMode === "machine-only";
   const includeBanner = orderMode === "complete" || orderMode === "banner-only";
 
   // Calculations
@@ -86,27 +90,38 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
   const totalAreaSqFt = parseFloat((validWidth * validHeight).toFixed(2));
 
   // Machine cost
-  const activeMachineConfig = MACHINE_OPTIONS[machineType] || MACHINE_OPTIONS.standard;
-  const machineUnitCost = includeMachine ? Math.max(0, parseFloat(customMachineRate) || 0) : 0;
+  const activeMachineConfig =
+    MACHINE_OPTIONS[machineType] || MACHINE_OPTIONS.standard;
+  const machineUnitCost = includeMachine
+    ? Math.max(0, parseFloat(customMachineRate) || 0)
+    : 0;
 
   // Flex cost
   const validFlexRate = Math.max(0, parseFloat(customFlexRate) || 0);
-  const bannerUnitCost = includeBanner ? Math.round(totalAreaSqFt * validFlexRate) : 0;
+  const bannerUnitCost = includeBanner
+    ? Math.round(totalAreaSqFt * validFlexRate)
+    : 0;
 
   // Unit Total
   const unitTotal = machineUnitCost + bannerUnitCost;
   const grossSubtotal = Math.round(unitTotal * quantity);
-  const validDiscount = Math.max(0, Math.min(grossSubtotal, parseFloat(discount) || 0));
+  const validDiscount = Math.max(
+    0,
+    Math.min(grossSubtotal, parseFloat(discount) || 0),
+  );
   const netAmountPayable = Math.max(0, grossSubtotal - validDiscount);
 
   // Active media object
   const activeMedia =
-    ROLLUP_MEDIA_TYPES.find((m) => m.id === selectedMediaId) || ROLLUP_MEDIA_TYPES[0];
+    ROLLUP_MEDIA_TYPES.find((m) => m.id === selectedMediaId) ||
+    ROLLUP_MEDIA_TYPES[0];
 
   // Handle Fixed Width change (updates machine default rate)
   const handleWidthChange = (newWidth) => {
     setFixedWidth(newWidth);
-    const newRate = activeMachineConfig.defaultRates[newWidth] || (newWidth === 3 ? 1350 : 1250);
+    const newRate =
+      activeMachineConfig.defaultRates[newWidth] ||
+      (newWidth === 3 ? 1350 : 1250);
     setCustomMachineRate(newRate);
   };
 
@@ -133,8 +148,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
         includeMachine && includeBanner
           ? "Machine + Banner"
           : includeMachine
-          ? "Hardware Machine Only"
-          : "Banner Print Only"
+            ? "Hardware Machine Only"
+            : "Banner Print Only"
       })`,
       categoryId: "flex-board",
       subCategory: "STANDIE",
@@ -153,7 +168,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
         "Flex Printing Substrate": includeBanner
           ? `${activeMedia.name} (${totalAreaSqFt} sq.ft. @ ₹${validFlexRate}/sqft = ₹${bannerUnitCost})`
           : "Not Included (Hardware Only)",
-        "Carry Bag": includeMachine ? "Complimentary Padded Shoulder Bag Included" : "N/A",
+        "Carry Bag": includeMachine
+          ? "Complimentary Padded Shoulder Bag Included"
+          : "N/A",
       },
     };
 
@@ -187,7 +204,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
           clientName: clientName.trim(),
           phone: clientPhone.trim(),
         },
-        productName: "Roll-Up Standee System (Hardware Machine + Custom Height Banner)",
+        productName:
+          "Roll-Up Standee System (Hardware Machine + Custom Height Banner)",
       });
     } catch (err) {
       console.error("PDF generation failed:", err);
@@ -221,7 +239,10 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
             Roll-Up Standee Machine & Banner System
           </h1>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Professional aluminium roll-up standee with fixed width base (<strong>2.5 Ft</strong> or <strong>3 Ft</strong>), customizable display height, heavy-duty spring roller mechanism, 1440 DPI anti-curl banner printing, and padded shoulder travel bag.
+            Professional aluminium roll-up standee with fixed width base (
+            <strong>2.5 Ft</strong> or <strong>3 Ft</strong>), customizable
+            display height, heavy-duty spring roller mechanism, 1440 DPI
+            anti-curl banner printing, and padded shoulder travel bag.
           </p>
 
           {/* Quick Order Mode Selector */}
@@ -236,7 +257,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               }`}
             >
               Complete Standee
-              <span className="block text-[9.5px] font-normal text-slate-400">Machine + Banner</span>
+              <span className="block text-[9.5px] font-normal text-slate-400">
+                Machine + Banner
+              </span>
             </button>
 
             <button
@@ -249,7 +272,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               }`}
             >
               Machine Only
-              <span className="block text-[9.5px] font-normal text-slate-400">Hardware Stand & Bag</span>
+              <span className="block text-[9.5px] font-normal text-slate-400">
+                Hardware Stand & Bag
+              </span>
             </button>
 
             <button
@@ -262,7 +287,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               }`}
             >
               Banner Print Only
-              <span className="block text-[9.5px] font-normal text-slate-400">Replacement Print</span>
+              <span className="block text-[9.5px] font-normal text-slate-400">
+                Replacement Print
+              </span>
             </button>
           </div>
         </div>
@@ -312,18 +339,28 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                       : "border-slate-300"
                   }`}
                 >
-                  {fixedWidth === 2.5 && <FiCheckCircle className="w-3.5 h-3.5" />}
+                  {fixedWidth === 2.5 && (
+                    <FiCheckCircle className="w-3.5 h-3.5" />
+                  )}
                 </div>
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-slate-200/60 space-y-1 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Machine Base:</span>
-                  <span className="font-black text-blue-700 font-mono">₹1,250</span>
+                  <span className="text-slate-500 font-medium">
+                    Machine Base:
+                  </span>
+                  <span className="font-black text-blue-700 font-mono">
+                    ₹1,250
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                  <span className="font-bold text-slate-800 font-mono">Fixed 2.5 Ft</span>
+                  <span className="text-slate-500 font-medium">
+                    Inside Banner Width:
+                  </span>
+                  <span className="font-bold text-slate-800 font-mono">
+                    Fixed 2.5 Ft
+                  </span>
                 </div>
               </div>
             </div>
@@ -356,18 +393,28 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                       : "border-slate-300"
                   }`}
                 >
-                  {fixedWidth === 3 && <FiCheckCircle className="w-3.5 h-3.5" />}
+                  {fixedWidth === 3 && (
+                    <FiCheckCircle className="w-3.5 h-3.5" />
+                  )}
                 </div>
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-slate-200/60 space-y-1 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Machine Base:</span>
-                  <span className="font-black text-blue-700 font-mono">₹1,350</span>
+                  <span className="text-slate-500 font-medium">
+                    Machine Base:
+                  </span>
+                  <span className="font-black text-blue-700 font-mono">
+                    ₹1,350
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Inside Banner Width:</span>
-                  <span className="font-bold text-slate-800 font-mono">Fixed 3 Ft</span>
+                  <span className="text-slate-500 font-medium">
+                    Inside Banner Width:
+                  </span>
+                  <span className="font-bold text-slate-800 font-mono">
+                    Fixed 3 Ft
+                  </span>
                 </div>
               </div>
             </div>
@@ -428,14 +475,22 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               <div className="flex gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setCustomHeight((prev) => Math.max(1, (parseFloat(prev) || 6) - 0.5))}
+                  onClick={() =>
+                    setCustomHeight((prev) =>
+                      Math.max(1, (parseFloat(prev) || 6) - 0.5),
+                    )
+                  }
                   className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-lg flex items-center justify-center transition-colors"
                 >
                   -
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCustomHeight((prev) => Math.min(6, (parseFloat(prev) || 6) + 0.5))}
+                  onClick={() =>
+                    setCustomHeight((prev) =>
+                      Math.min(6, (parseFloat(prev) || 6) + 0.5),
+                    )
+                  }
                   className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-lg flex items-center justify-center transition-colors"
                 >
                   +
@@ -516,13 +571,19 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Fixed {validWidth} Ft (W) × {validHeight} Ft (H) = <strong className="text-slate-800 font-mono">{totalAreaSqFt} Sq.Ft.</strong> (Durable high-gloss finish with vivid colors)
+                    Fixed {validWidth} Ft (W) × {validHeight} Ft (H) ={" "}
+                    <strong className="text-slate-800 font-mono">
+                      {totalAreaSqFt} Sq.Ft.
+                    </strong>{" "}
+                    (Durable high-gloss finish with vivid colors)
                   </p>
                 </div>
               </div>
 
               <div className="text-right sm:border-l sm:border-blue-200 sm:pl-5 shrink-0">
-                <span className="text-xs text-slate-500 block">Banner Total:</span>
+                <span className="text-xs text-slate-500 block">
+                  Banner Total:
+                </span>
                 <span className="text-lg font-black text-blue-700 font-mono block">
                   ₹{bannerUnitCost}
                 </span>
@@ -546,7 +607,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               </h2>
             </div>
             <span className="text-xs font-semibold text-slate-500">
-              Unit Subtotal: <strong className="text-slate-900 font-mono">₹{unitTotal}</strong>
+              Unit Subtotal:{" "}
+              <strong className="text-slate-900 font-mono">₹{unitTotal}</strong>
             </span>
           </div>
 
@@ -568,7 +630,9 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                   type="number"
                   min="1"
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                  }
                   className="flex-1 py-2 px-3 rounded-xl border border-slate-300 font-black text-slate-900 text-center text-base font-mono outline-hidden"
                 />
                 <button
@@ -660,7 +724,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
               ) : (
                 <>
                   <FiShoppingBag className="w-5 h-5" />
-                  Add to Quote Cart (₹{netAmountPayable.toLocaleString("en-IN")})
+                  Add to Quote Cart (₹{netAmountPayable.toLocaleString("en-IN")}
+                  )
                 </>
               )}
             </button>
@@ -721,7 +786,8 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
             {includeBanner && (
               <div className="flex items-center justify-between text-slate-600">
                 <span>
-                  Banner Print ({totalAreaSqFt} sqft × {quantity} @ ₹{validFlexRate}):
+                  Banner Print ({totalAreaSqFt} sqft × {quantity} @ ₹
+                  {validFlexRate}):
                 </span>
                 <span className="font-mono font-semibold text-slate-900">
                   ₹{(bannerUnitCost * quantity).toLocaleString("en-IN")}
@@ -745,13 +811,17 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
 
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between font-bold text-slate-700">
               <span>Gross Subtotal:</span>
-              <span className="font-mono">₹{grossSubtotal.toLocaleString("en-IN")}</span>
+              <span className="font-mono">
+                ₹{grossSubtotal.toLocaleString("en-IN")}
+              </span>
             </div>
 
             {validDiscount > 0 && (
               <div className="flex items-center justify-between text-red-600 font-bold">
                 <span>Special Discount:</span>
-                <span className="font-mono">- ₹{validDiscount.toLocaleString("en-IN")}</span>
+                <span className="font-mono">
+                  - ₹{validDiscount.toLocaleString("en-IN")}
+                </span>
               </div>
             )}
           </div>
