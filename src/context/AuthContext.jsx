@@ -5,11 +5,29 @@ const AuthContext = createContext();
 
 const AUTH_STORAGE_KEY = "a2v_portal_auth_session";
 
+export const SESSION_DURATION_HOURS = 8;
+export const SESSION_DURATION_MS = SESSION_DURATION_HOURS * 60 * 60 * 1000; // 8 hours (28,800,000 ms)
+
+const getSessionExpiry = (sess) => {
+  if (!sess) return 0;
+  if (sess.expiresAt) return Number(sess.expiresAt);
+  if (sess.loginTime) return new Date(sess.loginTime).getTime() + SESSION_DURATION_MS;
+  return 0;
+};
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(() => {
     try {
       const saved = localStorage.getItem(AUTH_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      const expiry = getSessionExpiry(parsed);
+      // Auto-clear if already past 8 hours
+      if (expiry && Date.now() >= expiry) {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return null;
+      }
+      return parsed;
     } catch (e) {
       return null;
     }
@@ -23,6 +41,14 @@ export function AuthProvider({ children }) {
 
     async function checkAuth() {
       if (session?.token) {
+        // First check client-side 8-hour expiry
+        const expiry = getSessionExpiry(session);
+        if (expiry && Date.now() >= expiry) {
+          logout("Your 8-hour session has expired. Please sign in again.");
+          if (isMounted) setLoading(false);
+          return;
+        }
+
         try {
           const user = await fetchCurrentUserApi(session.token);
           if (isMounted) {
@@ -32,8 +58,7 @@ export function AuthProvider({ children }) {
           console.warn("Session check with backend database failed:", err.message);
           // If token was rejected or expired by backend, clear session
           if (isMounted) {
-            setSession(null);
-            localStorage.removeItem(AUTH_STORAGE_KEY);
+            logout("Your 8-hour session has expired. Please sign in again.");
           }
         }
       }
@@ -48,6 +73,37 @@ export function AuthProvider({ children }) {
       isMounted = false;
     };
   }, []);
+
+  // Automatic timer & active watchdog for 8-hour session auto-logout
+  useEffect(() => {
+    if (!session?.token) return;
+
+    const expiryTime = getSessionExpiry(session);
+    const now = Date.now();
+    const timeLeft = expiryTime - now;
+
+    if (timeLeft <= 0) {
+      logout("Your 8-hour session has expired. Please sign in again.");
+      return;
+    }
+
+    // Timer that triggers exactly when 8 hours have elapsed
+    const timer = setTimeout(() => {
+      logout("Your 8-hour session has expired. Please sign in again.");
+    }, timeLeft);
+
+    // Watchdog checking every 15 seconds (detects computer sleep/wake or background tab resumption)
+    const watchdog = setInterval(() => {
+      if (Date.now() >= expiryTime) {
+        logout("Your 8-hour session has expired. Please sign in again.");
+      }
+    }, 15000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(watchdog);
+    };
+  }, [session]);
 
   /**
    * Step 1: Submit credentials (ID + Password)
@@ -74,10 +130,13 @@ export function AuthProvider({ children }) {
 
     // Direct login fallback if OTP was disabled on server
     if (res && res.success && res.token) {
+      const now = Date.now();
+      const expiresAt = res.expiresAt || (now + SESSION_DURATION_MS);
       const sessionData = {
         token: res.token,
         user: res.user,
-        loginTime: new Date().toISOString(),
+        loginTime: new Date(now).toISOString(),
+        expiresAt,
       };
       setSession(sessionData);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionData));
@@ -99,10 +158,13 @@ export function AuthProvider({ children }) {
     const res = await verifyOtpApi(tempToken, cleanOtp);
 
     if (res && res.success && res.token) {
+      const now = Date.now();
+      const expiresAt = res.expiresAt || (now + SESSION_DURATION_MS);
       const sessionData = {
         token: res.token,
         user: res.user,
-        loginTime: new Date().toISOString(),
+        loginTime: new Date(now).toISOString(),
+        expiresAt,
       };
       setSession(sessionData);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionData));
@@ -119,9 +181,12 @@ export function AuthProvider({ children }) {
     return await resendOtpApi(tempToken);
   };
 
-  const logout = () => {
+  const logout = (reason = null) => {
     setSession(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    if (reason && typeof reason === "string") {
+      sessionStorage.setItem("a2v_logout_reason", reason);
+    }
   };
 
   const user = session?.user || null;

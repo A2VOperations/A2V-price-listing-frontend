@@ -42,6 +42,15 @@ export default function LoginPage() {
   const [infoMsg, setInfoMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Check if user was automatically logged out (e.g. 8-hour session expiry)
+  useEffect(() => {
+    const reason = sessionStorage.getItem("a2v_logout_reason");
+    if (reason) {
+      setError(reason);
+      sessionStorage.removeItem("a2v_logout_reason");
+    }
+  }, []);
+
   // If already logged in, redirect to destination
   useEffect(() => {
     if (isAuthenticated) {
