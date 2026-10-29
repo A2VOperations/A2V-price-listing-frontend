@@ -19,7 +19,6 @@ import {
   FiCheck,
   FiX,
   FiAlertCircle,
-  FiMail,
   FiKey,
 } from "react-icons/fi";
 
@@ -35,7 +34,6 @@ export default function UserManager() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({
     username: "",
-    email: "",
     name: "",
     password: "",
     role: "user",
@@ -46,7 +44,6 @@ export default function UserManager() {
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({
     name: "",
-    email: "",
     role: "user",
     newPassword: "",
   });
@@ -76,17 +73,17 @@ export default function UserManager() {
     setError("");
     setSuccessMsg("");
 
-    if (!createForm.username.trim() || !createForm.email.trim() || !createForm.password.trim()) {
-      setError("Username, Email, and Password are all required.");
+    if (!createForm.username.trim() || !createForm.password.trim()) {
+      setError("Username and Password are required.");
       return;
     }
 
     try {
       setIsCreating(true);
       await createUserApi(createForm, token);
-      setSuccessMsg(`User '${createForm.username}' created successfully with email '${createForm.email}'!`);
+      setSuccessMsg(`User '${createForm.username}' created successfully!`);
       setIsCreateOpen(false);
-      setCreateForm({ username: "", email: "", name: "", password: "", role: "user" });
+      setCreateForm({ username: "", name: "", password: "", role: "user" });
       loadUsers();
     } catch (err) {
       setError(err.message || "Failed to create user.");
@@ -100,7 +97,6 @@ export default function UserManager() {
     setEditingUser(u);
     setEditForm({
       name: u.name || "",
-      email: u.email || "",
       role: u.role || "user",
       newPassword: "",
     });
@@ -118,7 +114,6 @@ export default function UserManager() {
       setIsUpdating(true);
       const payload = {
         name: editForm.name,
-        email: editForm.email,
         role: editForm.role,
       };
       if (editForm.newPassword.trim()) {
@@ -146,7 +141,7 @@ export default function UserManager() {
 
     if (
       window.confirm(
-        `Are you sure you want to delete user "${u.username}" (${u.email || "No Email"})? This action cannot be undone.`
+        `Are you sure you want to delete user "${u.username}"? This action cannot be undone.`
       )
     ) {
       try {
@@ -165,7 +160,6 @@ export default function UserManager() {
     const term = searchTerm.toLowerCase();
     return (
       (u.username || "").toLowerCase().includes(term) ||
-      (u.email || "").toLowerCase().includes(term) ||
       (u.name || "").toLowerCase().includes(term) ||
       (u.role || "").toLowerCase().includes(term)
     );
@@ -182,10 +176,10 @@ export default function UserManager() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div>
             <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <FiUsers className="w-5 h-5 text-orange-600" /> User Management & OTP Configuration
+              <FiUsers className="w-5 h-5 text-orange-600" /> User Management
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Create and manage user accounts in the database. Each user requires an email address for <strong>Supabase Email OTP</strong> delivery.
+              Create and manage user accounts in the database. For security, all login OTP codes are dispatched exclusively to the <strong>Administrator email</strong>.
             </p>
           </div>
 
@@ -296,7 +290,6 @@ export default function UserManager() {
               <thead className="bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-100">
                 <tr>
                   <th className="py-3 px-4 sm:px-6">User / Login ID</th>
-                  <th className="py-3 px-4">Email Address (for OTP)</th>
                   <th className="py-3 px-4">Full Name</th>
                   <th className="py-3 px-4">Access Role</th>
                   <th className="py-3 px-4">Created Date</th>
@@ -306,14 +299,14 @@ export default function UserManager() {
               <tbody className="divide-y divide-slate-100">
                 {loading && users.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-12 text-center text-slate-400">
+                    <td colSpan="5" className="py-12 text-center text-slate-400">
                       <div className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-600 rounded-full animate-spin mx-auto mb-2" />
                       Loading users from database...
                     </td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-12 text-center text-slate-400">
+                    <td colSpan="5" className="py-12 text-center text-slate-400">
                       No users match your search criteria.
                     </td>
                   </tr>
@@ -346,13 +339,6 @@ export default function UserManager() {
                               </div>
                               <div className="text-[11px] text-slate-400">Login ID</div>
                             </div>
-                          </div>
-                        </td>
-
-                        <td className="py-3.5 px-4 font-mono text-slate-700">
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <FiMail className="w-3.5 h-3.5 text-orange-500" />
-                            <span>{u.email || <span className="text-slate-400 italic">No email</span>}</span>
                           </div>
                         </td>
 
@@ -420,7 +406,7 @@ export default function UserManager() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Create New Account</h3>
-                  <p className="text-[11px] text-slate-400">Stores user in database & enables Supabase OTP</p>
+                  <p className="text-[11px] text-slate-400">Stores user in database (Login OTP sent to Admin)</p>
                 </div>
               </div>
               <button
@@ -444,24 +430,6 @@ export default function UserManager() {
                   onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white font-medium"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email Address (for Supabase OTP) <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. user@company.com"
-                    value={createForm.email}
-                    onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white font-medium"
-                  />
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1">Verification OTP will be sent to this email upon signing in.</p>
               </div>
 
               <div>
@@ -570,7 +538,7 @@ export default function UserManager() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Edit User: {editingUser.username}</h3>
-                  <p className="text-[11px] text-slate-400">Modify email, profile or set new password</p>
+                  <p className="text-[11px] text-slate-400">Modify profile or set new password</p>
                 </div>
               </div>
               <button
@@ -593,23 +561,6 @@ export default function UserManager() {
                   placeholder="Enter user's name"
                   className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white font-medium"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email Address (for Supabase OTP)
-                </label>
-                <div className="relative">
-                  <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <input
-                    type="email"
-                    required
-                    value={editForm.email}
-                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    placeholder="Enter user's email"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white font-medium"
-                  />
-                </div>
               </div>
 
               <div>

@@ -156,7 +156,7 @@ export default function LoginPage() {
             </h1>
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
               {step === "otp"
-                ? `Enter the verification code sent to ${maskedEmail || "your email"}`
+                ? `Enter the verification code sent to Administrator (${maskedEmail || "Admin"})`
                 : "Sign in with your authorized ID and password."}
             </p>
           </div>
@@ -265,9 +265,9 @@ export default function LoginPage() {
                     <FiMail className="w-5 h-5" />
                   </div>
                   <div className="text-xs">
-                    <p className="font-bold text-slate-900">OTP Sent via Supabase</p>
+                    <p className="font-bold text-slate-900">OTP Sent to Administrator</p>
                     <p className="text-[11px] text-slate-600">
-                      We sent a 6-digit code to <strong className="text-slate-900">{maskedEmail}</strong>.
+                      Security verification code was sent to the Administrator email: <strong className="text-slate-900">{maskedEmail}</strong>.
                     </p>
                   </div>
                 </div>
