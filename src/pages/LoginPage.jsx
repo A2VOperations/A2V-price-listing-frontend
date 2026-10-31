@@ -87,7 +87,7 @@ export default function LoginPage() {
         setMaskedEmail(res.email);
         setStep("otp");
         setInfoMsg(res.message || `OTP code has been sent to ${res.email} via Supabase.`);
-        setResendCooldown(45); // 45 seconds cooldown for resend
+        setResendCooldown(res.cooldownSeconds || 60); // 60 seconds full Supabase cooldown
       } else {
         // Direct login if OTP was bypassed
         const target = location.state?.from?.pathname || (res?.role === "admin" ? "/admin" : "/");
@@ -134,7 +134,7 @@ export default function LoginPage() {
       setIsSubmitting(true);
       const res = await resendOtp(tempToken);
       setInfoMsg(res?.message || "A fresh OTP code has been sent to your email.");
-      setResendCooldown(45);
+      setResendCooldown(res?.cooldownSeconds || 60);
     } catch (err) {
       setError(err.message || "Failed to resend OTP. Please try again.");
     } finally {
@@ -291,7 +291,7 @@ export default function LoginPage() {
                     autoFocus
                     maxLength={10}
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\s+/g, ""))}
+                    onChange={(e) => setOtp(e.target.value.replace(/[^0-9a-zA-Z]/g, ""))}
                     placeholder="e.g. 123456"
                     className="w-full text-center tracking-[0.3em] font-mono text-xl py-3 px-4 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-bold transition-all"
                   />

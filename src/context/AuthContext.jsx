@@ -125,6 +125,8 @@ export function AuthProvider({ children }) {
         tempToken: res.tempToken,
         email: res.email,
         message: res.message,
+        rateLimited: res.rateLimited,
+        cooldownSeconds: res.cooldownSeconds,
       };
     }
 
