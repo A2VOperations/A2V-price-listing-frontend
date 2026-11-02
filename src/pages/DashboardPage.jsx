@@ -1,22 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  FiGrid,
-  FiSearch,
-  FiArrowRight,
-  FiMaximize2,
-  FiTv,
-  FiTag,
-  FiCheckCircle,
-} from "react-icons/fi";
+import { FiGrid, FiSearch } from "react-icons/fi";
 import { TbCalculator } from "react-icons/tb";
 import CategoryGrid from "@/components/category/CategoryGrid";
-import { useQuote } from "@/context/QuoteContext";
+import CategoryCard from "@/components/category/CategoryCard";
 import { useData } from "@/context/DataContext";
 
+import flexImg from "@/assets/images/categories (14).webp";
+import stickersImg from "@/assets/images/categories (9).webp";
+import standieImg from "@/assets/images/luxury-standie.jpg";
+
 export default function DashboardPage() {
-  const { categories, products, loading, error, refreshData } = useData();
-  const { itemCount, totalQuoteAmount } = useQuote();
+  const { categories, loading, error, refreshData } = useData();
   const [searchTerm, setSearchTerm] = useState("");
 
   if (loading) {
@@ -45,76 +39,120 @@ export default function DashboardPage() {
     );
   }
 
+  // Custom Price Categories (Flex Board, Stickers, Standee) rendered as Category Cards
+  const customPriceCategories = [
+    {
+      id: "flex-board",
+      slug: "flex-board",
+      destination: "/calculators/flex-board",
+      name: "Flex Board",
+      image: flexImg,
+      badge: "Frame / Sq.Ft",
+      description:
+        "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods, and fitting.",
+    },
+    {
+      id: "stickers-labels",
+      slug: "stickers-labels",
+      destination: "/calculators/stickers",
+      name: "Stickers & Labels",
+      image: stickersImg,
+      badge: "12×18 & 13×19",
+      description:
+        "Custom die-cut paper, waterproof vinyl, and transparent sticker sheet nesting calculator.",
+    },
+    {
+      id: "standie",
+      slug: "standie",
+      destination: "/calculators/standee",
+      name: "Standee Displays",
+      image: standieImg,
+      badge: "3 Models",
+      description:
+        "Portable Roll-Up Standees, Heavy-Duty MS Iron Frame Standees, and A-Frame Tent Easel Huts.",
+    },
+  ];
+
+  // Exact standard category ordering shown in Image 1:
+  // Row 1: Files & Folders, Envelopes, ATM Pouches, Pens, Visiting Cards
+  // Row 2: Bill Books, Pamphlet / Posters, Tags, Letter Heads, Digital Paper Printing
+  const image1Order = [
+    "files",
+    "envelopes",
+    "atm-pouches",
+    "pens",
+    "visiting-cards",
+    "bill-books",
+    "pamphlets-posters",
+    "tags",
+    "letter-heads",
+    "digital-paper-printing",
+    "card-holders",
+  ];
+
+  // Standard Product Catalog (exclude flex-board, standee, and stickers which are in the top price category display)
+  const standardCategories = categories
+    .filter(
+      (c) =>
+        c.slug !== "flex-board" &&
+        c.id !== "flex-board" &&
+        c.slug !== "stickers-labels" &&
+        c.id !== "stickers-labels" &&
+        c.slug !== "stickers" &&
+        c.slug !== "standie" &&
+        c.id !== "standie" &&
+        c.slug !== "standee" &&
+        c.id !== "standee" &&
+        !c.name.toLowerCase().includes("stand") &&
+        !c.name.toLowerCase().includes("flex") &&
+        !c.name.toLowerCase().includes("sticker"),
+    )
+    .sort((a, b) => {
+      const indexA = image1Order.indexOf(a.id || a.slug);
+      const indexB = image1Order.indexOf(b.id || b.slug);
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
   // Filter categories for search
-  const filteredCategories = categories.filter(
+  const filteredCategories = standardCategories.filter(
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.description &&
         c.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  const calculatorCards = [
-    {
-      id: "flex-board",
-      title: "Flex Board Calculator",
-      subtitle: "Custom Size Printing & Iron/Wooden Framing",
-      description:
-        "Calculate square feet rates, Star & Normal flex materials, welded iron / wooden batten framing, support rods, and on-site fitting.",
-      link: "/calculators/flex-board",
-      icon: FiMaximize2,
-      badge: "Frame / Sq.Ft",
-      badgeColor: "bg-orange-100 text-orange-800 border-orange-200",
-      accentBg: "bg-orange-50 border-orange-200 hover:border-orange-500",
-      iconBg: "bg-orange-600 text-white",
-      features: [
-        "Normal, Star & Blackout Flex",
-        "Iron & Wooden Frame Options",
-        "Support Rods & On-site Fitting",
-      ],
-    },
-    {
-      id: "standee",
-      title: "Standee Calculator",
-      subtitle: "Roll-Up Aluminium, Welded Iron & A-Frame Huts",
-      description:
-        "Instant pricing for portable roll-up standees (2.5 & 3 ft width with carry bag), heavy-duty welded MS iron standees, and triangular tent huts.",
-      link: "/calculators/standee",
-      icon: FiTv,
-      badge: "3 Display Models",
-      badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
-      accentBg: "bg-blue-50/70 border-blue-200 hover:border-blue-500",
-      iconBg: "bg-blue-600 text-white",
-      features: [
-        "Aluminium Roll-Up (Standard & Luxury)",
-        "Heavy-Duty MS Iron Frame Standee",
-        "A-Frame Hut Tent (Iron 3kg/5kg/Wood)",
-      ],
-    },
-    {
-      id: "stickers",
-      title: "Sticker Sheet Calculator",
-      subtitle: "Digital 12×18 & 13×19 Sheet Nesting",
-      description:
-        "Automatic sheet nesting calculation for custom sticker dimensions, Chromo paper, waterproof Vinyl (Gloss/Matte), and die-cutting.",
-      link: "/calculators/stickers",
-      icon: FiTag,
-      badge: "12×18 & 13×19 Sheets",
-      badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
-      accentBg: "bg-emerald-50/70 border-emerald-200 hover:border-emerald-500",
-      iconBg: "bg-emerald-600 text-white",
-      features: [
-        "12×18 & 13×19 Sheet Sizes",
-        "Waterproof Vinyl & Chromo Paper",
-        "Half Cut & Full Die-Cut Options",
-      ],
-    },
-  ];
-
   return (
     <div className="space-y-10">
-      {/* SECTION 2: STANDARD PRODUCT CATALOG CATEGORIES */}
-      <section className="space-y-4" id="categories">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-200">
+      {/* SECTION 1: PRICE CATEGORY CUSTOMIZED DISPLAY (LOOKS LIKE PRODUCT CATEGORIES CATALOG) */}
+      <section className="space-y-4" id="custom-calculators">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-orange-600 text-white font-bold shadow-xs">
+              <TbCalculator className="w-5 h-5" />
+            </span>
+            <h2 className="text-lg font-bold text-slate-900">
+              Custom Price Calculators &amp; Displays
+            </h2>
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Custom size calculators and display hardware for Flex Boards, Sticker Sheets, and Standees.
+          </p>
+        </div>
+
+        {/* 3 Category Cards in Category Catalog Grid Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+          {customPriceCategories.map((cat) => (
+            <CategoryCard key={cat.id} category={cat} />
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 2: STANDARD PRODUCT CATEGORIES CATALOG (MATCHING IMAGE 1 DESIGN) */}
+      <section className="space-y-4 pt-4 border-t border-slate-200" id="categories">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="p-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold">
@@ -142,7 +180,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Category Grid Display */}
+        {/* Category Grid Display (Matching Image 1: 5 columns on desktop) */}
         <CategoryGrid categories={filteredCategories} />
       </section>
     </div>

@@ -10,20 +10,37 @@ export default function CategoryCard({ category }) {
     category.id === "flex-board" ||
     category.slug === "stickers-labels" ||
     category.slug === "stickers" ||
-    category.id === "stickers-labels";
+    category.id === "stickers-labels" ||
+    category.slug === "standie" ||
+    category.slug === "standee" ||
+    category.id === "standie" ||
+    category.id === "standee";
 
-  let destination = `/category/${category.slug}`;
+  let destination = category.destination || `/category/${category.slug}`;
   let actionText = "View Products";
-  let badgeText = null;
+  let badgeText = category.badge || null;
 
   if (category.slug === "flex-board" || category.id === "flex-board") {
     destination = "/calculators/flex-board";
     actionText = "Open Calculator";
-    badgeText = "Flex & Standee Tool";
-  } else if (category.slug === "stickers-labels" || category.slug === "stickers" || category.id === "stickers-labels") {
+    badgeText = category.badge || "Flex & Frame Tool";
+  } else if (
+    category.slug === "stickers-labels" ||
+    category.slug === "stickers" ||
+    category.id === "stickers-labels"
+  ) {
     destination = "/calculators/stickers";
     actionText = "Open Calculator";
-    badgeText = "Sheet Nesting Tool";
+    badgeText = category.badge || "Sheet Nesting Tool";
+  } else if (
+    category.slug === "standie" ||
+    category.slug === "standee" ||
+    category.id === "standie" ||
+    category.id === "standee"
+  ) {
+    destination = "/calculators/standee";
+    actionText = "Open Calculator";
+    badgeText = category.badge || "3 Models";
   }
 
   return (

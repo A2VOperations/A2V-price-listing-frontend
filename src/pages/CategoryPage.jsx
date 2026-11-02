@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import ProductCard from "@/components/product/ProductCard";
@@ -17,31 +17,49 @@ import { TbCalculator } from "react-icons/tb";
 
 export default function CategoryPage() {
   const { slug } = useParams();
+
+  // Standee and Flex Board are custom calculator categories: redirect directly to their dedicated calculator systems
+  if (slug === "standie" || slug === "standee") {
+    return <Navigate to="/calculators/standee" replace />;
+  }
+  if (slug === "flex-board") {
+    return <Navigate to="/calculators/flex-board" replace />;
+  }
+  if (slug === "stickers" || slug === "stickers-labels") {
+    return <Navigate to="/calculators/stickers" replace />;
+  }
+
   const { getCategoryBySlug, getProductsByCategory, loading } = useData();
-  const category =
-    getCategoryBySlug(slug) ||
-    (slug === "standie" || slug === "standee"
-      ? getCategoryBySlug("flex-board")
-      : null);
-  const allProducts = category ? getProductsByCategory(category.id) : [];
+  const category = getCategoryBySlug(slug);
+
+  // Retrieve products
+  let allProducts = [];
+  if (isStandeeSlug) {
+    const flexProducts = getProductsByCategory("flex-board") || [];
+    allProducts = flexProducts.filter(
+      (p) =>
+        p.subCategory?.includes("STANDIE") ||
+        p.isStandie ||
+        p.isRollUpStandie ||
+        p.isHutStandie ||
+        p.id?.startsWith("STD-") ||
+        p.slug?.includes("stand") ||
+        p.slug?.includes("rollup"),
+    );
+  } else if (category) {
+    allProducts = getProductsByCategory(category.id) || [];
+  }
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState(
-    slug === "standie" || slug === "standee" ? "STANDIE" : "all",
-  );
+  const [selectedSubCategory, setSelectedSubCategory] = useState("all");
+
   const isStickerCategory =
     category?.id === "stickers-labels" ||
     category?.slug === "stickers-labels" ||
     category?.id === "stickers" ||
     category?.slug === "stickers";
 
-  const isFlexOrStandee =
-    category?.id === "flex-board" ||
-    category?.slug === "flex-board" ||
-    slug === "standie" ||
-    slug === "standee";
-
-  const [activeTab, setActiveTab] = useState("calculator"); // 'calculator' | 'products'
+  const [activeTab, setActiveTab] = useState("products"); // 'calculator' | 'products'
 
   if (loading) {
     return (
@@ -79,7 +97,29 @@ export default function CategoryPage() {
   // Group products by subCategory if any exist
   const groupedProducts = {};
   filteredProducts.forEach((product) => {
-    const subCat = product.subCategory || "General Products";
+    let subCat = product.subCategory || "General Products";
+
+    // For Standee products, separate into distinct model subcategories (Roll-Up Standees, Iron Frame, Huts)
+    if (
+      product.isRollUpStandie ||
+      product.slug?.includes("rollup") ||
+      product.id === "STD-001"
+    ) {
+      subCat = "ROLL-UP STANDEES";
+    } else if (
+      product.isStandie ||
+      product.slug?.includes("iron-frame") ||
+      product.id === "STD-002"
+    ) {
+      subCat = "IRON FRAME STANDEES";
+    } else if (
+      product.isHutStandie ||
+      product.slug?.includes("hut") ||
+      product.id === "STD-003"
+    ) {
+      subCat = "STANDEE HUTS (A-FRAME)";
+    }
+
     if (!groupedProducts[subCat]) {
       groupedProducts[subCat] = [];
     }
@@ -95,6 +135,7 @@ export default function CategoryPage() {
     <div className="space-y-8">
       <Breadcrumb items={[{ label: category.name }]} />
 
+      {/* Category Header */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
@@ -123,79 +164,9 @@ export default function CategoryPage() {
         </div>
       </div>
 
-      {/* Dedicated Calculators Section Alert Banners */}
-      {isFlexOrStandee && (
-        <div className="bg-gradient-to-r from-orange-50 via-white to-blue-50 rounded-2xl border border-orange-200/90 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-600 text-white font-mono shadow-xs">
-              <TbCalculator className="w-3.5 h-3.5" />
-              Dedicated Calculators Section
-            </span>
-            <h3 className="text-sm font-bold text-slate-900">
-              Flex Board &amp; Standee Interactive Price Calculators
-            </h3>
-            <p className="text-xs text-slate-600 max-w-2xl">
-              Flex Boards &amp; Standees have their own dedicated calculation tools with live dimensions, framing, and instant quotation PDF generation.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              to="/calculators/flex-board"
-              className="px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 shadow-xs transition-colors flex items-center gap-1.5"
-            >
-              <FiMaximize2 className="w-3.5 h-3.5" />
-              <span>Flex Board Calculator</span>
-            </Link>
-            <Link
-              to="/calculators/standee"
-              className="px-3.5 py-2 rounded-lg text-xs font-bold text-blue-900 bg-blue-100/80 hover:bg-blue-200/80 border border-blue-200 shadow-xs transition-colors flex items-center gap-1.5"
-            >
-              <FiTv className="w-3.5 h-3.5 text-blue-700" />
-              <span>Standee Calculator (3 Models)</span>
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {isStickerCategory && (
-        <div className="bg-emerald-50/80 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="p-2 rounded-xl bg-emerald-600 text-white">
-              <TbCalculator className="w-4 h-4" />
-            </span>
-            <div>
-              <h4 className="text-xs font-bold text-slate-900">
-                Sticker Sheet Calculator (12×18 &amp; 13×19)
-              </h4>
-              <p className="text-[11px] text-slate-600">
-                Calculate nested sheet quantities, cuts, Chromo &amp; Vinyl media with instant quotation.
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/calculators/stickers"
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-colors self-start sm:self-auto"
-          >
-            Open in Calculators Section →
-          </Link>
-        </div>
-      )}
-
       {/* If Sticker Category: Render Tabs for Interactive Calculator & Catalog */}
       {isStickerCategory && (
         <div className="flex border-b border-slate-200 gap-3">
-          <button
-            type="button"
-            onClick={() => setActiveTab("calculator")}
-            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
-              activeTab === "calculator"
-                ? "border-orange-600 text-orange-600"
-                : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <FiGrid className="w-4 h-4" />
-            Sticker Sheet Calculator (12×18 &amp; 13×19)
-          </button>
           <button
             type="button"
             onClick={() => setActiveTab("products")}
@@ -207,6 +178,18 @@ export default function CategoryPage() {
           >
             <FiList className="w-4 h-4" />
             Standard Products Catalog ({filteredProducts.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("calculator")}
+            className={`pb-3 px-4 text-sm font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+              activeTab === "calculator"
+                ? "border-orange-600 text-orange-600"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <FiGrid className="w-4 h-4" />
+            Sticker Sheet Calculator (12×18 &amp; 13×19)
           </button>
         </div>
       )}
@@ -221,8 +204,8 @@ export default function CategoryPage() {
           actionHref={`/category/${slug}`}
         />
       ) : hasSubCategories ? (
-        // Grouped Layout (Sample Board Style with Color-Coded Sub-Headings)
-        <div className="space-y-8">
+        // Grouped Subcategories Layout matching Image 2 reference design
+        <div className="space-y-10">
           {/* Subcategory Pills Navigation Filter */}
           {subCategoryKeys.length > 1 && (
             <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-slate-200">
@@ -265,9 +248,13 @@ export default function CategoryPage() {
 
           {(() => {
             const preferredOrder = [
+              "ROLL-UP STANDEES",
+              "IRON FRAME STANDEES",
+              "STANDEE HUTS (A-FRAME)",
               "FLEX BOARD PRINTING",
-              "STANDIE",
-              "STANDIE (ROLL-UP STANDEES)",
+              "PVC FILES",
+              "SBS FILES",
+              "PVC CLIP",
               "500 GSM CARDS (QTY. 500 CARDS)",
               "400 GSM CARDS (QTY. 1000 CARDS)",
               "350 GSM CARDS (QTY. 1000 CARDS)",
@@ -292,73 +279,22 @@ export default function CategoryPage() {
             });
 
             return entries.map(([subCategoryName, prods]) => {
-              let titleColor = "text-orange-800";
-              let borderColor = "border-orange-600";
-              let subtitle = "";
-              let badgeColor = "bg-orange-100 text-orange-800";
-              let gridCols =
-                "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5";
-
-              if (subCategoryName.toUpperCase().includes("STANDIE")) {
-                titleColor = "text-[#1D4ED8]";
-                borderColor = "border-[#2563EB]";
-                subtitle =
-                  "Portable aluminium roll-up standees with carry bags for exhibitions, retail counters, events & promotions.";
-                badgeColor = "bg-blue-100 text-blue-800";
-              } else if (subCategoryName.toUpperCase().includes("FLEX BOARD")) {
-                titleColor = "text-[#C2410C]";
-                borderColor = "border-[#EA580C]";
-                subtitle =
-                  "Custom outdoor flex board printing with iron/wooden structure framing, support rods & on-site fitting.";
-                badgeColor = "bg-orange-100 text-orange-800";
-              } else if (subCategoryName.includes("500 GSM")) {
-                titleColor = "text-[#D97706]";
-                borderColor = "border-[#D97706]";
-              } else if (subCategoryName.includes("400 GSM")) {
-                titleColor = "text-[#1E40AF]";
-                borderColor = "border-[#1E40AF]";
-              } else if (subCategoryName.includes("350 GSM")) {
-                titleColor = "text-[#0284C7]";
-                borderColor = "border-[#0284C7]";
-              } else if (subCategoryName.includes("REGULAR")) {
-                titleColor = "text-[#BE185D]";
-                borderColor = "border-[#BE185D]";
-              } else if (subCategoryName.includes("NT / PVC")) {
-                titleColor = "text-[#15803D]";
-                borderColor = "border-[#15803D]";
-              } else if (subCategoryName.includes("METAL")) {
-                titleColor = "text-[#DC2626]";
-                borderColor = "border-[#DC2626]";
-              }
-
               return (
-                <div key={subCategoryName} className="space-y-4">
-                  <div
-                    className={`border-b-2 ${borderColor} pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2
-                          className={`text-base sm:text-lg font-black tracking-tight ${titleColor} uppercase flex items-center gap-2`}
-                        >
-                          {subCategoryName}
-                        </h2>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${badgeColor}`}
-                        >
-                          {prods.length}{" "}
-                          {prods.length === 1 ? "Product" : "Products"}
-                        </span>
-                      </div>
-                      {subtitle && (
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {subtitle}
-                        </p>
-                      )}
+                <div key={subCategoryName} className="space-y-5">
+                  {/* Subcategory Header matching Image 2 */}
+                  <div className="border-b-2 border-[#C2410C] pb-2 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <h2 className="text-lg sm:text-xl font-black tracking-tight text-[#C2410C] uppercase flex items-center gap-2">
+                        {subCategoryName}
+                      </h2>
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
+                        {prods.length} {prods.length === 1 ? "Product" : "Products"}
+                      </span>
                     </div>
                   </div>
 
-                  <div className={`grid ${gridCols} gap-4`}>
+                  {/* Products Grid matching Image 2 card sizing */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
                     {prods.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
@@ -370,7 +306,7 @@ export default function CategoryPage() {
         </div>
       ) : (
         // Standard Grid Layout
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

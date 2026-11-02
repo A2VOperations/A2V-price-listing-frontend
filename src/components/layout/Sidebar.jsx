@@ -7,15 +7,11 @@ import {
   FiSliders,
   FiX,
   FiChevronRight,
-  FiMaximize2,
-  FiTv,
-  FiTag,
   FiUser,
   FiShield,
   FiLogOut,
   FiLogIn,
 } from "react-icons/fi";
-import { TbCalculator } from "react-icons/tb";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -37,48 +33,6 @@ export default function Sidebar({ isOpen, onClose }) {
     { label: "Quote Builder", href: "/quotes", icon: FiFileText },
     // Only show Admin Panel if user has admin privileges
     ...(isAdmin ? [{ label: "Admin Panel", href: "/admin", icon: FiSliders }] : []),
-  ];
-
-  const calculatorNavItems = [
-    {
-      label: "All Calculators",
-      href: "/calculators",
-      icon: TbCalculator,
-      badge: "Hub",
-      isActive: pathname === "/calculators",
-    },
-    {
-      label: "Flex Board Calculator",
-      href: "/calculators/flex-board",
-      icon: FiMaximize2,
-      badge: "Frame / Sq.Ft",
-      isActive:
-        pathname === "/calculators/flex-board" ||
-        pathname === "/calculator/flex-board" ||
-        pathname === "/product/flex-board-printing",
-    },
-    {
-      label: "Standee Calculator",
-      href: "/calculators/standee",
-      icon: FiTv,
-      badge: "3 Models",
-      isActive:
-        pathname === "/calculators/standee" ||
-        pathname === "/calculator/standee" ||
-        pathname.includes("rollup") ||
-        pathname.includes("standie") ||
-        pathname.includes("standee"),
-    },
-    {
-      label: "Sticker Sheet Calculator",
-      href: "/calculators/stickers",
-      icon: FiTag,
-      badge: "12×18 & 13×19",
-      isActive:
-        pathname === "/calculators/stickers" ||
-        pathname === "/calculator/stickers" ||
-        pathname.includes("sticker"),
-    },
   ];
 
   const sidebarContent = (
@@ -118,56 +72,6 @@ export default function Sidebar({ isOpen, onClose }) {
                 <span>{item.label}</span>
               </div>
               <FiChevronRight className={`w-3.5 h-3.5 ${isActive ? "text-white opacity-80" : "text-slate-600"}`} />
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="my-1 border-t border-slate-800/80" />
-
-      {/* Dedicated Section: Price Calculators */}
-      <div className="p-3 space-y-1">
-        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-orange-400 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <TbCalculator className="w-3.5 h-3.5 text-orange-400" />
-            Price Calculators
-          </span>
-          <span className="text-[9px] bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded font-mono font-bold">
-            3 Tools
-          </span>
-        </div>
-
-        {calculatorNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = item.isActive;
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              onClick={onClose}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                isActive
-                  ? "bg-orange-600 text-white font-semibold shadow-sm"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white group"
-              }`}
-            >
-              <div className="flex items-center space-x-2.5 min-w-0">
-                <Icon
-                  className={`w-4 h-4 flex-shrink-0 ${
-                    isActive ? "text-white" : "text-orange-400 group-hover:text-orange-300"
-                  }`}
-                />
-                <span className="truncate">{item.label}</span>
-              </div>
-              <span
-                className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase flex-shrink-0 ${
-                  isActive
-                    ? "bg-white/20 text-white"
-                    : "bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-300"
-                }`}
-              >
-                {item.badge}
-              </span>
             </Link>
           );
         })}

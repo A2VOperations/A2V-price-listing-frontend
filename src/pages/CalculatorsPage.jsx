@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import EmptyState from "@/components/common/EmptyState";
@@ -8,13 +8,14 @@ import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
 import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
-import StandieTypeTabs from "@/components/product/StandieTypeTabs";
 import {
   FiMaximize2,
   FiTv,
   FiTag,
-  FiSliders,
-  FiFileText,
+  FiBox,
+  FiLayers,
+  FiCheck,
+  FiArrowRight,
   FiCheckCircle,
 } from "react-icons/fi";
 import { TbCalculator } from "react-icons/tb";
@@ -25,34 +26,18 @@ export default function CalculatorsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { getProductBySlug, loading } = useData();
 
-  // Normalize active section from route or query: 'flex-board' | 'standee' | 'stickers'
+  // Active section: 'flex-board' | 'standee' | 'stickers'
   const validSections = ["flex-board", "standee", "stickers"];
-  const initialSection =
+  const currentSection =
     type && validSections.includes(type.toLowerCase())
       ? type.toLowerCase()
-      : searchParams.get("tab") || "flex-board";
+      : searchParams.get("tab") || "standee";
 
-  const [activeSection, setActiveSection] = useState(initialSection);
+  // Standee model filter: 'rollup' | 'iron-frame' | 'hut'
+  const currentStandeeModel = searchParams.get("model") || "rollup";
 
-  // Standee model sub-tab: 'rollup' | 'iron-frame' | 'hut'
-  const initialModel = searchParams.get("model") || "rollup";
-  const [standeeModel, setStandeeModel] = useState(initialModel);
-
-  // Synchronize state when URL param changes
-  useEffect(() => {
-    if (type && validSections.includes(type.toLowerCase())) {
-      setActiveSection(type.toLowerCase());
-    }
-  }, [type]);
-
-  const handleSelectSection = (sec) => {
-    setActiveSection(sec);
-    navigate(`/calculators/${sec}`);
-  };
-
-  const handleSelectStandeeModel = (model) => {
-    setStandeeModel(model);
-    setSearchParams({ model });
+  const handleSelectStandeeModel = (modelId) => {
+    setSearchParams({ model: modelId });
   };
 
   if (loading) {
@@ -128,128 +113,272 @@ export default function CalculatorsPage() {
       isSticker: true,
     };
 
-  // Calculator sections configuration
-  const calculatorTabs = [
+  // 3 Standee categories / models definition
+  const standeeCategories = [
     {
-      id: "flex-board",
-      name: "Flex Board Calculator",
-      shortTitle: "Flex Board",
-      badge: "Custom Sq.Ft & Frame",
-      desc: "Iron / Wooden Structure, Support Rods & Fitting",
-      icon: FiMaximize2,
-      accentColor: "border-orange-600 text-orange-600 bg-orange-50/50",
-    },
-    {
-      id: "standee",
-      name: "Standee Calculator",
-      shortTitle: "Standee Displays",
-      badge: "Roll-Up / Iron / Hut",
-      desc: "Aluminium Cassette, Welded MS Frame & A-Frame Tents",
+      id: "rollup",
+      code: "STD-001",
+      name: "Roll-Up Standee",
+      subtitle: "Aluminium Cassette Base",
+      tag: "2.5 & 3 Ft Width",
+      description:
+        "Portable aluminium cassette with spring roller mechanism, Star Flex media, and padded carry bag included.",
       icon: FiTv,
-      accentColor: "border-blue-600 text-blue-600 bg-blue-50/50",
+      badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+      activeClasses:
+        "border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 text-blue-900 shadow-sm",
     },
     {
-      id: "stickers",
-      name: "Sticker Calculator",
-      shortTitle: "Stickers & Labels",
-      badge: "12×18 & 13×19 Sheets",
-      desc: "Automatic Sheet Nesting, Die-Cuts, Half & Full Cuts",
-      icon: FiTag,
-      accentColor: "border-emerald-600 text-emerald-600 bg-emerald-50/50",
+      id: "iron-frame",
+      code: "STD-002",
+      name: "Iron Frame Standee",
+      subtitle: "Heavy-Duty Welded MS Pipe",
+      tag: "Custom Height & Width",
+      description:
+        "Welded square MS iron pipe frame with angle leg base, support rods, and double-sided Star Flex display.",
+      icon: FiBox,
+      badgeColor: "bg-orange-100 text-orange-800 border-orange-200",
+      activeClasses:
+        "border-orange-600 bg-orange-50/70 ring-2 ring-orange-500/20 text-orange-900 shadow-sm",
+    },
+    {
+      id: "hut",
+      code: "STD-003",
+      name: "Standee Hut (A-Frame)",
+      subtitle: "Dual-Sided Tent / Easel Display",
+      tag: "Iron 3kg / 5kg / Wood",
+      description:
+        "Triangular A-board tent structure with top hinges, high wind resistance, and dual-sided branding for pavements.",
+      icon: FiLayers,
+      badgeColor: "bg-purple-100 text-purple-800 border-purple-200",
+      activeClasses:
+        "border-purple-600 bg-purple-50/70 ring-2 ring-purple-500/20 text-purple-900 shadow-sm",
     },
   ];
 
-  const currentTab = calculatorTabs.find((t) => t.id === activeSection) || calculatorTabs[0];
+  // =========================================================================
+  // VIEW 1: FLEX BOARD CALCULATOR (DEDICATED - ONLY FLEX BOARD SHOWS)
+  // =========================================================================
+  if (currentSection === "flex-board") {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={[{ label: "Flex Board Calculator" }]} />
 
-  const breadcrumbItems = [
-    { label: "Price Calculators", href: "/calculators" },
-    { label: currentTab.name },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumb items={breadcrumbItems} />
-
-      {/* Main Section Header Card */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-lg border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
+        {/* Dedicated Page Header for Flex Board */}
+        <div className="bg-white rounded-2xl border border-orange-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/20 text-orange-300 border border-orange-500/30 font-mono">
-                <TbCalculator className="w-3.5 h-3.5 text-orange-400" />
-                Custom Price Calculators
+              <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
+                <FiMaximize2 className="w-5 h-5" />
               </span>
-              <span className="text-xs text-slate-400 hidden sm:inline">• Live Dimensions &amp; Estimates</span>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Flex Board Printing &amp; Frame Calculator
+              </h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Printing &amp; Hardware Price Calculators
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Calculate exact custom dimension pricing, structure materials, hardware specifications,
-              and sheet nesting layouts with instant PDF quotation downloads.
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+              Calculate exact square feet rates, Star &amp; Normal flex materials, welded MS iron / wooden batten framing, support rods, and on-site fitting.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl px-4 py-3 flex items-center gap-3 shadow-inner">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <div>
-                <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                  Active Tool
-                </p>
-                <p className="text-xs font-black text-orange-400">
-                  {currentTab.name}
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <Link
+              to="/calculators/standee"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
+            >
+              <FiTv className="w-3.5 h-3.5 text-blue-600" />
+              <span>Standee Calculator →</span>
+            </Link>
+            <Link
+              to="/calculators/stickers"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
+            >
+              <FiTag className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Sticker Calculator →</span>
+            </Link>
           </div>
         </div>
 
-        {/* Top-Level Section Switcher Tabs */}
-        <div className="mt-6 pt-5 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {calculatorTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeSection === tab.id;
+        {/* Dedicated Flex Board Calculator Form */}
+        <FlexBoardOrderForm product={flexProduct} />
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 2: STICKER SHEET CALCULATOR (DEDICATED - ONLY STICKERS SHOW)
+  // =========================================================================
+  if (currentSection === "stickers") {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={[{ label: "Sticker Sheet Calculator" }]} />
+
+        {/* Dedicated Page Header for Stickers */}
+        <div className="bg-white rounded-2xl border border-emerald-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-emerald-600 text-white shadow-xs">
+                <FiTag className="w-5 h-5" />
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Sticker Sheet Calculator (12×18 &amp; 13×19)
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+              Automatic sheet nesting calculation for custom sticker dimensions, Chromo paper, waterproof Vinyl (Gloss/Matte), and precision die-cutting.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <Link
+              to="/calculators/flex-board"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
+            >
+              <FiMaximize2 className="w-3.5 h-3.5 text-orange-600" />
+              <span>Flex Board Calculator →</span>
+            </Link>
+            <Link
+              to="/calculators/standee"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
+            >
+              <FiTv className="w-3.5 h-3.5 text-blue-600" />
+              <span>Standee Calculator →</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Dedicated Sticker Calculator Form */}
+        <StickerCalculator product={stickerProduct} />
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 3: STANDEE DISPLAYS & DEDICATED CALCULATOR SYSTEM
+  // Shows the 3 Standee categories FIRST, then opens the selected calculator!
+  // =========================================================================
+  const activeModelDetails =
+    standeeCategories.find((m) => m.id === currentStandeeModel) ||
+    standeeCategories[0];
+
+  return (
+    <div className="space-y-6">
+      <Breadcrumb
+        items={[
+          { label: "Standee Displays", href: "/calculators/standee" },
+          { label: activeModelDetails.name },
+        ]}
+      />
+
+      {/* Standee Hub Header */}
+      <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+              <FiTv className="w-5 h-5" />
+            </span>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Standee Displays &amp; Calculator System
+            </h1>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+            Select one of the 3 Standee categories below to view its hardware specifications and use its dedicated calculator system.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <Link
+            to="/calculators/flex-board"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            Flex Board →
+          </Link>
+          <Link
+            to="/calculators/stickers"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            Stickers →
+          </Link>
+        </div>
+      </div>
+
+      {/* STEP 1: PROMINENT DISPLAY OF THE 3 STANDEE CATEGORIES FIRST */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+          <div>
+            <span className="text-[10px] font-black tracking-wider uppercase text-slate-400">
+              Standee Categories
+            </span>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">
+              Choose Standee Structure &amp; Model
+            </h2>
+          </div>
+          <span className="text-xs text-slate-500 font-medium">
+            3 Categories Available • Click to switch calculator system
+          </span>
+        </div>
+
+        {/* 3 Categories Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {standeeCategories.map((item) => {
+            const Icon = item.icon;
+            const isSelected = currentStandeeModel === item.id;
             return (
               <button
-                key={tab.id}
+                key={item.id}
                 type="button"
-                onClick={() => handleSelectSection(tab.id)}
-                className={`p-3.5 rounded-xl text-left transition-all border flex items-start gap-3 cursor-pointer ${
-                  isActive
-                    ? "bg-slate-800 border-orange-500 text-white shadow-md ring-1 ring-orange-500/40"
-                    : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-600"
+                onClick={() => handleSelectStandeeModel(item.id)}
+                className={`p-4 rounded-xl border text-left transition-all relative flex flex-col justify-between group cursor-pointer ${
+                  isSelected
+                    ? item.activeClasses
+                    : "border-slate-200 hover:border-slate-300 bg-slate-50/60 hover:bg-slate-50 text-slate-700"
                 }`}
               >
-                <span
-                  className={`p-2 rounded-lg mt-0.5 ${
-                    isActive
-                      ? "bg-orange-600 text-white"
-                      : "bg-slate-700/80 text-slate-300"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-bold truncate">
-                      {tab.shortTitle}
-                    </span>
+                {isSelected && (
+                  <span className="absolute top-3 right-3 w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs">
+                    <FiCheck className="w-3 h-3" />
+                  </span>
+                )}
+
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
                     <span
-                      className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
-                        isActive
-                          ? "bg-orange-500/20 text-orange-300"
-                          : "bg-slate-700 text-slate-400"
+                      className={`p-2 rounded-lg ${
+                        isSelected
+                          ? "bg-white text-slate-900 shadow-xs"
+                          : "bg-white text-slate-500 border border-slate-200 group-hover:text-slate-800"
                       }`}
                     >
-                      {tab.badge}
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <span
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${item.badgeColor}`}
+                    >
+                      #{item.code}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {tab.desc}
+
+                  <h3 className="font-bold text-sm text-slate-900 leading-snug">
+                    {item.name}
+                  </h3>
+                  <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                    {item.subtitle}
                   </p>
+                  <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed line-clamp-2">
+                    {item.description}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                  <span className="font-semibold text-slate-600">{item.tag}</span>
+                  <span
+                    className={`font-bold ${
+                      isSelected
+                        ? "text-blue-700 font-extrabold"
+                        : "text-slate-400 group-hover:text-slate-700"
+                    }`}
+                  >
+                    {isSelected ? "Active Calculator System" : "Open System →"}
+                  </span>
                 </div>
               </button>
             );
@@ -257,36 +386,25 @@ export default function CalculatorsPage() {
         </div>
       </div>
 
-      {/* Standee Sub-Tabs (Roll-Up, Iron Frame, Standee Hut) */}
-      {activeSection === "standee" && (
-        <StandieTypeTabs
-          activeType={standeeModel}
-          onSelectType={handleSelectStandeeModel}
-        />
-      )}
+      {/* STEP 2: DEDICATED CALCULATOR SYSTEM FOR THE SELECTED STANDEE MODEL */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
+              Active Calculator: {activeModelDetails.name} (#{activeModelDetails.code})
+            </h3>
+          </div>
+        </div>
 
-      {/* Main Interactive Calculator Container */}
-      <div className="min-w-0">
-        {activeSection === "flex-board" && (
-          <FlexBoardOrderForm product={flexProduct} />
+        {currentStandeeModel === "rollup" && (
+          <RollUpStandieOrderForm product={rollupProduct} />
         )}
-
-        {activeSection === "standee" && (
-          <>
-            {standeeModel === "rollup" && (
-              <RollUpStandieOrderForm product={rollupProduct} />
-            )}
-            {standeeModel === "iron-frame" && (
-              <StandieOrderForm product={ironStandieProduct} />
-            )}
-            {standeeModel === "hut" && (
-              <StandieHutOrderForm product={hutStandieProduct} />
-            )}
-          </>
+        {currentStandeeModel === "iron-frame" && (
+          <StandieOrderForm product={ironStandieProduct} />
         )}
-
-        {activeSection === "stickers" && (
-          <StickerCalculator product={stickerProduct} />
+        {currentStandeeModel === "hut" && (
+          <StandieHutOrderForm product={hutStandieProduct} />
         )}
       </div>
     </div>

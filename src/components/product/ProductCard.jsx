@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FiClock, FiLayers, FiArrowRight } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
 import ProductImage from "../common/ProductImage";
 import { useQuote } from "@/context/QuoteContext";
 
@@ -119,36 +119,40 @@ export default function ProductCard({ product }) {
     );
   }
 
-  // Standard Product Card layout for other catalog items
+  // Standard Product Card matching Image 2 reference design
   return (
-    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-orange-400 transition-all duration-200 flex flex-col overflow-hidden group">
-      {/* Image & Code Badge Header */}
-      <div className="h-44 w-full bg-slate-50 relative overflow-hidden">
+    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-orange-400 transition-all duration-200 flex flex-col overflow-hidden group">
+      {/* Image & Code Badge Header Area */}
+      <div className="h-48 sm:h-52 w-full bg-slate-50 relative overflow-hidden flex flex-col justify-center">
         <ProductImage
           src={product.image}
           alt={product.name}
           categoryName={product.categoryId}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-2.5 left-2.5 bg-slate-900/90 backdrop-blur-xs text-white text-[11px] font-bold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+
+        {/* Top-Left Code Badge */}
+        <div className="absolute top-3 left-3 bg-[#0F172A] text-white text-[11px] font-bold px-2 py-0.5 rounded shadow-xs flex items-center gap-1 z-10">
           <span className="text-orange-400">#</span>
-          {product.code}
+          <span>{product.code}</span>
         </div>
+
+        {/* Top-Right Tag Badge */}
         {product.badge ? (
-          <div className="absolute top-2.5 right-2.5 bg-red-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-xs uppercase tracking-wider">
+          <div className="absolute top-3 right-3 bg-[#DC2626] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-wider z-10">
             {product.badge}
           </div>
         ) : customPrices[product.id] !== undefined ? (
-          <div className="absolute top-2.5 right-2.5 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-xs uppercase tracking-wider">
+          <div className="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded shadow-xs uppercase tracking-wider z-10">
             Custom Price
           </div>
         ) : null}
       </div>
 
-      {/* Card Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      {/* Card Details Body */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
         <div>
-          <h4 className="text-sm font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
+          <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
             {product.name}
           </h4>
           <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
@@ -156,14 +160,22 @@ export default function ProductCard({ product }) {
           </p>
         </div>
 
-        {/* Pricing & CTA Footer */}
-        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+        {/* Configure CTA Button */}
+        <div className="pt-2">
           <Link
-            to={`/product/${product.slug}`}
-            className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 transition-colors shadow-xs group-hover:shadow-sm"
+            to={
+              product.id === "STD-001" || product.isRollUpStandie
+                ? "/calculators/standee?model=rollup"
+                : product.id === "STD-002" || (product.isStandie && !product.isHutStandie)
+                  ? "/calculators/standee?model=iron-frame"
+                  : product.id === "STD-003" || product.isHutStandie
+                    ? "/calculators/standee?model=hut"
+                    : `/product/${product.slug}`
+            }
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition-colors shadow-xs"
           >
             <span>Configure</span>
-            <FiArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
+            <FiArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
