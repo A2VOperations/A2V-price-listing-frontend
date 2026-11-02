@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import initialCategories from "@/data/categories.json";
+import initialProducts from "@/data/products.json";
 import {
   fetchCategoriesApi,
   createCategoryApi,
@@ -13,30 +15,33 @@ import {
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(initialCategories || []);
+  const [products, setProducts] = useState(initialProducts || []);
+  const [loading, setLoading] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [error, setError] = useState(null);
 
   const loadDataFromApi = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const [fetchedCats, fetchedProds] = await Promise.all([
         fetchCategoriesApi(),
         fetchProductsApi(),
       ]);
 
-      setCategories(Array.isArray(fetchedCats) ? fetchedCats : []);
-      setProducts(Array.isArray(fetchedProds) ? fetchedProds : []);
+      if (Array.isArray(fetchedCats) && fetchedCats.length > 0) {
+        setCategories(fetchedCats);
+      }
+      if (Array.isArray(fetchedProds) && fetchedProds.length > 0) {
+        setProducts(fetchedProds);
+      }
       setIsBackendConnected(true);
     } catch (err) {
-      console.error("MongoDB Backend API connection failed:", err.message);
+      console.warn("MongoDB Backend API connection failed, using local dataset fallback:", err.message);
       setIsBackendConnected(false);
-      setError(err.message || "Failed to load data from MongoDB backend.");
-      setCategories([]);
-      setProducts([]);
+      // Seamlessly keep fallback categories & products so UI is always functional
+      setCategories((prev) => (prev.length > 0 ? prev : initialCategories));
+      setProducts((prev) => (prev.length > 0 ? prev : initialProducts));
     } finally {
       setLoading(false);
     }
@@ -83,7 +88,18 @@ export function DataProvider({ children }) {
   };
 
   const getCategoryBySlug = (slug) => {
-    return categories.find((c) => c.slug === slug || c.id === slug);
+    if (!slug) return null;
+    const clean = slug.toLowerCase().trim();
+    return categories.find((c) => {
+      const cSlug = (c.slug || "").toLowerCase();
+      const cId = (c.id || "").toLowerCase();
+      return (
+        cSlug === clean ||
+        cId === clean ||
+        (clean === "visiting-cards" && (cSlug === "visiting-card" || cId === "visiting-card")) ||
+        (clean === "visiting-card" && (cSlug === "visiting-cards" || cId === "visiting-cards"))
+      );
+    });
   };
 
   const getProductBySlug = (slug) => {
@@ -91,7 +107,16 @@ export function DataProvider({ children }) {
   };
 
   const getProductsByCategory = (categoryId) => {
-    return products.filter((p) => p.categoryId === categoryId);
+    if (!categoryId) return [];
+    const clean = categoryId.toLowerCase().trim();
+    return products.filter((p) => {
+      const pCat = (p.categoryId || "").toLowerCase();
+      return (
+        pCat === clean ||
+        (clean === "visiting-cards" && (pCat === "visiting-card" || pCat === "visiting-cards")) ||
+        (clean === "visiting-card" && (pCat === "visiting-cards" || pCat === "visiting-card"))
+      );
+    });
   };
 
   const searchProducts = (query) => {

@@ -180,22 +180,7 @@ export default function CalculatorsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <Link
-              to="/calculators/standee"
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
-            >
-              <FiTv className="w-3.5 h-3.5 text-blue-600" />
-              <span>Standee Calculator →</span>
-            </Link>
-            <Link
-              to="/calculators/stickers"
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
-            >
-              <FiTag className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Sticker Calculator →</span>
-            </Link>
-          </div>
+          
         </div>
 
         {/* Dedicated Flex Board Calculator Form */}
@@ -228,22 +213,7 @@ export default function CalculatorsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <Link
-              to="/calculators/flex-board"
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
-            >
-              <FiMaximize2 className="w-3.5 h-3.5 text-orange-600" />
-              <span>Flex Board Calculator →</span>
-            </Link>
-            <Link
-              to="/calculators/standee"
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5"
-            >
-              <FiTv className="w-3.5 h-3.5 text-blue-600" />
-              <span>Standee Calculator →</span>
-            </Link>
-          </div>
+          
         </div>
 
         {/* Dedicated Sticker Calculator Form */}
@@ -285,20 +255,7 @@ export default function CalculatorsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start md:self-auto">
-          <Link
-            to="/calculators/flex-board"
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
-          >
-            Flex Board →
-          </Link>
-          <Link
-            to="/calculators/stickers"
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
-          >
-            Stickers →
-          </Link>
-        </div>
+       
       </div>
 
       {/* STEP 1: PROMINENT DISPLAY OF THE 3 STANDEE CATEGORIES FIRST */}

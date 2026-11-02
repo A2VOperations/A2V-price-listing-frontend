@@ -362,7 +362,10 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
 
 
   return (
-    <form onSubmit={handleAddOrder} className="space-y-6 text-slate-800">
+    <form onSubmit={handleAddOrder} className="text-slate-800">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: ALL CALCULATIONS & CONTROLS */}
+        <div className="lg:col-span-7 xl:col-span-7 space-y-6">
       {/* 1. SELECT FLEX SUBCATEGORY & MANUAL PRICE */}
       <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3.5 shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -789,17 +792,6 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
             )}
           </div>
         )}
-
-        {/* Dynamic 2D SVG Frame & Running Feet Diagram Preview */}
-        <FlexFramePreview
-          height={validHeight}
-          width={validWidth}
-          boardType={boardType}
-          supportRodType={supportRodType}
-          supportRodCount={supportRodCount}
-          customRodLength={customRodLength}
-          runningFeetDetails={runningFeetDetails}
-        />
       </div>
 
       {/* 4. ADDITIONAL HARDWARE & SERVICE OPTIONS */}
@@ -1405,6 +1397,106 @@ export default function FlexBoardOrderForm({ product, onVariantSelect }) {
         <p className="text-[11px] text-center text-slate-400">
           Official PDF quotation is automatically generated with client-ready specifications and cost breakdown.
         </p>
+      </div>
+        </div>
+
+        {/* RIGHT COLUMN: DIAGRAM & SPECIFICATIONS PREVIEW */}
+        <div className="lg:col-span-5 xl:col-span-5 space-y-4 lg:sticky lg:top-6">
+          {/* Dynamic 2D SVG Frame & Running Feet Diagram Preview */}
+          <FlexFramePreview
+            height={validHeight}
+            width={validWidth}
+            boardType={boardType}
+            supportRodType={supportRodType}
+            supportRodCount={supportRodCount}
+            customRodLength={customRodLength}
+            runningFeetDetails={runningFeetDetails}
+          />
+
+          {/* Live Dimension & Specs Summary Card */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3.5 shadow-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <FiCheckCircle className="w-4 h-4 text-orange-600" />
+                Live Specifications &amp; Summary
+              </h4>
+              <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+                Live Overview
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 text-xs">
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                  Dimensions
+                </span>
+                <span className="font-extrabold text-slate-900 text-sm">
+                  {validHeight} ft × {validWidth} ft
+                </span>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                  Total Area
+                </span>
+                <span className="font-extrabold text-orange-600 text-sm">
+                  {flexAreaSqFt} sq. ft.
+                </span>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                  Flex Media
+                </span>
+                <span className="font-bold text-slate-900 truncate block" title={activeMaterial.label}>
+                  {activeMaterial.label}
+                </span>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                  Frame Structure
+                </span>
+                <span className="font-bold text-slate-900 truncate block">
+                  {boardType === "None" ? "Banner Only (No Frame)" : activeBoard.name}
+                </span>
+              </div>
+
+              {boardType !== "None" && (
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80 col-span-2">
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                    Total Running Feet
+                  </span>
+                  <div className="flex justify-between items-baseline">
+                    <span className="font-extrabold text-amber-700 text-sm">
+                      {runningFeetDetails.totalRunningFeet} ft
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      @ ₹{activeBoard.ratePerFt}/ft = Rs. {boardCostPerUnit.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Live Total Cost Badge */}
+            <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-3.5 rounded-xl border border-orange-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-orange-900 block">
+                  Total Amount Payable
+                </span>
+                <span className="text-[11px] text-slate-600">
+                  {quantity} {quantity === 1 ? "Board" : "Boards"} {validDiscount > 0 ? `(₹${validDiscount} off)` : ""}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-lg font-black text-orange-700 block">
+                  Rs. {totalAmount.toLocaleString()}/-
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   );

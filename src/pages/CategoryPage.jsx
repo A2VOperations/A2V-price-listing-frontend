@@ -32,21 +32,14 @@ export default function CategoryPage() {
   const { getCategoryBySlug, getProductsByCategory, loading } = useData();
   const category = getCategoryBySlug(slug);
 
+  // Redirect singular visiting-card to plural visiting-cards
+  if (slug === "visiting-card") {
+    return <Navigate to="/category/visiting-cards" replace />;
+  }
+
   // Retrieve products
   let allProducts = [];
-  if (isStandeeSlug) {
-    const flexProducts = getProductsByCategory("flex-board") || [];
-    allProducts = flexProducts.filter(
-      (p) =>
-        p.subCategory?.includes("STANDIE") ||
-        p.isStandie ||
-        p.isRollUpStandie ||
-        p.isHutStandie ||
-        p.id?.startsWith("STD-") ||
-        p.slug?.includes("stand") ||
-        p.slug?.includes("rollup"),
-    );
-  } else if (category) {
+  if (category) {
     allProducts = getProductsByCategory(category.id) || [];
   }
 

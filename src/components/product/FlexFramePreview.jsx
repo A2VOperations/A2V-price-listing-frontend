@@ -85,7 +85,7 @@ export default function FlexFramePreview({
           </h4>
         </div>
         <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-orange-950/60 text-orange-300 border border-orange-800/80">
-          {h} ft × {w} ft ({h * w} sqft)
+          {h} ft × {w} ft ({Math.round(h * w * 10) / 10} sqft)
         </span>
       </div>
 
@@ -93,7 +93,7 @@ export default function FlexFramePreview({
       <div className="relative flex justify-center items-center py-2 bg-slate-950/80 rounded-lg border border-slate-800/80 overflow-hidden">
         <svg
           viewBox={`0 0 ${maxCanvasWidth} ${maxCanvasHeight}`}
-          className="w-full max-h-48 drop-shadow-md"
+          className="w-full max-h-56 sm:max-h-64 drop-shadow-md"
         >
           <defs>
             <pattern

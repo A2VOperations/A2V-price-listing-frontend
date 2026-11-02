@@ -9,6 +9,7 @@ import ProductOrderForm from "@/components/product/ProductOrderForm";
 import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
 import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
+import FlexBoardOrderForm from "@/components/product/FlexBoardOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
 import StandieTypeTabs from "@/components/product/StandieTypeTabs";
 import { TbCalculator } from "react-icons/tb";
@@ -212,6 +213,27 @@ export default function ProductPage() {
     product.isFlexBoard ||
     product.categoryId === "flex-board" ||
     product.slug?.includes("flex");
+
+  if (isFlexBoard) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <Breadcrumb items={breadcrumbItems} />
+          <Link
+            to="/calculators/flex-board"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-200 transition-colors self-start sm:self-auto"
+          >
+            <TbCalculator className="w-3.5 h-3.5" />
+            <span>Open in Price Calculators Section</span>
+            <FiArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <FlexBoardOrderForm product={product} />
+        <ProductInfo product={product} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
