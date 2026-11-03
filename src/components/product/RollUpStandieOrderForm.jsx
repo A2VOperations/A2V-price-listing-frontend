@@ -17,7 +17,7 @@ const ROLLUP_MEDIA_TYPES = [
     defaultRate: 30,
     tag: "High Gloss",
     description:
-      "High durability glossy flex with vivid color contrast and rich ink saturation.",
+      "Glossy Star Flex frontlit media, 1440 DPI outdoor-grade banner print.",
   },
 ];
 
@@ -27,7 +27,7 @@ const MACHINE_OPTIONS = {
     name: "Standard Aluminium Roll-Up Machine Base",
     tag: "Standard Base",
     description:
-      "Lightweight anodized aluminium cassette with twin rotating swivel stabilizer feet, 3-section support pole, and padded shoulder carry bag.",
+      "Anodized aluminium cassette with twin swivel stabilizer feet, 3-section support pole, and carry bag.",
     defaultRates: {
       2.5: 1250,
       3: 1350,
@@ -38,7 +38,7 @@ const MACHINE_OPTIONS = {
     name: "Luxury Broad Base Teardrop Roll-Up Machine",
     tag: "Luxury Broad Base",
     description:
-      "Heavy-duty teardrop wide-footprint cassette with chrome mirror endcaps, superior stability without swivel feet, and deluxe padded travel bag.",
+      "Teardrop wide-footprint cassette with chrome endcaps, self-stabilizing base, and padded carry bag.",
     defaultRates: {
       2.5: 1200,
       3: 1500,
@@ -575,7 +575,7 @@ export default function RollUpStandieOrderForm({ product, onVariantSelect }) {
                     <strong className="text-slate-800 font-mono">
                       {totalAreaSqFt} Sq.Ft.
                     </strong>{" "}
-                    (Durable high-gloss finish with vivid colors)
+                    (Star Flex high-gloss frontlit media)
                   </p>
                 </div>
               </div>

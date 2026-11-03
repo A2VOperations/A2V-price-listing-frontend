@@ -79,7 +79,7 @@ export default function FlexFramePreview({
     <div className="bg-slate-900 text-white rounded-xl p-4 shadow-md border border-slate-800 space-y-3">
       <div className="flex items-center justify-between border-b border-slate-800 pb-2">
         <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-orange-500"></span>
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
             Frame Diagram Preview
           </h4>

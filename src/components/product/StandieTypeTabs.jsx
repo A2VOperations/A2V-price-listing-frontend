@@ -122,7 +122,7 @@ export default function StandieTypeTabs({ activeType = "rollup", onSelectType })
                     isActive ? "text-orange-600" : "text-slate-400 group-hover:text-slate-600"
                   }`}
                 >
-                  {isActive ? "Active Calculator" : "Select Model →"}
+                  {isActive ? "Selected" : "Select →"}
                 </span>
               </div>
             </button>

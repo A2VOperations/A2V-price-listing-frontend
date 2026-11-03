@@ -711,10 +711,10 @@ export default function ProductOrderForm({
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <FiUser className="w-3.5 h-3.5 text-orange-600" />
-                Client Details (For Official Quotation PDF):
+                Client Details (For Quotation PDF):
               </span>
               <span className="text-[10px] text-slate-400 font-medium">
-                Personalized Estimate
+                PDF Header Info
               </span>
             </div>
 

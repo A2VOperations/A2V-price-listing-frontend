@@ -148,9 +148,7 @@ export default function LoginPage() {
         {/* Main Card */}
         <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden">
           {/* Header Banner */}
-          <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-8 text-white text-center relative overflow-hidden">
-            <div className="absolute -top-12 -right-12 w-36 h-36 bg-orange-600/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-amber-600/25 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-slate-900 px-6 py-8 text-white text-center border-b border-slate-800">
 
             <div className="flex justify-center mb-3">
               <img

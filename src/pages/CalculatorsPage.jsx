@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
+import React from "react";
+import { useParams, useSearchParams} from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
-import EmptyState from "@/components/common/EmptyState";
 import FlexBoardOrderForm from "@/components/product/FlexBoardOrderForm";
 import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
@@ -15,14 +14,10 @@ import {
   FiBox,
   FiLayers,
   FiCheck,
-  FiArrowRight,
-  FiCheckCircle,
 } from "react-icons/fi";
-import { TbCalculator } from "react-icons/tb";
 
 export default function CalculatorsPage() {
   const { type } = useParams();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { getProductBySlug, loading } = useData();
 
@@ -122,7 +117,7 @@ export default function CalculatorsPage() {
       subtitle: "Aluminium Cassette Base",
       tag: "2.5 & 3 Ft Width",
       description:
-        "Portable aluminium cassette with spring roller mechanism, Star Flex media, and padded carry bag included.",
+        "Portable aluminium cassette with spring roller mechanism, Star Flex banner, and padded carry bag.",
       icon: FiTv,
       badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
       activeClasses:
@@ -165,22 +160,20 @@ export default function CalculatorsPage() {
         <Breadcrumb items={[{ label: "Flex Board Calculator" }]} />
 
         {/* Dedicated Page Header for Flex Board */}
-        <div className="bg-white rounded-2xl border border-orange-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
                 <FiMaximize2 className="w-5 h-5" />
               </span>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Flex Board Printing &amp; Frame Calculator
+                Flex Board Printing &amp; Framing
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Calculate exact square feet rates, Star &amp; Normal flex materials, welded MS iron / wooden batten framing, support rods, and on-site fitting.
+              Calculate custom dimensions for Star or Normal flex, welded MS iron or wooden framing, support rods, and installation.
             </p>
           </div>
-
-          
         </div>
 
         {/* Dedicated Flex Board Calculator Form */}
@@ -198,22 +191,20 @@ export default function CalculatorsPage() {
         <Breadcrumb items={[{ label: "Sticker Sheet Calculator" }]} />
 
         {/* Dedicated Page Header for Stickers */}
-        <div className="bg-white rounded-2xl border border-emerald-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-emerald-600 text-white shadow-xs">
+              <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
                 <FiTag className="w-5 h-5" />
               </span>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Sticker Sheet Calculator (12×18 &amp; 13×19)
+                Sticker Sheet Nesting (12×18 &amp; 13×19)
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Automatic sheet nesting calculation for custom sticker dimensions, Chromo paper, waterproof Vinyl (Gloss/Matte), and precision die-cutting.
+              Calculate sticker count and sheet yield across Chromo paper, waterproof Vinyl (Gloss/Matte), and custom die-cuts.
             </p>
           </div>
-
-          
         </div>
 
         {/* Dedicated Sticker Calculator Form */}
@@ -240,22 +231,20 @@ export default function CalculatorsPage() {
       />
 
       {/* Standee Hub Header */}
-      <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+            <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
               <FiTv className="w-5 h-5" />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Standee Displays &amp; Calculator System
+              Standee Displays &amp; Hardware
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-            Select one of the 3 Standee categories below to view its hardware specifications and use its dedicated calculator system.
+            Configure dimensions, hardware specifications, and print media for Roll-Up, Heavy-Duty MS Iron, and A-Frame models.
           </p>
         </div>
-
-       
       </div>
 
       {/* STEP 1: PROMINENT DISPLAY OF THE 3 STANDEE CATEGORIES FIRST */}
@@ -263,14 +252,14 @@ export default function CalculatorsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div>
             <span className="text-[10px] font-black tracking-wider uppercase text-slate-400">
-              Standee Categories
+              Hardware Types
             </span>
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
-              Choose Standee Structure &amp; Model
+              Select Standee Model
             </h2>
           </div>
           <span className="text-xs text-slate-500 font-medium">
-            3 Categories Available • Click to switch calculator system
+            3 models available
           </span>
         </div>
 
@@ -334,7 +323,7 @@ export default function CalculatorsPage() {
                         : "text-slate-400 group-hover:text-slate-700"
                     }`}
                   >
-                    {isSelected ? "Active Calculator System" : "Open System →"}
+                    {isSelected ? "Selected" : "Configure →"}
                   </span>
                 </div>
               </button>
@@ -347,9 +336,9 @@ export default function CalculatorsPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-orange-600" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-              Active Calculator: {activeModelDetails.name} (#{activeModelDetails.code})
+              Active: {activeModelDetails.name} (#{activeModelDetails.code})
             </h3>
           </div>
         </div>
