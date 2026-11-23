@@ -195,7 +195,9 @@ export function AuthProvider({ children }) {
   const token = session?.token || null;
   const isAuthenticated = Boolean(token && user);
   const isAdmin = user?.role === "admin";
+  const isManager = user?.role === "manager";
   const isUser = user?.role === "user";
+  const isManagerOrAdmin = Boolean(user && (user.role === "admin" || user.role === "manager"));
 
   return (
     <AuthContext.Provider
@@ -206,7 +208,9 @@ export function AuthProvider({ children }) {
         loading,
         isAuthenticated,
         isAdmin,
+        isManager,
         isUser,
+        isManagerOrAdmin,
         login,
         verifyOtp,
         resendOtp,

@@ -11,6 +11,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import CategoryManager from "@/pages/admin/CategoryManager";
 import ProductManager from "@/pages/admin/ProductManager";
 import UserManager from "@/pages/admin/UserManager";
+import PrintingRatesManager from "@/pages/admin/PrintingRatesManager";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function App() {
@@ -21,7 +22,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
-        {/* Protected Overall Project Storefront Routes (Accessible by both User and Admin) */}
+        {/* Protected Overall Project Storefront Routes (Accessible by User, Manager, Admin) */}
         <Route
           path="/"
           element={
@@ -79,11 +80,11 @@ export default function App() {
           }
         />
 
-        {/* Protected Admin Routes (Only Accessible by Admin role) */}
+        {/* Protected Admin & Manager Routes */}
         <Route
           path="/admin"
           element={
-            <ProtectedRoute requireAdmin>
+            <ProtectedRoute requireManagerOrAdmin>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -91,7 +92,7 @@ export default function App() {
         <Route
           path="/admin/categories"
           element={
-            <ProtectedRoute requireAdmin>
+            <ProtectedRoute requireManagerOrAdmin>
               <CategoryManager />
             </ProtectedRoute>
           }
@@ -99,8 +100,16 @@ export default function App() {
         <Route
           path="/admin/products"
           element={
-            <ProtectedRoute requireAdmin>
+            <ProtectedRoute requireManagerOrAdmin>
               <ProductManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/printing-rates"
+          element={
+            <ProtectedRoute requireManagerOrAdmin>
+              <PrintingRatesManager />
             </ProtectedRoute>
           }
         />

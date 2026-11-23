@@ -167,6 +167,7 @@ export default function UserManager() {
 
   const totalUsers = users.length;
   const adminCount = users.filter((u) => u.role === "admin").length;
+  const managerCount = users.filter((u) => u.role === "manager").length;
   const standardCount = users.filter((u) => u.role === "user").length;
 
   return (
@@ -232,7 +233,7 @@ export default function UserManager() {
         )}
 
         {/* Summary Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
               <FiUsers className="w-6 h-6" />
@@ -254,11 +255,21 @@ export default function UserManager() {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
+              <FiShield className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Prod. Managers</p>
+              <p className="text-2xl font-black text-slate-900">{managerCount}</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
               <FiUserCheck className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Standard Users</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Sales Executives</p>
               <p className="text-2xl font-black text-slate-900">{standardCount}</p>
             </div>
           </div>
@@ -352,10 +363,15 @@ export default function UserManager() {
                               <FiShield className="w-3 h-3 text-purple-600" />
                               Administrator
                             </span>
+                          ) : u.role === "manager" ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                              <FiShield className="w-3 h-3 text-amber-600" />
+                              Production Manager
+                            </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
                               <FiUserCheck className="w-3 h-3 text-blue-600" />
-                              Standard User
+                              Sales Executive
                             </span>
                           )}
                         </td>
@@ -463,7 +479,7 @@ export default function UserManager() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Account Role <span className="text-rose-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setCreateForm({ ...createForm, role: "user" })}
@@ -474,9 +490,24 @@ export default function UserManager() {
                     }`}
                   >
                     <div className="flex items-center gap-1.5 font-bold text-xs">
-                      <FiUserCheck className="w-4 h-4 text-blue-600" /> Standard User
+                      <FiUserCheck className="w-4 h-4 text-blue-600" /> Sales Executive
                     </div>
-                    <span className="text-[10px] text-slate-500">Access quotes, prices & calculators</span>
+                    <span className="text-[10px] text-slate-500">Customer quotes & selling prices</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCreateForm({ ...createForm, role: "manager" })}
+                    className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all ${
+                      createForm.role === "manager"
+                        ? "border-amber-500 bg-amber-50/70 text-amber-900 ring-2 ring-amber-500/20"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <FiShield className="w-4 h-4 text-amber-600" /> Prod. Manager
+                    </div>
+                    <span className="text-[10px] text-slate-500">Manage paper/rates & audit costs</span>
                   </button>
 
                   <button
@@ -491,7 +522,7 @@ export default function UserManager() {
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <FiShield className="w-4 h-4 text-purple-600" /> Administrator
                     </div>
-                    <span className="text-[10px] text-slate-500">Full control over database & users</span>
+                    <span className="text-[10px] text-slate-500">Full control over system & users</span>
                   </button>
                 </div>
               </div>
@@ -588,7 +619,8 @@ export default function UserManager() {
                   onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white font-medium"
                 >
-                  <option value="user">Standard User</option>
+                  <option value="user">Sales Executive (Standard User)</option>
+                  <option value="manager">Production Manager</option>
                   <option value="admin">Administrator</option>
                 </select>
               </div>

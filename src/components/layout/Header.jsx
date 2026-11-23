@@ -12,7 +12,7 @@ import {
 import { useQuote } from "@/context/QuoteContext";
 import { useAuth } from "@/context/AuthContext";
 import SearchModal from "../common/SearchModal";
-import Logo from "../../../public/logo/A2V  Groups Logo.png";
+const Logo = "/logo/A2V  Groups Logo.png";
 
 export default function Header({ onToggleMobileSidebar }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -42,7 +42,11 @@ export default function Header({ onToggleMobileSidebar }) {
             </button>
 
             <Link to="/" className="flex items-center group">
-              <img src={Logo} alt="logo" className="w-12 h-12 sm:w-14 sm:h-14 object-contain" />
+              <img
+                src={Logo}
+                alt="logo"
+                className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
+              />
               <div>
                 <div className="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center gap-1.5 ml-2">
                   A2V PRINTS
@@ -102,7 +106,11 @@ export default function Header({ onToggleMobileSidebar }) {
                         : "bg-gradient-to-tr from-orange-600 to-amber-600"
                     }`}
                   >
-                    {isAdmin ? <FiShield className="w-3.5 h-3.5" /> : <FiUser className="w-3.5 h-3.5" />}
+                    {isAdmin ? (
+                      <FiShield className="w-3.5 h-3.5" />
+                    ) : (
+                      <FiUser className="w-3.5 h-3.5" />
+                    )}
                   </div>
                   <div className="text-left">
                     <div className="text-xs font-bold leading-none text-slate-200">

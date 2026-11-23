@@ -12,6 +12,8 @@ import {
   FiLogOut,
   FiUser,
   FiShield,
+  FiSliders,
+  FiFileText,
 } from "react-icons/fi";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
@@ -24,7 +26,9 @@ export default function AdminLayout({ children }) {
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to sign out from the Admin Portal?")) {
+    if (
+      window.confirm("Are you sure you want to sign out from the Admin Portal?")
+    ) {
       logout();
       navigate("/login");
     }
@@ -34,6 +38,16 @@ export default function AdminLayout({ children }) {
     { label: "Dashboard", href: "/admin", icon: FiGrid },
     { label: "Categories", href: "/admin/categories", icon: FiFolder },
     { label: "Products & Subcategories", href: "/admin/products", icon: FiBox },
+    {
+      label: "Printing Masters & Rates",
+      href: "/admin/printing-rates",
+      icon: FiSliders,
+    },
+    {
+      label: "Production & Quote Audit",
+      href: "/admin/quotations-audit",
+      icon: FiFileText,
+    },
     { label: "User Management", href: "/admin/users", icon: FiUsers },
   ];
 
@@ -54,7 +68,12 @@ export default function AdminLayout({ children }) {
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-lg border border-slate-700">
                 <FiShield className="w-3 h-3 text-orange-400" />
-                <span>Admin: <strong className="text-white">{user?.name || user?.username || "admin"}</strong></span>
+                <span>
+                  {user?.role === "manager" ? "Manager" : "Admin"}:{" "}
+                  <strong className="text-white">
+                    {user?.name || user?.username || "admin"}
+                  </strong>
+                </span>
               </span>
 
               {isBackendConnected ? (

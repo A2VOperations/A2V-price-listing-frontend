@@ -39,7 +39,9 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
               ) : (
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{categories.length}</h3>
+                <h3 className="text-2xl font-black text-slate-900 mt-1">
+                  {categories.length}
+                </h3>
               )}
               <Link
                 to="/admin/categories"
@@ -82,7 +84,9 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="w-12 h-7 bg-slate-200 rounded animate-pulse mt-1"></div>
               ) : (
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{products.length}</h3>
+                <h3 className="text-2xl font-black text-slate-900 mt-1">
+                  {products.length}
+                </h3>
               )}
               <Link
                 to="/admin/products"
@@ -130,9 +134,12 @@ export default function AdminDashboard() {
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700">
                 1. Category Level
               </span>
-              <h3 className="font-bold text-xs text-slate-800">Main Categories</h3>
+              <h3 className="font-bold text-xs text-slate-800">
+                Main Categories
+              </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                e.g. <em>Visiting Cards</em>, <em>Flex Board</em>, <em>ATM Pouches</em>. Appears on the home dashboard grid.
+                e.g. <em>Visiting Cards</em>, <em>Flex Board</em>,{" "}
+                <em>ATM Pouches</em>. Appears on the home dashboard grid.
               </p>
             </div>
 
@@ -140,9 +147,13 @@ export default function AdminDashboard() {
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700">
                 2. Sub-Category Level
               </span>
-              <h3 className="font-bold text-xs text-slate-800">Sub-Category Grouping</h3>
+              <h3 className="font-bold text-xs text-slate-800">
+                Sub-Category Grouping
+              </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                e.g. <em>500 GSM CARDS (QTY. 500 CARDS)</em>, <em>400 GSM CARDS</em>. Groups cards on category pages with custom color banners.
+                e.g. <em>500 GSM CARDS (QTY. 500 CARDS)</em>,{" "}
+                <em>400 GSM CARDS</em>. Groups cards on category pages with
+                custom color banners.
               </p>
             </div>
 
@@ -150,35 +161,66 @@ export default function AdminDashboard() {
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">
                 3. Product & Sub-Sub Variations
               </span>
-              <h3 className="font-bold text-xs text-slate-800">Variations & Options</h3>
+              <h3 className="font-bold text-xs text-slate-800">
+                Variations & Options
+              </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                e.g. <em>500 GSM + Velvet + Die Cut</em>. Includes dropdown choices, custom pricing tiers, and specs.
+                e.g. <em>500 GSM + Velvet + Die Cut</em>. Includes dropdown
+                choices, custom pricing tiers, and specs.
               </p>
             </div>
           </div>
         </div>
 
         {/* Quick Action Navigation */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             to="/admin/categories"
-            className="flex-1 p-5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 transition-all flex items-center justify-between text-orange-950 group"
+            className="p-5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 transition-all flex items-center justify-between text-orange-950 group"
           >
             <div>
-              <h3 className="font-bold text-sm">Manage Main Categories</h3>
-              <p className="text-xs text-orange-700 mt-1">Add, edit category names, descriptions, and thumbnails.</p>
+              <h3 className="font-bold text-sm">Main Categories</h3>
+              <p className="text-xs text-orange-700 mt-1">
+                Catalog category hierarchy.
+              </p>
             </div>
             <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
           </Link>
 
           <Link
             to="/admin/products"
-            className="flex-1 p-5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 transition-all flex items-center justify-between text-emerald-900 group"
+            className="p-5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 transition-all flex items-center justify-between text-emerald-900 group"
           >
             <div>
-              <h3 className="font-bold text-sm">Manage Products & Variations</h3>
+              <h3 className="font-bold text-sm">Products & Tiers</h3>
               <p className="text-xs text-emerald-700 mt-1">
-                Edit sub-categories, sub-sub variation details, price tiers, specs, and options.
+                Variants, specs & retail prices.
+              </p>
+            </div>
+            <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
+          </Link>
+
+          <Link
+            to="/admin/printing-rates"
+            className="p-5 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-all flex items-center justify-between text-amber-950 group"
+          >
+            <div>
+              <h3 className="font-bold text-sm">Printing Masters</h3>
+              <p className="text-xs text-amber-700 mt-1">
+                Paper, offset, digital & binding.
+              </p>
+            </div>
+            <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
+          </Link>
+
+          <Link
+            to="/admin/quotations-audit"
+            className="p-5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 transition-all flex items-center justify-between text-purple-950 group"
+          >
+            <div>
+              <h3 className="font-bold text-sm">Production Audit</h3>
+              <p className="text-xs text-purple-700 mt-1">
+                Margin floor & Job Card issuing.
               </p>
             </div>
             <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
