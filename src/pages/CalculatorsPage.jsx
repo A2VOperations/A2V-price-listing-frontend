@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useSearchParams} from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import FlexBoardOrderForm from "@/components/product/FlexBoardOrderForm";
@@ -7,6 +7,7 @@ import StandieOrderForm from "@/components/product/StandieOrderForm";
 import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm";
 import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
+import CommercialPrintCalculator from "@/components/product/CommercialPrintCalculator";
 import {
   FiMaximize2,
   FiTv,
@@ -14,6 +15,7 @@ import {
   FiBox,
   FiLayers,
   FiCheck,
+  FiBookOpen,
 } from "react-icons/fi";
 
 export default function CalculatorsPage() {
@@ -21,8 +23,8 @@ export default function CalculatorsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { getProductBySlug, loading } = useData();
 
-  // Active section: 'flex-board' | 'standee' | 'stickers'
-  const validSections = ["flex-board", "standee", "stickers"];
+  // Active section: 'bill-books' | 'flex-board' | 'standee' | 'stickers'
+  const validSections = ["bill-books", "bill-book", "flex-board", "standee", "stickers"];
   const currentSection =
     type && validSections.includes(type.toLowerCase())
       ? type.toLowerCase()
@@ -47,8 +49,7 @@ export default function CalculatorsPage() {
   }
 
   // Retrieve products from database / context
-  const flexProduct =
-    getProductBySlug("flex-board-printing") ||
+  const flexProduct = getProductBySlug("flex-board-printing") ||
     getProductBySlug("flex-board") || {
       id: "FB-001",
       code: "FB-001",
@@ -60,8 +61,7 @@ export default function CalculatorsPage() {
         "Custom Flex Board printing & framing calculator with Iron/Wooden structure options, support rods, and fitting.",
     };
 
-  const rollupProduct =
-    getProductBySlug("rollup-standie") ||
+  const rollupProduct = getProductBySlug("rollup-standie") ||
     getProductBySlug("STD-001") || {
       id: "STD-001",
       code: "STD-001",
@@ -72,8 +72,7 @@ export default function CalculatorsPage() {
       isRollUpStandie: true,
     };
 
-  const ironStandieProduct =
-    getProductBySlug("iron-frame-standie") ||
+  const ironStandieProduct = getProductBySlug("iron-frame-standie") ||
     getProductBySlug("STD-002") || {
       id: "STD-002",
       code: "STD-002",
@@ -84,8 +83,7 @@ export default function CalculatorsPage() {
       isStandie: true,
     };
 
-  const hutStandieProduct =
-    getProductBySlug("standee-hut") ||
+  const hutStandieProduct = getProductBySlug("standee-hut") ||
     getProductBySlug("STD-003") || {
       id: "STD-003",
       code: "STD-003",
@@ -96,8 +94,7 @@ export default function CalculatorsPage() {
       isHutStandie: true,
     };
 
-  const stickerProduct =
-    getProductBySlug("waterproof-vinyl-die-cut-sticker") ||
+  const stickerProduct = getProductBySlug("waterproof-vinyl-die-cut-sticker") ||
     getProductBySlug("SL-001") || {
       id: "SL-001",
       code: "SL-001",
@@ -106,6 +103,20 @@ export default function CalculatorsPage() {
       subCategory: "STICKERS & LABELS",
       slug: "waterproof-vinyl-die-cut-sticker",
       isSticker: true,
+    };
+
+  const billBookProduct =
+    getProductBySlug("bill-books") ||
+    getProductBySlug("bill-book") ||
+    getProductBySlug("BB-001") || {
+      id: "BB-001",
+      code: "BB-001",
+      name: "Bill Book & Commercial Printing Calculator",
+      categoryId: "bill-books",
+      subCategory: "BILL BOOKS",
+      slug: "bill-books",
+      description:
+        "Smart Commercial Printing calculator for Bill Books, Receipt Books, Challans, Single/Multi-Ply with Mini Offset & Digital costing.",
     };
 
   // 3 Standee categories / models definition
@@ -152,6 +163,37 @@ export default function CalculatorsPage() {
   ];
 
   // =========================================================================
+  // VIEW 0: BILL BOOK & COMMERCIAL PRINTING CALCULATOR (DEDICATED)
+  // =========================================================================
+  if (currentSection === "bill-books" || currentSection === "bill-book") {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb items={[{ label: "Bill Book & Commercial Printing Calculator" }]} />
+
+        {/* Dedicated Page Header for Bill Books */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
+                <FiBookOpen className="w-5 h-5" />
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Bill Book, Receipt Book &amp; Writing Pad Calculator
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+              Smart commercial printing engine for Single, Two-Ply &amp; Three-Ply carbonless books with sheet cutting yield, Mini Offset impressions, and continuous serial numbering.
+            </p>
+          </div>
+        </div>
+
+        {/* Dedicated Commercial Print Calculator Component */}
+        <CommercialPrintCalculator product={billBookProduct} />
+      </div>
+    );
+  }
+
+  // =========================================================================
   // VIEW 1: FLEX BOARD CALCULATOR (DEDICATED - ONLY FLEX BOARD SHOWS)
   // =========================================================================
   if (currentSection === "flex-board") {
@@ -171,7 +213,8 @@ export default function CalculatorsPage() {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Calculate custom dimensions for Star or Normal flex, welded MS iron or wooden framing, support rods, and installation.
+              Calculate custom dimensions for Star or Normal flex, welded MS
+              iron or wooden framing, support rods, and installation.
             </p>
           </div>
         </div>
@@ -202,7 +245,8 @@ export default function CalculatorsPage() {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Calculate sticker count and sheet yield across Chromo paper, waterproof Vinyl (Gloss/Matte), and custom die-cuts.
+              Calculate sticker count and sheet yield across Chromo paper,
+              waterproof Vinyl (Gloss/Matte), and custom die-cuts.
             </p>
           </div>
         </div>
@@ -242,7 +286,8 @@ export default function CalculatorsPage() {
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-            Configure dimensions, hardware specifications, and print media for Roll-Up, Heavy-Duty MS Iron, and A-Frame models.
+            Configure dimensions, hardware specifications, and print media for
+            Roll-Up, Heavy-Duty MS Iron, and A-Frame models.
           </p>
         </div>
       </div>
@@ -315,7 +360,9 @@ export default function CalculatorsPage() {
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-slate-600">{item.tag}</span>
+                  <span className="font-semibold text-slate-600">
+                    {item.tag}
+                  </span>
                   <span
                     className={`font-bold ${
                       isSelected

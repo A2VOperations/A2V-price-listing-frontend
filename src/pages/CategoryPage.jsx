@@ -18,7 +18,7 @@ import { TbCalculator } from "react-icons/tb";
 export default function CategoryPage() {
   const { slug } = useParams();
 
-  // Standee and Flex Board are custom calculator categories: redirect directly to their dedicated calculator systems
+  // Standee, Flex Board, Stickers, and Bill Books are custom calculator categories: redirect directly to their dedicated calculator systems
   if (slug === "standie" || slug === "standee") {
     return <Navigate to="/calculators/standee" replace />;
   }
@@ -27,6 +27,9 @@ export default function CategoryPage() {
   }
   if (slug === "stickers" || slug === "stickers-labels") {
     return <Navigate to="/calculators/stickers" replace />;
+  }
+  if (slug === "bill-books" || slug === "bill-book") {
+    return <Navigate to="/calculators/bill-books" replace />;
   }
 
   const { getCategoryBySlug, getProductsByCategory, loading } = useData();
@@ -281,7 +284,8 @@ export default function CategoryPage() {
                         {subCategoryName}
                       </h2>
                       <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
-                        {prods.length} {prods.length === 1 ? "Product" : "Products"}
+                        {prods.length}{" "}
+                        {prods.length === 1 ? "Product" : "Products"}
                       </span>
                     </div>
                   </div>

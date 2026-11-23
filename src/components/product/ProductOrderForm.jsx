@@ -7,10 +7,7 @@ import {
   FiDownload,
   FiUser,
   FiPhone,
-  FiPercent,
-  FiFileText,
   FiCheckCircle,
-  FiDollarSign,
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import { calculateProductPrice } from "@/lib/priceCalculator";
@@ -20,12 +17,25 @@ import StandieOrderForm from "./StandieOrderForm";
 import RollUpStandieOrderForm from "./RollUpStandieOrderForm";
 import StandieHutOrderForm from "./StandieHutOrderForm";
 import StickerCalculator from "./StickerCalculator";
+import CommercialPrintCalculator from "./CommercialPrintCalculator";
 
 export default function ProductOrderForm({
   product,
   customBasePrice,
   onVariantSelect,
 }) {
+  if (
+    product?.categoryId === "bill-books" ||
+    product?.slug?.includes("bill-book") ||
+    product?.isBillBook
+  ) {
+    return (
+      <CommercialPrintCalculator
+        product={product}
+        onVariantSelect={onVariantSelect}
+      />
+    );
+  }
   if (
     product?.isRollUpStandie ||
     product?.slug?.includes("rollup") ||
@@ -266,7 +276,8 @@ export default function ProductOrderForm({
           Number(exactOrBelow.lastPrice) > 0
         ) {
           baseLastPrice =
-            (Number(exactOrBelow.lastPrice) / Number(exactOrBelow.qty)) * numQty;
+            (Number(exactOrBelow.lastPrice) / Number(exactOrBelow.qty)) *
+            numQty;
           hasBaseLastPrice = true;
         } else if (
           sorted[0] &&
@@ -482,7 +493,7 @@ export default function ProductOrderForm({
                     type="number"
                     min={minQty}
                     step={currentProduct.quantityStep || 100}
-                    value={quantity} 
+                    value={quantity}
                     onChange={(e) =>
                       setQuantity(
                         Math.max(
@@ -660,21 +671,14 @@ export default function ProductOrderForm({
             <div className="p-3.5 sm:px-4 flex justify-between items-center group relative hover:bg-amber-50/25 transition-colors cursor-default select-none">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-slate-700">
-                  Applicable Cost
+                  Applicable Price
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                {currentLastPrice !== null && (
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-semibold text-slate-400 hidden sm:inline">
-                    (Last: Rs. {currentLastPrice.toLocaleString()}/-)
-                  </span>
-                )}
                 <span className="font-bold text-slate-900">
                   Rs. {applicableCost.toLocaleString()}/-
                 </span>
               </div>
-
-              
             </div>
 
             {validDiscount > 0 && (

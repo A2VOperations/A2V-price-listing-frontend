@@ -8,6 +8,7 @@ import { useData } from "@/context/DataContext";
 import flexImg from "@/assets/images/categories (14).webp";
 import stickersImg from "@/assets/images/categories (9).webp";
 import standieImg from "@/assets/images/luxury-standie.jpg";
+import billBookImg from "@/assets/images/categories (8).webp";
 
 export default function DashboardPage() {
   const { categories, loading, error, refreshData } = useData();
@@ -39,8 +40,18 @@ export default function DashboardPage() {
     );
   }
 
-  // Custom Price Categories (Flex Board, Stickers, Standee) rendered as Category Cards
+  // Custom Price Categories (Bill Book, Flex Board, Stickers, Standee) rendered as Category Cards
   const customPriceCategories = [
+    {
+      id: "bill-books",
+      slug: "bill-books",
+      destination: "/calculators/bill-books",
+      name: "Bill Book & Pads",
+      image: billBookImg,
+      badge: "Smart Press",
+      description:
+        "Commercial Printing calculator for Bill Books, Receipt Books, Challans, Single/Multi-Ply with Mini Offset & Digital costing.",
+    },
     {
       id: "flex-board",
       slug: "flex-board",
@@ -138,12 +149,13 @@ export default function DashboardPage() {
             </h2>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Custom size calculators and display hardware for Flex Boards, Sticker Sheets, and Standees.
+            Custom size calculators and display hardware for Bill Books, Flex
+            Boards, Sticker Sheets, and Standees.
           </p>
         </div>
 
-        {/* 3 Category Cards in Category Catalog Grid Style */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        {/* 4 Category Cards in Category Catalog Grid Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {customPriceCategories.map((cat) => (
             <CategoryCard key={cat.id} category={cat} />
           ))}
@@ -151,7 +163,10 @@ export default function DashboardPage() {
       </section>
 
       {/* SECTION 2: STANDARD PRODUCT CATEGORIES CATALOG (MATCHING IMAGE 1 DESIGN) */}
-      <section className="space-y-4 pt-4 border-t border-slate-200" id="categories">
+      <section
+        className="space-y-4 pt-4 border-t border-slate-200"
+        id="categories"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -163,7 +178,8 @@ export default function DashboardPage() {
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Browse standard quantity-based printing products (Visiting Cards, Envelopes, Pamphlets, Bill Books &amp; more).
+              Browse standard quantity-based printing products (Visiting Cards,
+              Envelopes, Pamphlets, Bill Books &amp; more).
             </p>
           </div>
 
