@@ -193,7 +193,7 @@ export default function CommercialPrintCalculator({
   // Available Colours for a given layer, type, and GSM in that layer's locked size
   const getColoursForLayerTypeAndGsm = (layerIndex, type, gsm) => {
     const sheets = getSheetsForLayer(layerIndex);
-    if (!sheets || sheets.length === 0) return ["Yellow", "Pink", "Green", "Blue", "White"];
+    if (!sheets || sheets.length === 0) return ["Yellow", "Pink", "Green", "White"];
     const filtered = sheets.filter((p) => {
       const typeMatch =
         !type ||

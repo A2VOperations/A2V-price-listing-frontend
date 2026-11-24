@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -28,6 +28,7 @@ import {
   FiSearch,
   FiAlertCircle,
   FiInfo,
+  FiFilter,
 } from "react-icons/fi";
 
 export default function PrintingRatesManager() {
@@ -45,9 +46,11 @@ export default function PrintingRatesManager() {
   const [bindingRates, setBindingRates] = useState([]);
   const [finishingRates, setFinishingRates] = useState([]);
 
-  // Search & Filter for papers
+  // Search & Dynamic Filters for papers
   const [paperSearch, setPaperSearch] = useState("");
+  const [sheetSizeFilter, setSheetSizeFilter] = useState("all");
   const [paperTypeFilter, setPaperTypeFilter] = useState("all");
+  const [gsmFilter, setGsmFilter] = useState("all");
   const [paperColourFilter, setPaperColourFilter] = useState("all");
 
   // ADD NEW SHEET MODAL STATE
@@ -321,33 +324,103 @@ export default function PrintingRatesManager() {
     }
   };
 
-  // Filtered papers
-  const filteredPapers = papers.filter((p) => {
-    const term = paperSearch.toLowerCase();
-    const sizeStr = `${p.rawSheetWidth || p.rawWidthInch} * ${p.rawSheetHeight || p.rawHeightInch}`.toLowerCase();
-    const sizeStrX = `${p.rawSheetWidth || p.rawWidthInch}x${p.rawSheetHeight || p.rawHeightInch}`.toLowerCase();
-    const typeStr = (p.paperType || "").toLowerCase();
-    const gsmStr = `${p.gsm}`.toLowerCase();
-    const colourStr = (p.colour || "").toLowerCase();
+  // Dynamic filter options derived directly from fetched papers data
+  const uniqueSheetSizes = useMemo(() => {
+    const sizeMap = new Map();
+    papers.forEach((p) => {
+      const w = Number(p.rawSheetWidth || p.rawWidthInch || 0);
+      const h = Number(p.rawSheetHeight || p.rawHeightInch || 0);
+      if (w > 0 && h > 0) {
+        const key = `${w}x${h}`;
+        if (!sizeMap.has(key)) {
+          sizeMap.set(key, { key, w, h, label: `${w}" × ${h}"` });
+        }
+      }
+    });
+    return Array.from(sizeMap.values()).sort((a, b) => a.w - b.w || a.h - b.h);
+  }, [papers]);
 
-    const matchesSearch =
-      sizeStr.includes(term) ||
-      sizeStrX.includes(term) ||
-      typeStr.includes(term) ||
-      gsmStr.includes(term) ||
-      colourStr.includes(term);
+  const uniquePaperTypes = useMemo(() => {
+    const types = new Set();
+    papers.forEach((p) => {
+      const t = (p.paperType || "").trim();
+      if (t) types.add(t);
+    });
+    return Array.from(types).sort();
+  }, [papers]);
 
-    const matchesType =
-      paperTypeFilter === "all" || typeStr === paperTypeFilter.toLowerCase();
+  const uniqueGsms = useMemo(() => {
+    const gsms = new Set();
+    papers.forEach((p) => {
+      const g = Number(p.gsm);
+      if (g > 0) gsms.add(g);
+    });
+    return Array.from(gsms).sort((a, b) => a - b);
+  }, [papers]);
 
-    const matchesColour =
-      paperColourFilter === "all" || colourStr === paperColourFilter.toLowerCase();
+  const uniqueColours = useMemo(() => {
+    const cols = new Set();
+    papers.forEach((p) => {
+      const c = (p.colour || "").trim();
+      if (c) cols.add(c);
+    });
+    return Array.from(cols).sort();
+  }, [papers]);
 
-    return matchesSearch && matchesType && matchesColour;
-  });
+  const hasActiveFilters =
+    paperSearch.trim() !== "" ||
+    sheetSizeFilter !== "all" ||
+    paperTypeFilter !== "all" ||
+    gsmFilter !== "all" ||
+    paperColourFilter !== "all";
 
-  // Extract unique paper types for filter
-  const uniquePaperTypes = Array.from(new Set(papers.map((p) => p.paperType || "Maplitho"))).filter(Boolean);
+  const clearFilters = () => {
+    setPaperSearch("");
+    setSheetSizeFilter("all");
+    setPaperTypeFilter("all");
+    setGsmFilter("all");
+    setPaperColourFilter("all");
+  };
+
+  // Filtered papers matching all active criteria
+  const filteredPapers = useMemo(() => {
+    return papers.filter((p) => {
+      const w = Number(p.rawSheetWidth || p.rawWidthInch || 0);
+      const h = Number(p.rawSheetHeight || p.rawHeightInch || 0);
+      const typeStr = (p.paperType || "").trim();
+      const gsmNum = Number(p.gsm || 0);
+      const colourStr = (p.colour || "").trim();
+
+      const term = paperSearch.trim().toLowerCase();
+      const sizeStr = `${w} * ${h}`.toLowerCase();
+      const sizeStrX = `${w}x${h}`.toLowerCase();
+
+      const matchesSearch =
+        !term ||
+        sizeStr.includes(term) ||
+        sizeStrX.includes(term) ||
+        typeStr.toLowerCase().includes(term) ||
+        `${gsmNum}`.includes(term) ||
+        colourStr.toLowerCase().includes(term) ||
+        (p.description || "").toLowerCase().includes(term);
+
+      const matchesSize =
+        sheetSizeFilter === "all" || `${w}x${h}` === sheetSizeFilter;
+
+      const matchesType =
+        paperTypeFilter === "all" ||
+        typeStr.toLowerCase() === paperTypeFilter.toLowerCase();
+
+      const matchesGsm =
+        gsmFilter === "all" || gsmNum === Number(gsmFilter);
+
+      const matchesColour =
+        paperColourFilter === "all" ||
+        colourStr.toLowerCase() === paperColourFilter.toLowerCase();
+
+      return matchesSearch && matchesSize && matchesType && matchesGsm && matchesColour;
+    });
+  }, [papers, paperSearch, sheetSizeFilter, paperTypeFilter, gsmFilter, paperColourFilter]);
 
   return (
     <AdminLayout>
@@ -466,64 +539,122 @@ export default function PrintingRatesManager() {
         {/* ============================================================== */}
         {activeTab === "papers" && (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
-            {/* Table Action Bar */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-3">
-              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
-                <div className="relative w-full sm:w-64">
+            {/* Table Action Bar with Dynamic Filters */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 space-y-3.5">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                {/* Search Bar */}
+                <div className="relative w-full lg:w-80">
                   <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <input
                     type="text"
                     value={paperSearch}
                     onChange={(e) => setPaperSearch(e.target.value)}
-                    placeholder="Search size, newspaper, GSM, color..."
-                    className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                    placeholder="Search size, paper type, GSM, color..."
+                    className="w-full pl-9 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white"
                   />
+                  {paperSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setPaperSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    >
+                      <FiX className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <select
-                    value={paperTypeFilter}
-                    onChange={(e) => setPaperTypeFilter(e.target.value)}
-                    className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="all">All Paper Types</option>
-                    <option value="Newspaper">Newspaper</option>
-                    <option value="Maplitho">Maplitho</option>
-                    <option value="Bond">Bond Paper</option>
-                    <option value="Art Paper">Art Paper</option>
-                    {uniquePaperTypes.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={paperColourFilter}
-                    onChange={(e) => setPaperColourFilter(e.target.value)}
-                    className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="all">All Colours</option>
-                    <option value="White">White</option>
-                    <option value="Yellow">Yellow</option>
-                    <option value="Pink">Pink</option>
-                    <option value="Blue">Blue</option>
-                    <option value="Green">Green</option>
-                  </select>
-                </div>
+                {/* Add New Sheet Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError("");
+                    setIsAddSheetOpen(true);
+                  }}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0"
+                >
+                  <FiPlus className="w-4 h-4" /> Add New Sheet
+                </button>
               </div>
 
-              {/* Add New Sheet Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setError("");
-                  setIsAddSheetOpen(true);
-                }}
-                className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <FiPlus className="w-4 h-4" /> Add New Sheet
-              </button>
+              {/* Dynamic Filter Selectors (Fetched directly from database papers) */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mr-1">
+                  <FiFilter className="w-3.5 h-3.5 text-orange-600" /> Filters:
+                </span>
+
+                {/* 1. Sheet Size Filter */}
+                <select
+                  value={sheetSizeFilter}
+                  onChange={(e) => setSheetSizeFilter(e.target.value)}
+                  className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="all">All Sheet Sizes ({uniqueSheetSizes.length})</option>
+                  {uniqueSheetSizes.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* 2. Paper Type Filter */}
+                <select
+                  value={paperTypeFilter}
+                  onChange={(e) => setPaperTypeFilter(e.target.value)}
+                  className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="all">All Paper Types ({uniquePaperTypes.length})</option>
+                  {uniquePaperTypes.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+
+                {/* 3. GSM Filter */}
+                <select
+                  value={gsmFilter}
+                  onChange={(e) => setGsmFilter(e.target.value)}
+                  className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="all">All GSM ({uniqueGsms.length})</option>
+                  {uniqueGsms.map((g) => (
+                    <option key={g} value={g}>
+                      {g} GSM
+                    </option>
+                  ))}
+                </select>
+
+                {/* 4. Color Filter */}
+                <select
+                  value={paperColourFilter}
+                  onChange={(e) => setPaperColourFilter(e.target.value)}
+                  className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                >
+                  <option value="all">All Colours ({uniqueColours.length})</option>
+                  {uniqueColours.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Clear Filters Button */}
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-1 px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-all cursor-pointer"
+                    title="Reset all active filters"
+                  >
+                    <FiX className="w-3.5 h-3.5" /> Clear Filters
+                  </button>
+                )}
+
+                {/* Result Count Badge */}
+                <span className="text-[11px] text-slate-400 font-medium ml-auto">
+                  Showing <strong className="text-slate-800">{filteredPapers.length}</strong> of {papers.length} sheets
+                </span>
+              </div>
             </div>
 
             {/* Exact 6-Column Format Sheet Table */}
@@ -551,7 +682,16 @@ export default function PrintingRatesManager() {
                   ) : filteredPapers.length === 0 ? (
                     <tr>
                       <td colSpan="7" className="py-12 text-center text-slate-400">
-                        No sheets match your search criteria. Click "+ Add New Sheet" to add one.
+                        <p className="font-semibold text-slate-600 mb-1">No sheets match your selected filter criteria.</p>
+                        {hasActiveFilters && (
+                          <button
+                            type="button"
+                            onClick={clearFilters}
+                            className="mt-2 text-xs font-bold text-orange-600 hover:text-orange-700 underline cursor-pointer"
+                          >
+                            Clear all filters
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ) : (
@@ -1005,7 +1145,7 @@ export default function PrintingRatesManager() {
                   6. Color Sheet <span className="text-rose-500">*</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
-                  {["White", "Yellow", "Pink", "Blue"].map((c) => (
+                  {["White", "Yellow", "Pink", "Green"].map((c) => (
                     <button
                       key={c}
                       type="button"
@@ -1022,7 +1162,7 @@ export default function PrintingRatesManager() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Or custom color (e.g. Green, Buff, Ivory)"
+                  placeholder="Or custom color (e.g. Buff, Ivory, Blue)"
                   value={newSheetForm.colour}
                   onChange={(e) => setNewSheetForm({ ...newSheetForm, colour: e.target.value })}
                   className="w-full mt-2 px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -1170,6 +1310,22 @@ export default function PrintingRatesManager() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   6. Color Sheet <span className="text-rose-500">*</span>
                 </label>
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  {["White", "Yellow", "Pink", "Green"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setEditSheetForm({ ...editSheetForm, colour: c })}
+                      className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all ${
+                        editSheetForm.colour.toLowerCase() === c.toLowerCase()
+                          ? "bg-orange-50 border-orange-600 text-orange-700 ring-2 ring-orange-500/20"
+                          : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
                 <input
                   type="text"
                   required
