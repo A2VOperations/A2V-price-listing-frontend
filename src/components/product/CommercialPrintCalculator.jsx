@@ -489,15 +489,15 @@ export default function CommercialPrintCalculator({
       grid = isHoriz ? { cols: hCols, rows: hRows } : { cols: vCols, rows: vRows };
     }
 
-    // 2. Paper Requirements & Costs (Zero Cutting Margin & Strict Ream/Loose Rule)
+    // 2. Paper Requirements & Costs (Strict Ream & Loose Sheet Purchasing Rule)
     // Rule:
-    // - Zero cutting margin / wastage is applied (grossRawSheets === netRawSheets).
+    // - Every layer has +5 extra sheets added for production/press make-ready wastage buffer.
     // - Every full 500 sheets is purchased at the Rim Price (reamRate).
     // - Any remaining loose sheets (< 500) are purchased at Loose Price (loosePrice).
     // - If plies use the SAME paper sheet (same type, GSM, colour, size), their sheet quantities are combined together.
     const totalPagesPerPly = qty * pages; // e.g. 10 books * 100 pages = 1000 sheets
     const netRawSheets = Math.ceil(totalPagesPerPly / bestYield);
-    const wastage = 0; // Zero cutting margin / sheet buffer as instructed
+    const wastage = 5; // +5 extra sheets per layer for wastage
     const grossRawSheets = netRawSheets + wastage;
 
     // Group active plies by exact paper identity to combine purchase of the same sheet
@@ -1548,8 +1548,8 @@ export default function CommercialPrintCalculator({
                   <span className="font-bold text-slate-900">{calculation.netRawSheets}</span>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-500 block">Cutting Margin / Wastage</span>
-                  <span className="font-bold text-slate-500">0 Sheets</span>
+                  <span className="text-[10px] text-slate-500 block">Wastage / Layer</span>
+                  <span className="font-bold text-amber-600">+{calculation.wastage} Sheets</span>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                   <span className="text-[10px] text-slate-500 block">Total Sheets / Ply</span>
@@ -1562,7 +1562,7 @@ export default function CommercialPrintCalculator({
                 <div className="flex justify-between items-center font-bold text-orange-950">
                   <span>Total Order Raw Sheets ({plyCount}-Ply):</span>
                   <span className="text-sm font-extrabold text-orange-600">
-                    {calculation.totalGrossRawSheetsAllPlies} Sheets
+                    {calculation.totalGrossRawSheetsAllPlies} Sheets ({calculation.totalNetRawSheetsAllPlies} Net + {calculation.wastage * plyCount} Wastage)
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-600 divide-y divide-orange-100">
@@ -1572,7 +1572,7 @@ export default function CommercialPrintCalculator({
                         • Layer {idx + 1} ({p.colour}):
                       </span>
                       <span className="font-bold text-slate-900">
-                        {p.netRawSheets} sheets (0 margin)
+                        {p.netRawSheets} net (+{p.wastage} wastage = {p.grossRawSheets} gross)
                       </span>
                     </div>
                   ))}
