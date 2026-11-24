@@ -1,6 +1,7 @@
 import React from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useData } from "@/context/DataContext";
+import { useAuth } from "@/context/AuthContext";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import FlexBoardOrderForm from "@/components/product/FlexBoardOrderForm";
 import StandieOrderForm from "@/components/product/StandieOrderForm";
@@ -16,12 +17,15 @@ import {
   FiLayers,
   FiCheck,
   FiBookOpen,
+  FiShield,
+  FiArrowLeft,
 } from "react-icons/fi";
 
 export default function CalculatorsPage() {
   const { type } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { getProductBySlug, loading } = useData();
+  const { isManagerOrAdmin } = useAuth();
 
   // Active section: 'bill-books' | 'flex-board' | 'standee' | 'stickers'
   const validSections = [
@@ -169,8 +173,37 @@ export default function CalculatorsPage() {
 
   // =========================================================================
   // VIEW 0: BILL BOOK & COMMERCIAL PRINTING CALCULATOR (DEDICATED)
+  // Restrict access strictly to Admin and Manager roles
   // =========================================================================
   if (currentSection === "bill-books" || currentSection === "bill-book") {
+    if (!isManagerOrAdmin) {
+      return (
+        <div className="space-y-6">
+          <Breadcrumb
+            items={[{ label: "Commercial Print & Bill Book Calculator" }]}
+          />
+          <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl shadow-xl border border-amber-100 text-center">
+            <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <FiShield className="w-7 h-7" />
+            </div>
+            <h2 className="text-xl font-black text-slate-900 mb-2">
+              Manager or Admin Access Required
+            </h2>
+            <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+              The Commercial Print &amp; Bill Book Calculator is restricted to
+              Production Managers and Administrators.
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-md"
+            >
+              <FiArrowLeft className="w-4 h-4" /> Return to Dashboard
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6">
         <Breadcrumb

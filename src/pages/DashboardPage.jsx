@@ -4,6 +4,7 @@ import { TbCalculator } from "react-icons/tb";
 import CategoryGrid from "@/components/category/CategoryGrid";
 import CategoryCard from "@/components/category/CategoryCard";
 import { useData } from "@/context/DataContext";
+import { useAuth } from "@/context/AuthContext";
 
 import flexImg from "@/assets/images/categories (14).webp";
 import stickersImg from "@/assets/images/categories (9).webp";
@@ -12,6 +13,7 @@ import billBookImg from "@/assets/images/categories (8).webp";
 
 export default function DashboardPage() {
   const { categories, loading, error, refreshData } = useData();
+  const { isManagerOrAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
   if (loading) {
@@ -41,7 +43,8 @@ export default function DashboardPage() {
   }
 
   // Custom Price Categories (Bill Book, Flex Board, Stickers, Standee) rendered as Category Cards
-  const customPriceCategories = [
+  // Commercial Print & Bill Book Calculator is restricted to Manager and Admin
+  const allCustomPriceCategories = [
     {
       id: "bill-books",
       slug: "bill-books",
@@ -83,6 +86,10 @@ export default function DashboardPage() {
         "Portable Roll-Up Standees, Heavy-Duty MS Iron Frame Standees, and A-Frame Tent Easel Huts.",
     },
   ];
+
+  const customPriceCategories = allCustomPriceCategories.filter(
+    (cat) => cat.id !== "bill-books" || isManagerOrAdmin
+  );
 
   // Exact standard category ordering shown in Image 1:
   // Row 1: Files & Folders, Envelopes, ATM Pouches, Pens, Visiting Cards
@@ -149,13 +156,21 @@ export default function DashboardPage() {
             </h2>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Custom size calculators and display hardware for Bill Books, Flex
-            Boards, Sticker Sheets, and Standees.
+            Custom size calculators and display hardware
+            {isManagerOrAdmin
+              ? " for Bill Books, Flex Boards, Sticker Sheets, and Standees."
+              : " for Flex Boards, Sticker Sheets, and Standees."}
           </p>
         </div>
 
-        {/* 4 Category Cards in Category Catalog Grid Style */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Category Cards in Category Catalog Grid Style */}
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 ${
+            customPriceCategories.length === 3
+              ? "lg:grid-cols-3"
+              : "lg:grid-cols-4"
+          } gap-5`}
+        >
           {customPriceCategories.map((cat) => (
             <CategoryCard key={cat.id} category={cat} />
           ))}
