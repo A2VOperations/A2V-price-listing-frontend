@@ -6,6 +6,7 @@ import ProductImage from "../common/ProductImage";
 
 export default function CategoryCard({ category }) {
   const isCalculatorCategory =
+    Boolean(category.destination && category.destination.startsWith("/calculator")) ||
     category.slug === "flex-board" ||
     category.id === "flex-board" ||
     category.slug === "stickers-labels" ||
@@ -17,7 +18,7 @@ export default function CategoryCard({ category }) {
     category.id === "standee";
 
   let destination = category.destination || `/category/${category.slug}`;
-  let actionText = "View Products";
+  let actionText = isCalculatorCategory ? "Open Calculator" : "View Products";
   let badgeText = category.badge || null;
 
   if (category.slug === "flex-board" || category.id === "flex-board") {

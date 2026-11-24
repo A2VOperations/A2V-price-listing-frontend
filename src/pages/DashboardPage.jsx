@@ -44,14 +44,25 @@ export default function DashboardPage() {
 
   // Custom Price Categories (Bill Book, Flex Board, Stickers, Standee) rendered as Category Cards
   // Commercial Print & Bill Book Calculator is restricted to Manager and Admin
+  // Sales Bill Book Calculator is open to Salesperson, Manager, and Admin
   const allCustomPriceCategories = [
+    {
+      id: "sales-bill-book",
+      slug: "sales-bill-book",
+      destination: "/calculators/sales-bill-book",
+      name: "Bill Book (Sales Counter)",
+      image: billBookImg,
+      badge: "Sales Ready",
+      description:
+        "Fast customer quotations for A4, A5, 4.5×11 & Legal bill books with automated sheet rules & live admin rates.",
+    },
     {
       id: "bill-books",
       slug: "bill-books",
       destination: "/calculators/bill-books",
-      name: "Bill Book & Pads",
+      name: "Commercial Sheet & Offset",
       image: billBookImg,
-      badge: "Smart Press",
+      badge: "Production Engine",
       description:
         "Commercial Printing calculator for Bill Books, Receipt Books, Challans, Single/Multi-Ply with Mini Offset & Digital costing.",
     },
@@ -166,9 +177,11 @@ export default function DashboardPage() {
         {/* Category Cards in Category Catalog Grid Style */}
         <div
           className={`grid grid-cols-1 sm:grid-cols-2 ${
-            customPriceCategories.length === 3
-              ? "lg:grid-cols-3"
-              : "lg:grid-cols-4"
+            customPriceCategories.length === 5
+              ? "lg:grid-cols-5"
+              : customPriceCategories.length === 4
+              ? "lg:grid-cols-4"
+              : "lg:grid-cols-3"
           } gap-5`}
         >
           {customPriceCategories.map((cat) => (

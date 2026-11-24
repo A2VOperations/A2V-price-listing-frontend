@@ -260,6 +260,61 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
   res.json({ success: true, url: fileUrl });
 });
 
+// Mock Master Rates for Dev/Stand-alone Mode
+const defaultMockPapers = [
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Newspaper", gsm: 58, colour: "White", looseSheetRate: 1.20, reamRate: 520, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Newspaper", gsm: 58, colour: "Yellow", looseSheetRate: 1.25, reamRate: 545, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Newspaper", gsm: 58, colour: "Pink", looseSheetRate: 1.25, reamRate: 545, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Maplitho", gsm: 70, colour: "White", looseSheetRate: 1.50, reamRate: 700, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Maplitho", gsm: 70, colour: "Yellow", looseSheetRate: 1.55, reamRate: 725, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Maplitho", gsm: 70, colour: "Pink", looseSheetRate: 1.55, reamRate: 725, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Maplitho", gsm: 70, colour: "Blue", looseSheetRate: 1.55, reamRate: 725, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Bond", gsm: 70, colour: "White", looseSheetRate: 2.10, reamRate: 950, isActive: true },
+  { rawWidthInch: 18, rawHeightInch: 22, paperType: "Bond", gsm: 80, colour: "White", looseSheetRate: 2.40, reamRate: 1100, isActive: true },
+  { rawWidthInch: 23, rawHeightInch: 36, paperType: "Maplitho", gsm: 70, colour: "White", looseSheetRate: 3.10, reamRate: 1400, isActive: true },
+  { rawWidthInch: 23, rawHeightInch: 36, paperType: "Maplitho", gsm: 70, colour: "Yellow", looseSheetRate: 3.15, reamRate: 1425, isActive: true },
+  { rawWidthInch: 23, rawHeightInch: 36, paperType: "Maplitho", gsm: 70, colour: "Pink", looseSheetRate: 3.15, reamRate: 1425, isActive: true },
+  { rawWidthInch: 23, rawHeightInch: 36, paperType: "Maplitho", gsm: 80, colour: "White", looseSheetRate: 3.50, reamRate: 1600, isActive: true },
+];
+
+app.get("/api/masters/papers", (req, res) => {
+  res.json({ success: true, count: defaultMockPapers.length, data: defaultMockPapers });
+});
+
+app.get("/api/masters/printing-rates", (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { rateKey: "OFFSET_MASTER_LEGAL", rate: 30, unit: "per_master" },
+      { rateKey: "OFFSET_MASTER_DEMY", rate: 50, unit: "per_master" },
+      { rateKey: "OFFSET_IMPRESSION_RUN_1000", rate: 70, unit: "per_1000_impressions" },
+    ],
+  });
+});
+
+app.get("/api/masters/binding-rates", (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { bindingCode: "normal", name: "Normal Binding", ratePerBook: 25 },
+      { bindingCode: "stapler", name: "Stapler Binding", ratePerBook: 12 },
+      { bindingCode: "gumming", name: "Top Gumming", ratePerBook: 10 },
+      { bindingCode: "hardbound", name: "Hardbound Register", ratePerBook: 45 },
+      { bindingCode: "spiral", name: "Spiral Binding", ratePerBook: 30 },
+    ],
+  });
+});
+
+app.get("/api/masters/finishing-rates", (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { serviceKey: "FINISH_NUMBERING_PER_BOOK", name: "Serial Numbering", ratePerBook: 2 },
+      { serviceKey: "FINISH_PUNCHING_PER_BOOK", name: "Hole Punching", ratePerBook: 2 },
+    ],
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Backend Express server listening at http://localhost:${PORT}`);
 });

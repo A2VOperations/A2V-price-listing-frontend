@@ -9,6 +9,7 @@ import RollUpStandieOrderForm from "@/components/product/RollUpStandieOrderForm"
 import StandieHutOrderForm from "@/components/product/StandieHutOrderForm";
 import StickerCalculator from "@/components/product/StickerCalculator";
 import CommercialPrintCalculator from "@/components/product/CommercialPrintCalculator";
+import SalesBillBookCalculator from "@/components/product/SalesBillBookCalculator";
 import {
   FiMaximize2,
   FiTv,
@@ -27,8 +28,10 @@ export default function CalculatorsPage() {
   const { getProductBySlug, loading } = useData();
   const { isManagerOrAdmin } = useAuth();
 
-  // Active section: 'bill-books' | 'flex-board' | 'standee' | 'stickers'
+  // Active section: 'sales-bill-book' | 'bill-books' | 'flex-board' | 'standee' | 'stickers'
   const validSections = [
+    "sales-bill-book",
+    "sales-bill-books",
     "bill-books",
     "bill-book",
     "flex-board",
@@ -170,6 +173,25 @@ export default function CalculatorsPage() {
         "border-purple-600 bg-purple-50/70 ring-2 ring-purple-500/20 text-purple-900 shadow-sm",
     },
   ];
+
+  // =========================================================================
+  // VIEW -1: SALESPERSON BILL BOOK CALCULATOR (OPEN TO SALESPERSON, MANAGER, ADMIN)
+  // =========================================================================
+  if (
+    currentSection === "sales-bill-book" ||
+    currentSection === "sales-bill-books"
+  ) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumb
+          items={[{ label: "Bill Book & Cash Memo Calculator (Sales)" }]}
+        />
+
+        {/* Dedicated Salesperson Bill Book Calculator Component */}
+        <SalesBillBookCalculator />
+      </div>
+    );
+  }
 
   // =========================================================================
   // VIEW 0: BILL BOOK & COMMERCIAL PRINTING CALCULATOR (DEDICATED)
