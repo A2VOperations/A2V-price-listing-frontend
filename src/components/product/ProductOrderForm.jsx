@@ -17,25 +17,12 @@ import StandieOrderForm from "./StandieOrderForm";
 import RollUpStandieOrderForm from "./RollUpStandieOrderForm";
 import StandieHutOrderForm from "./StandieHutOrderForm";
 import StickerCalculator from "./StickerCalculator";
-import CommercialPrintCalculator from "./CommercialPrintCalculator";
 
 export default function ProductOrderForm({
   product,
   customBasePrice,
   onVariantSelect,
 }) {
-  if (
-    product?.categoryId === "bill-books" ||
-    product?.slug?.includes("bill-book") ||
-    product?.isBillBook
-  ) {
-    return (
-      <CommercialPrintCalculator
-        product={product}
-        onVariantSelect={onVariantSelect}
-      />
-    );
-  }
   if (
     product?.isRollUpStandie ||
     product?.slug?.includes("rollup") ||

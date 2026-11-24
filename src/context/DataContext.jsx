@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import initialCategories from "@/data/categories.json";
-import initialProducts from "@/data/products.json";
 import {
   fetchCategoriesApi,
   createCategoryApi,
@@ -15,33 +13,32 @@ import {
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const [categories, setCategories] = useState(initialCategories || []);
-  const [products, setProducts] = useState(initialProducts || []);
-  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [error, setError] = useState(null);
 
   const loadDataFromApi = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
       const [fetchedCats, fetchedProds] = await Promise.all([
         fetchCategoriesApi(),
         fetchProductsApi(),
       ]);
 
-      if (Array.isArray(fetchedCats) && fetchedCats.length > 0) {
+      if (Array.isArray(fetchedCats)) {
         setCategories(fetchedCats);
       }
-      if (Array.isArray(fetchedProds) && fetchedProds.length > 0) {
+      if (Array.isArray(fetchedProds)) {
         setProducts(fetchedProds);
       }
       setIsBackendConnected(true);
     } catch (err) {
-      console.warn("MongoDB Backend API connection failed, using local dataset fallback:", err.message);
+      console.error("Failed to load catalog data from server API:", err.message);
+      setError(err.message || "Failed to load catalog data from server.");
       setIsBackendConnected(false);
-      // Seamlessly keep fallback categories & products so UI is always functional
-      setCategories((prev) => (prev.length > 0 ? prev : initialCategories));
-      setProducts((prev) => (prev.length > 0 ? prev : initialProducts));
     } finally {
       setLoading(false);
     }

@@ -80,6 +80,351 @@ const BINDING_OPTIONS = [
   },
 ];
 
+/**
+ * Maximized Guillotine Combination Cutting Optimizer
+ * Computes the maximum possible pieces from a raw sheet by testing:
+ * 1. Pure vertical layout
+ * 2. Pure horizontal layout
+ * 3. Horizontal primary split with combination orientations (matching Image 1)
+ * 4. Vertical primary split with combination orientations
+ */
+function calculateSheetCuttingLayout(rawW, rawH, finishedW, finishedH) {
+  const sW = Number(rawW);
+  const sH = Number(rawH);
+  const pW = Number(finishedW);
+  const pH = Number(finishedH);
+
+  if (!sW || !sH || !pW || !pH || sW <= 0 || sH <= 0 || pW <= 0 || pH <= 0) {
+    return {
+      bestYield: 1,
+      selectedLayout: "vertical",
+      cutType: "single-grid",
+      grid: { cols: 1, rows: 1 },
+      blocks: [],
+      cards: [],
+      efficiency: 0,
+      cuttingSheetDimensions: { width: sW || 18, height: sH || 22 },
+    };
+  }
+
+  const eps = 0.001;
+
+  // 1. Pure Vertical Layout on given sheet (sW x sH)
+  const vCols = Math.floor((sW + eps) / pW);
+  const vRows = Math.floor((sH + eps) / pH);
+  const verticalYield = vCols * vRows;
+
+  // 2. Pure Horizontal Layout on given sheet (sW x sH)
+  const hCols = Math.floor((sW + eps) / pH);
+  const hRows = Math.floor((sH + eps) / pW);
+  const horizontalYield = hCols * hRows;
+
+  // Commercial Print Shop Standard Rule: A4 on 18" x 22" sheet quarters into 4 pieces
+  const isA4 =
+    (pW >= 8.0 && pW <= 9.0 && pH >= 10.5 && pH <= 12.0) ||
+    (pH >= 8.0 && pH <= 9.0 && pW >= 10.5 && pW <= 12.0);
+
+  // Commercial Print Shop Standard Rule: A5 (half of A4) on 18" x 22" sheet divides into 8 pieces
+  const isA5 =
+    (pW >= 4.0 && pW <= 6.0 && pH >= 8.0 && pH <= 9.5) ||
+    (pH >= 4.0 && pH <= 6.0 && pW >= 8.0 && pW <= 9.5);
+
+  const is18x22 = (sW === 18 && sH === 22) || (sW === 22 && sH === 18);
+
+  if (isA4 && is18x22) {
+    const cards = [];
+    let cNum = 1;
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 2; c++) {
+        cards.push({
+          num: cNum++,
+          dims: `${pW}" × ${pH}"`,
+          xPct: ((c * 9) / 18) * 100,
+          yPct: ((r * 11) / 22) * 100,
+          wPct: (9 / 18) * 100,
+          hPct: (11 / 22) * 100,
+          orientation: "vertical",
+        });
+      }
+    }
+    return {
+      bestYield: 4,
+      selectedLayout: "vertical",
+      cutType: "single-grid",
+      grid: { cols: 2, rows: 2 },
+      blocks: [
+        {
+          id: "Block 1",
+          label: "A4 Standard Cut (4-Out)",
+          count: 4,
+          cols: 2,
+          rows: 2,
+          itemW: 9,
+          itemH: 11,
+          orientation: "vertical",
+          x: 0,
+          y: 0,
+          width: 18,
+          height: 22,
+        },
+      ],
+      cards,
+      efficiency: Math.round(((4 * pW * pH) / (sW * sH)) * 1000) / 10,
+      cuttingSheetDimensions: { width: 18, height: 22 },
+    };
+  }
+
+  if (isA5 && is18x22) {
+    const isV = pW === 4.5 || pH === 4.5;
+    const cols = isV ? 4 : 2;
+    const rows = isV ? 2 : 4;
+    const itemW = isV ? 4.5 : 5.5;
+    const itemH = isV ? 11 : 9;
+    const cards = [];
+    let cNum = 1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        cards.push({
+          num: cNum++,
+          dims: `${pW}" × ${pH}"`,
+          xPct: ((c * itemW) / 18) * 100,
+          yPct: ((r * itemH) / 22) * 100,
+          wPct: (itemW / 18) * 100,
+          hPct: (itemH / 22) * 100,
+          orientation: isV ? "vertical" : "horizontal",
+        });
+      }
+    }
+    return {
+      bestYield: 8,
+      selectedLayout: isV ? "vertical" : "horizontal",
+      cutType: "single-grid",
+      grid: { cols, rows },
+      blocks: [
+        {
+          id: "Block 1",
+          label: "A5 Standard Cut (8-Out)",
+          count: 8,
+          cols,
+          rows,
+          itemW,
+          itemH,
+          orientation: isV ? "vertical" : "horizontal",
+          x: 0,
+          y: 0,
+          width: 18,
+          height: 22,
+        },
+      ],
+      cards,
+      efficiency: Math.round(((8 * pW * pH) / (sW * sH)) * 1000) / 10,
+      cuttingSheetDimensions: { width: 18, height: 22 },
+    };
+  }
+
+  // 3. Maximized Guillotine Combination Cutting Optimizer
+  const isHorizBetter = horizontalYield > verticalYield;
+  let best = {
+    yield: isHorizBetter ? horizontalYield : verticalYield,
+    selectedLayout: isHorizBetter ? "horizontal" : "vertical",
+    cutType: "single-grid",
+    grid: isHorizBetter ? { cols: hCols, rows: hRows } : { cols: vCols, rows: vRows },
+    sheetW: sW,
+    sheetH: sH,
+    blocks: [
+      {
+        id: "Block 1",
+        label: isHorizBetter ? "Horizontal Grid" : "Vertical Grid",
+        count: isHorizBetter ? horizontalYield : verticalYield,
+        cols: isHorizBetter ? hCols : vCols,
+        rows: isHorizBetter ? hRows : vRows,
+        itemW: isHorizBetter ? pH : pW,
+        itemH: isHorizBetter ? pW : pH,
+        orientation: isHorizBetter ? "horizontal" : "vertical",
+        x: 0,
+        y: 0,
+        width: isHorizBetter ? hCols * pH : vCols * pW,
+        height: isHorizBetter ? hRows * pW : vRows * pH,
+      },
+    ],
+  };
+
+  const sheetOrientations = [
+    { w: Math.max(sW, sH), h: Math.min(sW, sH) },
+    { w: Math.min(sW, sH), h: Math.max(sW, sH) },
+  ];
+
+  for (const s of sheetOrientations) {
+    const W = s.w;
+    const H = s.h;
+
+    for (let orient = 0; orient < 2; orient++) {
+      const wA = orient === 0 ? pW : pH;
+      const hA = orient === 0 ? pH : pW;
+      const wB = hA;
+      const hB = wA;
+
+      // Pattern A: Horizontal Primary Cut across W at y = H1
+      const maxR1 = Math.floor((H + eps) / hA);
+      for (let r1 = 1; r1 <= maxR1; r1++) {
+        const H1 = r1 * hA;
+        const c1 = Math.floor((W + eps) / wA);
+        const count1 = r1 * c1;
+
+        const remH = H - H1;
+        const r2 = Math.floor((remH + eps) / hB);
+        const c2 = Math.floor((W + eps) / wB);
+        const count2 = r2 * c2;
+
+        const total = count1 + count2;
+        if (total > best.yield) {
+          best = {
+            yield: total,
+            selectedLayout: count2 > 0 ? "combination" : (orient === 0 ? "vertical" : "horizontal"),
+            cutType: count2 > 0 ? "horizontal-split" : "single-grid",
+            grid: { cols: Math.max(c1, c2), rows: r1 + r2 },
+            sheetW: W,
+            sheetH: H,
+            blocks: [
+              {
+                id: "Block 1 (Top)",
+                label: `Top: ${count1} Pcs (${orient === 0 ? "Vertical" : "Horizontal"} ${wA}×${hA}")`,
+                count: count1,
+                cols: c1,
+                rows: r1,
+                itemW: wA,
+                itemH: hA,
+                orientation: orient === 0 ? "vertical" : "horizontal",
+                x: 0,
+                y: 0,
+                width: c1 * wA,
+                height: H1,
+              },
+              ...(count2 > 0
+                ? [
+                    {
+                      id: "Block 2 (Bottom)",
+                      label: `Bottom: ${count2} Pcs (${orient === 0 ? "Horizontal" : "Vertical"} ${wB}×${hB}")`,
+                      count: count2,
+                      cols: c2,
+                      rows: r2,
+                      itemW: wB,
+                      itemH: hB,
+                      orientation: orient === 0 ? "horizontal" : "vertical",
+                      x: 0,
+                      y: H1,
+                      width: c2 * wB,
+                      height: r2 * hB,
+                    },
+                  ]
+                : []),
+            ],
+          };
+        }
+      }
+
+      // Pattern B: Vertical Primary Cut down H at x = W1
+      const maxC1 = Math.floor((W + eps) / wA);
+      for (let c1 = 1; c1 <= maxC1; c1++) {
+        const W1 = c1 * wA;
+        const r1 = Math.floor((H + eps) / hA);
+        const count1 = c1 * r1;
+
+        const remW = W - W1;
+        const c2 = Math.floor((remW + eps) / wB);
+        const r2 = Math.floor((H + eps) / hB);
+        const count2 = c2 * r2;
+
+        const total = count1 + count2;
+        if (total > best.yield) {
+          best = {
+            yield: total,
+            selectedLayout: count2 > 0 ? "combination" : (orient === 0 ? "vertical" : "horizontal"),
+            cutType: count2 > 0 ? "vertical-split" : "single-grid",
+            grid: { cols: c1 + c2, rows: Math.max(r1, r2) },
+            sheetW: W,
+            sheetH: H,
+            blocks: [
+              {
+                id: "Block 1 (Left)",
+                label: `Left: ${count1} Pcs (${orient === 0 ? "Vertical" : "Horizontal"} ${wA}×${hA}")`,
+                count: count1,
+                cols: c1,
+                rows: r1,
+                itemW: wA,
+                itemH: hA,
+                orientation: orient === 0 ? "vertical" : "horizontal",
+                x: 0,
+                y: 0,
+                width: W1,
+                height: r1 * hA,
+              },
+              ...(count2 > 0
+                ? [
+                    {
+                      id: "Block 2 (Right)",
+                      label: `Right: ${count2} Pcs (${orient === 0 ? "Horizontal" : "Vertical"} ${wB}×${hB}")`,
+                      count: count2,
+                      cols: c2,
+                      rows: r2,
+                      itemW: wB,
+                      itemH: hB,
+                      orientation: orient === 0 ? "horizontal" : "vertical",
+                      x: W1,
+                      y: 0,
+                      width: c2 * wB,
+                      height: r2 * hB,
+                    },
+                  ]
+                : []),
+            ],
+          };
+        }
+      }
+    }
+  }
+
+  // Generate discrete card positions
+  const cards = [];
+  let cardNum = 1;
+  const sheetW = best.sheetW;
+  const sheetH = best.sheetH;
+
+  (best.blocks || []).forEach((block) => {
+    for (let r = 0; r < block.rows; r++) {
+      for (let c = 0; c < block.cols; c++) {
+        const x = block.x + c * block.itemW;
+        const y = block.y + r * block.itemH;
+        cards.push({
+          num: cardNum++,
+          dims: `${block.itemW}" × ${block.itemH}"`,
+          xPct: (x / sheetW) * 100,
+          yPct: (y / sheetH) * 100,
+          wPct: (block.itemW / sheetW) * 100,
+          hPct: (block.itemH / sheetH) * 100,
+          orientation: block.orientation,
+        });
+      }
+    }
+  });
+
+  const efficiency = Math.round(((best.yield * pW * pH) / (sW * sH)) * 1000) / 10;
+
+  return {
+    bestYield: best.yield,
+    selectedLayout: best.selectedLayout,
+    cutType: best.cutType,
+    grid: best.grid,
+    blocks: best.blocks,
+    cards,
+    efficiency,
+    cuttingSheetDimensions: {
+      width: best.sheetW,
+      height: best.sheetH,
+    },
+  };
+}
+
 export default function CommercialPrintCalculator({
   product,
   onVariantSelect,
@@ -452,42 +797,16 @@ export default function CommercialPrintCalculator({
       name: `${rawW}" × ${rawH}" (${rawW === 18 && rawH === 22 ? "Standard Mini Offset" : "Commercial Sheet"})`,
     };
 
-    let bestYield = 1;
-    let selectedLayout = "vertical";
-    let grid = { cols: 2, rows: 2 };
-
-    // Standard A4 on 18x22 sheet quarters into 4 pieces
-    const isA4 = (finishedW >= 8.0 && finishedW <= 9.0 && finishedH >= 10.5 && finishedH <= 12.0) ||
-                 (finishedH >= 8.0 && finishedH <= 9.0 && finishedW >= 10.5 && finishedW <= 12.0);
-
-    // Half of A4 (A5) on 18x22 sheet divides into 8 pieces
-    const isA5 = (finishedW >= 4.0 && finishedW <= 6.0 && finishedH >= 8.0 && finishedH <= 9.5) ||
-                 (finishedH >= 4.0 && finishedH <= 6.0 && finishedW >= 8.0 && finishedW <= 9.5);
-
-    if (isA4 && ((rawW === 18 && rawH === 22) || (rawW === 22 && rawH === 18))) {
-      bestYield = 4;
-      selectedLayout = "vertical";
-      grid = { cols: 2, rows: 2 };
-    } else if (isA5 && ((rawW === 18 && rawH === 22) || (rawW === 22 && rawH === 18))) {
-      bestYield = 8;
-      selectedLayout = (finishedW === 4.5 || finishedH === 4.5) ? "vertical" : "horizontal";
-      grid = (finishedW === 4.5 || finishedH === 4.5) ? { cols: 4, rows: 2 } : { cols: 2, rows: 4 };
-    } else {
-      // Pure mathematical cutting with 0 cutting margin (epsilon protection for exact divisions)
-      const eps = 0.001;
-      const vCols = Math.floor((rawW + eps) / finishedW);
-      const vRows = Math.floor((rawH + eps) / finishedH);
-      const vYield = vCols * vRows;
-
-      const hCols = Math.floor((rawW + eps) / finishedH);
-      const hRows = Math.floor((rawH + eps) / finishedW);
-      const hYield = hCols * hRows;
-
-      const isHoriz = hYield > vYield;
-      bestYield = Math.max(1, isHoriz ? hYield : vYield);
-      selectedLayout = isHoriz ? "horizontal" : "vertical";
-      grid = isHoriz ? { cols: hCols, rows: hRows } : { cols: vCols, rows: vRows };
-    }
+    // Use Maximized Guillotine Combination Cutting Optimizer
+    const cutting = calculateSheetCuttingLayout(rawW, rawH, finishedW, finishedH);
+    const bestYield = cutting.bestYield;
+    const selectedLayout = cutting.selectedLayout;
+    const grid = cutting.grid;
+    const blocks = cutting.blocks;
+    const cards = cutting.cards;
+    const efficiency = cutting.efficiency;
+    const cuttingSheetDimensions = cutting.cuttingSheetDimensions;
+    const cutType = cutting.cutType;
 
     // 2. Paper Requirements & Costs (Strict Ream & Loose Sheet Purchasing Rule)
     // Rule:
@@ -691,7 +1010,12 @@ export default function CommercialPrintCalculator({
       optimalRawSheet,
       bestYield,
       selectedLayout,
+      cutType,
       grid,
+      blocks,
+      cards,
+      efficiency,
+      cuttingSheetDimensions,
       netRawSheets,
       grossRawSheets,
       totalNetRawSheetsAllPlies,
@@ -1518,28 +1842,103 @@ export default function CommercialPrintCalculator({
                 </span>
               </h3>
 
-              <div className="p-4 bg-slate-950 rounded-xl flex flex-col items-center justify-center border border-slate-800 space-y-2">
-                <div className="text-[11px] font-semibold text-slate-300">
-                  Best Cut: {calculation.optimalRawSheet.name} ({calculation.selectedLayout} layout)
-                </div>
-                <div
-                  className="grid gap-1 p-2 bg-slate-800/80 rounded-lg border border-slate-700 max-w-full overflow-hidden"
-                  style={{
-                    gridTemplateColumns: `repeat(${calculation.grid?.cols || 2}, minmax(0, 1fr))`,
-                  }}
-                >
-                  {Array.from({ length: calculation.bestYield || 4 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-10 sm:w-12 h-14 sm:h-16 bg-orange-600/20 border border-orange-500/50 rounded flex items-center justify-center text-[10px] font-mono font-bold text-orange-400"
+              <div className="p-4 bg-slate-950 rounded-xl flex flex-col items-center justify-center border border-slate-800 space-y-3">
+                <div className="text-center space-y-1">
+                  <div className="text-xs font-bold text-slate-200 flex items-center justify-center gap-1.5 flex-wrap">
+                    <span>
+                      Best Cut: {calculation.cuttingSheetDimensions?.width || rawW}" × {calculation.cuttingSheetDimensions?.height || rawH}"
+                    </span>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded font-extrabold uppercase ${
+                        calculation.selectedLayout === "combination"
+                          ? "bg-purple-900/80 text-purple-300 border border-purple-700"
+                          : "bg-orange-950 text-orange-400 border border-orange-800"
+                      }`}
                     >
-                      #{i + 1}
-                    </div>
-                  ))}
+                      {calculation.selectedLayout === "combination"
+                        ? "Combination Layout"
+                        : `${calculation.selectedLayout} layout`}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    Maximized Yield: <strong className="text-orange-400 font-bold">{calculation.bestYield} Pcs / Sheet</strong> ({calculation.efficiency || 0}% Sheet Utilization)
+                  </div>
                 </div>
-                <span className="text-[10px] text-slate-400">
-                  Finished Size: {finishedW}" × {finishedH}"
-                </span>
+
+                {/* Proportional Sheet Cutting Visualizer matching Image 1 */}
+                <div className="w-full max-w-sm bg-slate-900/90 rounded-xl p-3 border border-slate-800 relative">
+                  {/* Sheet Dimension Header */}
+                  <div className="flex justify-between items-center text-[10px] font-mono text-emerald-400 mb-1 px-1">
+                    <span>↔ Width: {calculation.cuttingSheetDimensions?.width || rawW} Inch</span>
+                    <span>↕ Height: {calculation.cuttingSheetDimensions?.height || rawH} Inch</span>
+                  </div>
+
+                  {/* Proportional Sheet Canvas Area */}
+                  <div
+                    className="relative w-full bg-[#111c33] rounded-lg border-2 border-dashed border-slate-600 overflow-hidden shadow-inner my-1"
+                    style={{
+                      aspectRatio: `${(calculation.cuttingSheetDimensions?.width || rawW) / (calculation.cuttingSheetDimensions?.height || rawH)}`,
+                      minHeight: "180px",
+                      maxHeight: "260px",
+                    }}
+                  >
+                    {/* Rendered Individual Cards */}
+                    {(calculation.cards || []).map((card) => (
+                      <div
+                        key={card.num}
+                        className={`absolute border rounded flex flex-col items-center justify-center p-0.5 transition-all shadow-xs overflow-hidden ${
+                          card.orientation === "vertical"
+                            ? "bg-emerald-900/60 border-emerald-500/80 text-emerald-300"
+                            : "bg-sky-900/60 border-sky-500/80 text-sky-300"
+                        }`}
+                        style={{
+                          left: `${card.xPct}%`,
+                          top: `${card.yPct}%`,
+                          width: `${card.wPct}%`,
+                          height: `${card.hPct}%`,
+                        }}
+                      >
+                        <span className="text-[10px] sm:text-xs font-black font-mono leading-tight">
+                          Card #{card.num}
+                        </span>
+                        <span className="text-[8px] sm:text-[9px] opacity-85 font-mono leading-none mt-0.5 whitespace-nowrap">
+                          {card.dims}
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Unused Waste Watermark Indicator */}
+                    <div className="absolute right-1 bottom-1 text-[8px] text-amber-500/70 font-mono uppercase tracking-wider pointer-events-none select-none bg-black/60 px-1.5 py-0.5 rounded border border-amber-900/40">
+                      Offcut / Waste
+                    </div>
+                  </div>
+
+                  {/* Block / Section Legend */}
+                  {calculation.blocks && calculation.blocks.length > 1 && (
+                    <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-[10px]">
+                      {calculation.blocks.map((b, i) => (
+                        <div key={i} className="flex items-center gap-1.5">
+                          <span
+                            className={`w-2.5 h-2.5 rounded-xs border ${
+                              b.orientation === "vertical"
+                                ? "bg-emerald-500/40 border-emerald-400"
+                                : "bg-sky-500/40 border-sky-400"
+                            }`}
+                          />
+                          <span className="text-slate-300">
+                            {b.id}: <strong>{b.count} Pcs</strong> ({b.itemW}" × {b.itemH}")
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                  <span>Finished Size: <strong>{finishedW}" × {finishedH}"</strong></span>
+                  <span>•</span>
+                  <span>Zero Cutting Margin</span>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">

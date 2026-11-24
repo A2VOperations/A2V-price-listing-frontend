@@ -18,7 +18,7 @@ import { TbCalculator } from "react-icons/tb";
 export default function CategoryPage() {
   const { slug } = useParams();
 
-  // Standee, Flex Board, Stickers, and Bill Books are custom calculator categories: redirect directly to their dedicated calculator systems
+  // Standee, Flex Board, and Stickers are custom calculator categories: redirect directly to their dedicated calculator systems
   if (slug === "standie" || slug === "standee") {
     return <Navigate to="/calculators/standee" replace />;
   }
@@ -27,9 +27,6 @@ export default function CategoryPage() {
   }
   if (slug === "stickers" || slug === "stickers-labels") {
     return <Navigate to="/calculators/stickers" replace />;
-  }
-  if (slug === "bill-books" || slug === "bill-book") {
-    return <Navigate to="/calculators/bill-books" replace />;
   }
 
   const { getCategoryBySlug, getProductsByCategory, loading } = useData();
@@ -248,6 +245,11 @@ export default function CategoryPage() {
               "IRON FRAME STANDEES",
               "STANDEE HUTS (A-FRAME)",
               "FLEX BOARD PRINTING",
+              "DUPLICATE NCR BILL BOOKS (2-PLY)",
+              "TRIPLICATE NCR BILL BOOKS (3-PLY)",
+              "RECEIPT & CASH MEMO BOOKS",
+              "DELIVERY CHALLAN BOOKS",
+              "NCR CARBONLESS BILL BOOKS",
               "PVC FILES",
               "SBS FILES",
               "PVC CLIP",

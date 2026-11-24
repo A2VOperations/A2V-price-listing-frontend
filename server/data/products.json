@@ -226,8 +226,8 @@
     "id": "BB-001",
     "code": "BB-1",
     "categoryId": "bill-books",
-    "subCategory": "NCR CARBONLESS BILL BOOKS",
-    "name": "Bill Book",
+    "subCategory": "DUPLICATE NCR BILL BOOKS (2-PLY)",
+    "name": "Duplicate NCR Bill Book (2-Ply)",
     "slug": "duplicate-ncr-bill-book",
     "image": "/src/assets/images/categories (8).webp",
     "description": "Custom printed Carbonless NCR paper Bill Books & Invoice Books available in 2 Copy (Duplicate) and 3 Copy (Triplicate) with sequential numbering and staple binding.",
@@ -237,8 +237,7 @@
     "unitName": "Books",
     "pricingModel": "quantity_tiered",
     "variantCombinations": [
-      "Bill Book - 2 Copy",
-      "Bill Book - 3 Copy"
+      "Bill Book - 2 Copy"
     ],
     "variantDetails": {
       "Bill Book - 2 Copy": {
@@ -597,7 +596,671 @@
       "/src/assets/images/categories (8).webp"
     ],
     "quantityPricingTiers": [],
-    "updatedAt": "2026-08-31T07:40:18.963Z"
+    "updatedAt": "2026-08-31T07:40:18.963Z",
+    "badge": "2-Ply NCR"
+  },
+  {
+    "_id": "6a8d3f3e181ae861f1c381b8",
+    "id": "BB-002",
+    "code": "BB-002",
+    "categoryId": "bill-books",
+    "subCategory": "TRIPLICATE NCR BILL BOOKS (3-PLY)",
+    "name": "Triplicate NCR Bill Book (3-Ply)",
+    "slug": "triplicate-ncr-bill-book",
+    "badge": "3-Ply NCR",
+    "image": "/src/assets/images/categories (8).webp",
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "description": "Commercial printed 3-Copy Triplicate Carbonless NCR paper Invoice Books with 1st White, 2nd Pink, and 3rd Yellow sheets. 50 sets per book with serial numbering and heavy-duty binding.",
+    "minQuantity": 10,
+    "quantityStep": 5,
+    "basePrice": 2000,
+    "unitName": "Books",
+    "pricingModel": "quantity_tiered",
+    "variantCombinations": [
+      "Bill Book - 3 Copy"
+    ],
+    "variantDetails": {
+      "Bill Book - 3 Copy": {
+        "code": "BB-3",
+        "basePrice": 2000,
+        "minQuantity": 10,
+        "quantityStep": 5,
+        "quantityPricingTiers": [
+          {
+            "minQty": 10,
+            "pricePerUnit": 200
+          },
+          {
+            "minQty": 25,
+            "pricePerUnit": 175
+          },
+          {
+            "minQty": 50,
+            "pricePerUnit": 155
+          },
+          {
+            "minQty": 100,
+            "pricePerUnit": 135
+          }
+        ],
+        "specifications": {
+          "Product Ref.": "BB/01st Edition (Sample File)",
+          "Product Code": "BB-3",
+          "Product Class": "Triplicate (3 Copy / 3-Ply)",
+          "Paper Quality": "55 GSM Carbonless NCR Paper (1st White, 2nd Pink, 3rd Yellow)",
+          "Book Capacity": "50 Sets per Book (150 Sheets Total)",
+          "Numbering": "Red Ink Sequential Serial Numbering",
+          "Binding Type": "Top Heavy-Duty Staple & Perforation with Spine Cloth Tape",
+          "Pricing Note": "Price discount applicable (System auto calculate) with increase in Quantity"
+        },
+        "ourSpecialization": [
+          "Printing with latest offset machines for clear and sharp carbon transfer",
+          "High-grade carbonless NCR paper for clean impressions across all 3 copies",
+          "Innovative, Advanced & Equipped Post Printing Unit with automatic numbering",
+          "Constant quality with reasonable price"
+        ],
+        "productSpecialization": [
+          "Triplicate 3-Ply NCR Carbonless paper (1st White, 2nd Pink, 3rd Yellow)",
+          "50 Sets per book with exact sequential red ink numbering",
+          "Perforated top copy & duplicate with firm backing board",
+          "Ideal for Triplicate Invoices, Audit Copies, and Triplicate Receipts"
+        ],
+        "importantNotes": [
+          "Please mention the starting serial number in order notes (e.g., 001 or 1001).",
+          "Standard Bill Book size: 1/5th Page (4.25\" x 7.0\") or 1/4th Page (5.5\" x 8.5\").",
+          "Use high-resolution vector artwork (CDR / PDF / AI) for clean text and rules."
+        ],
+        "fileRequirements": {
+          "formats": [
+            "PDF",
+            "CDR",
+            "AI"
+          ],
+          "minDpi": 300,
+          "fullDesignSize": "1/5th Page (W: 108 mm X H: 178 mm) / 1/4th Page (W: 140 mm X H: 216 mm)",
+          "safeArea": "4 mm inside boundary",
+          "bleed": "2 mm"
+        },
+        "options": [
+          {
+            "id": "1stPaperQuality",
+            "name": "1st Paper Quality",
+            "type": "select",
+            "required": true,
+            "values": [
+              {
+                "label": "100 GSM DEO Paper (1 Side Print)",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "100 GSM DEO Paper (2 Side Print)",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "90 GSM Sunshine Paper (1 Side Print)",
+                "priceAdjustment": 0
+              }
+            ]
+          },
+          {
+            "id": "2ndCopyPaperColor",
+            "name": "2nd Copy Paper Color",
+            "type": "select",
+            "required": true,
+            "values": [
+              {
+                "label": "White",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Pink",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Yellow",
+                "priceAdjustment": 0
+              }
+            ]
+          },
+          {
+            "id": "3rdCopyPaperColor",
+            "name": "3rd Copy Paper Color",
+            "type": "select",
+            "required": true,
+            "values": [
+              {
+                "label": "White",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Pink",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Yellow",
+                "priceAdjustment": 0
+              }
+            ]
+          },
+          {
+            "id": "bindingStyle",
+            "name": "Binding Quality",
+            "type": "select",
+            "required": true,
+            "values": [
+              {
+                "label": "Normal",
+                "priceAdjustment": 0
+              },
+              {
+                "label": "Premium",
+                "priceAdjustment": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "specifications": {
+      "Product Ref.": "BB/01st Edition (Sample File)",
+      "Product Code": "BB-002",
+      "Product Class": "Triplicate (3 Copy / 3-Ply)",
+      "Paper Quality": "55 GSM Carbonless NCR Paper (1st White, 2nd Pink, 3rd Yellow)",
+      "Book Capacity": "50 Sets per Book",
+      "Numbering": "Red Ink Sequential Serial Numbering",
+      "Pricing Note": "Price discount applicable (System auto calculate) with increase in Quantity"
+    },
+    "ourSpecialization": [
+      "Printing with latest offset machines for clear and sharp carbon transfer",
+      "High-grade carbonless NCR paper for clean impressions without carbon paper",
+      "Innovative, Advanced & Equipped Post Printing Unit with automatic numbering",
+      "Constant quality with reasonable price"
+    ],
+    "productSpecialization": [
+      "Triplicate 3-Ply NCR Carbonless paper (1st White, 2nd Pink, 3rd Yellow)",
+      "50 Sets per book with exact sequential red ink numbering",
+      "Perforated pages for easy tearing with sturdy Kraft cover binding",
+      "Ideal for Tax Invoices, Delivery Challans, and Transporter Records"
+    ],
+    "importantNotes": [
+      "Please mention the starting serial number in order notes (e.g., 001 or 1001).",
+      "Standard Bill Book size: 1/5th Page (4.25\" x 7.0\") or 1/4th Page (5.5\" x 8.5\").",
+      "Use high-resolution vector artwork (CDR / PDF / AI) for clean text and rules."
+    ],
+    "fileRequirements": {
+      "formats": [
+        "PDF",
+        "CDR",
+        "AI"
+      ],
+      "minDpi": 300,
+      "fullDesignSize": "1/5th Page (W: 108 mm X H: 178 mm) / 1/4th Page (W: 140 mm X H: 216 mm)",
+      "safeArea": "4 mm inside boundary",
+      "bleed": "2 mm"
+    },
+    "options": [
+      {
+        "id": "paperSize",
+        "name": "Book Size",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "1/5th Page (4.25\" X 7.0\")",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "1/4th Page (5.5\" X 8.5\")",
+            "priceAdjustment": 300
+          },
+          {
+            "label": "A4 Size (8.27\" X 11.69\")",
+            "priceAdjustment": 800
+          }
+        ]
+      },
+      {
+        "id": "numbering",
+        "name": "Sequential Numbering",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Red Ink Serial Numbering Included",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Without Numbering",
+            "priceAdjustment": 0
+          }
+        ]
+      },
+      {
+        "id": "bindingStyle",
+        "name": "Binding Style",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Top Staple & Perforation with Tape",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Pad Glue Binding (No Perforation)",
+            "priceAdjustment": 0
+          }
+        ]
+      }
+    ],
+    "quantityPricingTiers": [
+      {
+        "minQty": 10,
+        "pricePerUnit": 200
+      },
+      {
+        "minQty": 25,
+        "pricePerUnit": 175
+      },
+      {
+        "minQty": 50,
+        "pricePerUnit": 155
+      },
+      {
+        "minQty": 100,
+        "pricePerUnit": 135
+      }
+    ],
+    "updatedAt": "2026-11-24T08:23:59.414Z"
+  },
+  {
+    "_id": "6a8d3f3e181ae861f1c381b9",
+    "id": "BB-003",
+    "code": "BB-003",
+    "categoryId": "bill-books",
+    "subCategory": "RECEIPT & CASH MEMO BOOKS",
+    "name": "Receipt & Cash Memo Book",
+    "slug": "receipt-cash-memo-book",
+    "badge": "Cash Memo",
+    "image": "/src/assets/images/categories (8).webp",
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "description": "Single & duplicate cash memo and receipt books crafted from premium paper with sequential red numbering, tear-off perforation, and sturdy Kraft cover binding.",
+    "minQuantity": 10,
+    "quantityStep": 5,
+    "basePrice": 950,
+    "unitName": "Books",
+    "pricingModel": "quantity_tiered",
+    "variantCombinations": [
+      "Single Copy (100 Leaves)",
+      "Duplicate with Carbon (50 Sets)"
+    ],
+    "variantDetails": {
+      "Single Copy (100 Leaves)": {
+        "code": "RC-1",
+        "basePrice": 950,
+        "minQuantity": 10,
+        "quantityStep": 5,
+        "quantityPricingTiers": [
+          {
+            "minQty": 10,
+            "pricePerUnit": 95
+          },
+          {
+            "minQty": 25,
+            "pricePerUnit": 80
+          },
+          {
+            "minQty": 50,
+            "pricePerUnit": 70
+          },
+          {
+            "minQty": 100,
+            "pricePerUnit": 60
+          }
+        ],
+        "specifications": {
+          "Product Ref.": "RC/01st Edition",
+          "Product Code": "RC-1",
+          "Paper Quality": "70 GSM Maplitho Paper",
+          "Book Capacity": "100 Receipts per Book",
+          "Numbering": "Red Ink Serial Numbering Included"
+        }
+      },
+      "Duplicate with Carbon (50 Sets)": {
+        "code": "RC-2",
+        "basePrice": 1250,
+        "minQuantity": 10,
+        "quantityStep": 5,
+        "quantityPricingTiers": [
+          {
+            "minQty": 10,
+            "pricePerUnit": 125
+          },
+          {
+            "minQty": 25,
+            "pricePerUnit": 105
+          },
+          {
+            "minQty": 50,
+            "pricePerUnit": 95
+          },
+          {
+            "minQty": 100,
+            "pricePerUnit": 85
+          }
+        ],
+        "specifications": {
+          "Product Ref.": "RC/02nd Edition",
+          "Product Code": "RC-2",
+          "Paper Quality": "55 GSM Carbonless NCR / Carbon Paper",
+          "Book Capacity": "50 Sets per Book",
+          "Numbering": "Red Ink Serial Numbering Included"
+        }
+      }
+    },
+    "specifications": {
+      "Product Code": "BB-003",
+      "Book Size": "1/5th Page (4.25\" x 7.0\") or 1/4th Page (5.5\" x 8.5\")",
+      "Paper Quality": "70 GSM White Maplitho / 55 GSM NCR",
+      "Binding Type": "Top Staple & Perforation with Spine Cloth Tape",
+      "Serial Numbering": "Red Ink Sequential Numbering Included"
+    },
+    "ourSpecialization": [
+      "Printing with latest offset machines for clear and sharp carbon transfer",
+      "High-grade carbonless NCR paper for clean impressions without carbon paper",
+      "Innovative, Advanced & Equipped Post Printing Unit with automatic numbering",
+      "Constant quality with reasonable price"
+    ],
+    "productSpecialization": [
+      "Clear sequential numbering in sharp red ink",
+      "Micro-perforation for smooth tearing",
+      "Thick chipboard backing for effortless writing on the go"
+    ],
+    "importantNotes": [
+      "Please mention the starting serial number in order notes (e.g., 001 or 1001).",
+      "Standard Bill Book size: 1/5th Page (4.25\" x 7.0\") or 1/4th Page (5.5\" x 8.5\").",
+      "Use high-resolution vector artwork (CDR / PDF / AI) for clean text and rules."
+    ],
+    "fileRequirements": {
+      "formats": [
+        "PDF",
+        "CDR",
+        "AI"
+      ],
+      "minDpi": 300,
+      "fullDesignSize": "1/5th Page (W: 108 mm X H: 178 mm) / 1/4th Page (W: 140 mm X H: 216 mm)",
+      "safeArea": "4 mm inside boundary",
+      "bleed": "2 mm"
+    },
+    "options": [
+      {
+        "id": "paperSize",
+        "name": "Book Size",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "1/5th Page (4.25\" X 7.0\")",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "1/4th Page (5.5\" X 8.5\")",
+            "priceAdjustment": 300
+          },
+          {
+            "label": "A4 Size (8.27\" X 11.69\")",
+            "priceAdjustment": 800
+          }
+        ]
+      },
+      {
+        "id": "numbering",
+        "name": "Sequential Numbering",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Red Ink Serial Numbering Included",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Without Numbering",
+            "priceAdjustment": 0
+          }
+        ]
+      },
+      {
+        "id": "bindingStyle",
+        "name": "Binding Style",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Top Staple & Perforation with Tape",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Pad Glue Binding (No Perforation)",
+            "priceAdjustment": 0
+          }
+        ]
+      }
+    ],
+    "quantityPricingTiers": [
+      {
+        "minQty": 10,
+        "pricePerUnit": 95
+      },
+      {
+        "minQty": 25,
+        "pricePerUnit": 80
+      },
+      {
+        "minQty": 50,
+        "pricePerUnit": 70
+      },
+      {
+        "minQty": 100,
+        "pricePerUnit": 60
+      }
+    ],
+    "updatedAt": "2026-11-24T08:34:34.799Z"
+  },
+  {
+    "_id": "6a8d3f3e181ae861f1c381ba",
+    "id": "BB-004",
+    "code": "BB-004",
+    "categoryId": "bill-books",
+    "subCategory": "DELIVERY CHALLAN BOOKS",
+    "name": "Delivery Challan Book",
+    "slug": "delivery-challan-book",
+    "badge": "Challan Book",
+    "image": "/src/assets/images/categories (8).webp",
+    "images": [
+      "/src/assets/images/categories (8).webp"
+    ],
+    "description": "Dispatch delivery challan books in 2-ply and 3-ply NCR with receiver acknowledgment, vehicle info fields, consecutive numbering, and sturdy book binding.",
+    "minQuantity": 10,
+    "quantityStep": 5,
+    "basePrice": 1600,
+    "unitName": "Books",
+    "pricingModel": "quantity_tiered",
+    "variantCombinations": [
+      "Duplicate Challan (50 Sets)",
+      "Triplicate Challan (50 Sets)"
+    ],
+    "variantDetails": {
+      "Duplicate Challan (50 Sets)": {
+        "code": "DC-2",
+        "basePrice": 1600,
+        "minQuantity": 10,
+        "quantityStep": 5,
+        "quantityPricingTiers": [
+          {
+            "minQty": 10,
+            "pricePerUnit": 160
+          },
+          {
+            "minQty": 25,
+            "pricePerUnit": 135
+          },
+          {
+            "minQty": 50,
+            "pricePerUnit": 120
+          },
+          {
+            "minQty": 100,
+            "pricePerUnit": 105
+          }
+        ],
+        "specifications": {
+          "Product Ref.": "DC/01st Edition",
+          "Product Code": "DC-2",
+          "Product Class": "Duplicate (2-Ply)",
+          "Paper Quality": "55 GSM Carbonless NCR (1st White, 2nd Pink)"
+        }
+      },
+      "Triplicate Challan (50 Sets)": {
+        "code": "DC-3",
+        "basePrice": 2100,
+        "minQuantity": 10,
+        "quantityStep": 5,
+        "quantityPricingTiers": [
+          {
+            "minQty": 10,
+            "pricePerUnit": 210
+          },
+          {
+            "minQty": 25,
+            "pricePerUnit": 185
+          },
+          {
+            "minQty": 50,
+            "pricePerUnit": 165
+          },
+          {
+            "minQty": 100,
+            "pricePerUnit": 150
+          }
+        ],
+        "specifications": {
+          "Product Ref.": "DC/02nd Edition",
+          "Product Code": "DC-3",
+          "Product Class": "Triplicate (3-Ply)",
+          "Paper Quality": "55 GSM Carbonless NCR (1st White, 2nd Pink, 3rd Yellow)"
+        }
+      }
+    },
+    "specifications": {
+      "Product Code": "BB-004",
+      "Standard Size": "A5 Size (5.83\" x 8.27\") or 1/4th Page (5.5\" x 8.5\")",
+      "Paper Quality": "55 GSM Carbonless NCR Paper",
+      "Book Capacity": "50 Sets per Book",
+      "Binding Type": "Top Heavy-Duty Staple & Tape Binding"
+    },
+    "ourSpecialization": [
+      "Printing with latest offset machines for clear and sharp carbon transfer",
+      "High-grade carbonless NCR paper for clean impressions without carbon paper",
+      "Innovative, Advanced & Equipped Post Printing Unit with automatic numbering",
+      "Constant quality with reasonable price"
+    ],
+    "productSpecialization": [
+      "Receiver acknowledgment copy format with vehicle & transporter info",
+      "Instant NCR carbon transfer without messy carbon paper",
+      "Consecutive red serial numbering"
+    ],
+    "importantNotes": [
+      "Please mention the starting serial number in order notes (e.g., 001 or 1001).",
+      "Standard Bill Book size: 1/5th Page (4.25\" x 7.0\") or 1/4th Page (5.5\" x 8.5\").",
+      "Use high-resolution vector artwork (CDR / PDF / AI) for clean text and rules."
+    ],
+    "fileRequirements": {
+      "formats": [
+        "PDF",
+        "CDR",
+        "AI"
+      ],
+      "minDpi": 300,
+      "fullDesignSize": "1/5th Page (W: 108 mm X H: 178 mm) / 1/4th Page (W: 140 mm X H: 216 mm)",
+      "safeArea": "4 mm inside boundary",
+      "bleed": "2 mm"
+    },
+    "options": [
+      {
+        "id": "paperSize",
+        "name": "Book Size",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "1/5th Page (4.25\" X 7.0\")",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "1/4th Page (5.5\" X 8.5\")",
+            "priceAdjustment": 300
+          },
+          {
+            "label": "A4 Size (8.27\" X 11.69\")",
+            "priceAdjustment": 800
+          }
+        ]
+      },
+      {
+        "id": "numbering",
+        "name": "Sequential Numbering",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Red Ink Serial Numbering Included",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Without Numbering",
+            "priceAdjustment": 0
+          }
+        ]
+      },
+      {
+        "id": "bindingStyle",
+        "name": "Binding Style",
+        "type": "select",
+        "required": true,
+        "values": [
+          {
+            "label": "Top Staple & Perforation with Tape",
+            "priceAdjustment": 0
+          },
+          {
+            "label": "Pad Glue Binding (No Perforation)",
+            "priceAdjustment": 0
+          }
+        ]
+      }
+    ],
+    "quantityPricingTiers": [
+      {
+        "minQty": 10,
+        "pricePerUnit": 160
+      },
+      {
+        "minQty": 25,
+        "pricePerUnit": 135
+      },
+      {
+        "minQty": 50,
+        "pricePerUnit": 120
+      },
+      {
+        "minQty": 100,
+        "pricePerUnit": 105
+      }
+    ],
+    "updatedAt": "2026-11-24T08:34:34.799Z"
   },
   {
     "_id": "6a8d3f3e181ae861f1c381b8",

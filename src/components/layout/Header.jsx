@@ -63,7 +63,7 @@ export default function Header({ onToggleMobileSidebar }) {
             >
               <span className="flex items-center">
                 <FiSearch className="w-4 h-4 text-slate-400 group-hover:text-orange-400 mr-2.5 transition-colors" />
-                Search product name, code (e.g. VC-001), or category...
+                Search product name
               </span>
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-900 rounded border border-slate-700">
                 Ctrl + K

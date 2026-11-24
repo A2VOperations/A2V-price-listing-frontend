@@ -18,7 +18,6 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // Paths
 const categoriesFilePath = path.join(__dirname, "data", "categories.json");
 const productsFilePath = path.join(__dirname, "data", "products.json");
-const srcProductsFilePath = path.join(__dirname, "..", "src", "data", "products.json");
 
 const uploadsDir = path.join(__dirname, "..", "public", "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -75,12 +74,6 @@ function readProducts() {
 function saveProducts(products) {
   try {
     fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2), "utf8");
-    // Also update src/data/products.json for frontend backup/sync
-    try {
-      fs.writeFileSync(srcProductsFilePath, JSON.stringify(products, null, 2), "utf8");
-    } catch (e) {
-      console.warn("Could not sync to src/data/products.json:", e);
-    }
     return true;
   } catch (err) {
     console.error("Error saving products:", err);
