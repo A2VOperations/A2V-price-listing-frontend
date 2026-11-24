@@ -24,7 +24,13 @@ export default function CalculatorsPage() {
   const { getProductBySlug, loading } = useData();
 
   // Active section: 'bill-books' | 'flex-board' | 'standee' | 'stickers'
-  const validSections = ["bill-books", "bill-book", "flex-board", "standee", "stickers"];
+  const validSections = [
+    "bill-books",
+    "bill-book",
+    "flex-board",
+    "standee",
+    "stickers",
+  ];
   const currentSection =
     type && validSections.includes(type.toLowerCase())
       ? type.toLowerCase()
@@ -105,8 +111,7 @@ export default function CalculatorsPage() {
       isSticker: true,
     };
 
-  const billBookProduct =
-    getProductBySlug("bill-books") ||
+  const billBookProduct = getProductBySlug("bill-books") ||
     getProductBySlug("bill-book") ||
     getProductBySlug("BB-001") || {
       id: "BB-001",
@@ -168,24 +173,9 @@ export default function CalculatorsPage() {
   if (currentSection === "bill-books" || currentSection === "bill-book") {
     return (
       <div className="space-y-6">
-        <Breadcrumb items={[{ label: "Bill Book & Commercial Printing Calculator" }]} />
-
-        {/* Dedicated Page Header for Bill Books */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-orange-600 text-white shadow-xs">
-                <FiBookOpen className="w-5 h-5" />
-              </span>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Bill Book, Receipt Book &amp; Writing Pad Calculator
-              </h1>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Smart commercial printing engine for Single, Two-Ply &amp; Three-Ply carbonless books with sheet cutting yield, Mini Offset impressions, and continuous serial numbering.
-            </p>
-          </div>
-        </div>
+        <Breadcrumb
+          items={[{ label: "Bill Book & Commercial Printing Calculator" }]}
+        />
 
         {/* Dedicated Commercial Print Calculator Component */}
         <CommercialPrintCalculator product={billBookProduct} />

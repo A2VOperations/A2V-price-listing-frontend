@@ -173,7 +173,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Action Navigation */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link
             to="/admin/categories"
             className="p-5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 transition-all flex items-center justify-between text-orange-950 group"
@@ -208,19 +208,6 @@ export default function AdminDashboard() {
               <h3 className="font-bold text-sm">Printing Masters</h3>
               <p className="text-xs text-amber-700 mt-1">
                 Paper, offset, digital & binding.
-              </p>
-            </div>
-            <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />
-          </Link>
-
-          <Link
-            to="/admin/quotations-audit"
-            className="p-5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 transition-all flex items-center justify-between text-purple-950 group"
-          >
-            <div>
-              <h3 className="font-bold text-sm">Production Audit</h3>
-              <p className="text-xs text-purple-700 mt-1">
-                Margin floor & Job Card issuing.
               </p>
             </div>
             <FiPlus className="w-5 h-5 group-hover:scale-125 transition-transform" />

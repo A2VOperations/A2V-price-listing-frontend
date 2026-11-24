@@ -507,7 +507,7 @@ export default function UserManager() {
                     <div className="flex items-center gap-1.5 font-bold text-xs">
                       <FiShield className="w-4 h-4 text-amber-600" /> Prod. Manager
                     </div>
-                    <span className="text-[10px] text-slate-500">Manage paper/rates & audit costs</span>
+                    <span className="text-[10px] text-slate-500">Manage paper & printing rates</span>
                   </button>
 
                   <button

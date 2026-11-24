@@ -13,7 +13,6 @@ import {
   FiUser,
   FiShield,
   FiSliders,
-  FiFileText,
 } from "react-icons/fi";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
@@ -42,11 +41,6 @@ export default function AdminLayout({ children }) {
       label: "Printing Masters & Rates",
       href: "/admin/printing-rates",
       icon: FiSliders,
-    },
-    {
-      label: "Production & Quote Audit",
-      href: "/admin/quotations-audit",
-      icon: FiFileText,
     },
     { label: "User Management", href: "/admin/users", icon: FiUsers },
   ];

@@ -26,29 +26,29 @@ import { generateGeneralProductQuotationPdf } from "@/lib/generateQuotationPdf";
 const PRESET_SIZES = [
   {
     id: "4.5x11",
-    name: '4.5" × 11" (Standard Bill Book - 8 Out)',
+    name: '4.5" × 11" (Standard Bill Book - 8 Out of 18×22)',
     w: 4.5,
     h: 11,
     popular: true,
   },
   {
     id: "a4",
-    name: 'A4 (8.25" × 11" Trimmed - 4 Out of 18×22)',
-    w: 8.25,
-    h: 11,
+    name: 'A4 (8.27" × 11.69" - 4 Out of 18×22)',
+    w: 8.27,
+    h: 11.69,
     popular: true,
   },
   {
     id: "a5",
-    name: 'A5 / A4 Half (5.5" × 8.25" - 8 Out of 18×22)',
-    w: 5.5,
-    h: 8.25,
+    name: 'A5 / A4 Half (5.83" × 8.27" - 8 Out of 18×22)',
+    w: 5.83,
+    h: 8.27,
     popular: true,
   },
   { id: "legal", name: 'Legal (8.5" × 14.0")', w: 8.5, h: 14.0 },
-  { id: "1/4-demy", name: '1/4 Demy (4.5" × 9.0")', w: 4.5, h: 9.0 },
-  { id: "1/6-demy", name: '1/6 Demy (3.0" × 9.0")', w: 3.0, h: 9.0 },
-  { id: "1/8-demy", name: '1/8 Demy (4.5" × 4.5")', w: 4.5, h: 4.5 },
+  { id: "1/4-demy", name: '1/4 Demy (9" × 11" - 4 Out of 18×22)', w: 9, h: 11 },
+  { id: "1/8-demy", name: '1/8 Demy (4.5" × 11" - 8 Out of 18×22)', w: 4.5, h: 11 },
+  { id: "1/6-demy", name: '1/6 Demy (5.5" × 6.0" - 6 Out)', w: 5.5, h: 6.0 },
   { id: "custom", name: "Custom Dimensions", w: 4.5, h: 11 },
 ];
 
@@ -456,20 +456,31 @@ export default function CommercialPrintCalculator({
     let selectedLayout = "vertical";
     let grid = { cols: 2, rows: 2 };
 
-    const isA4 = (finishedW >= 8.0 && finishedW <= 8.5 && finishedH >= 11.0 && finishedH <= 12.0) ||
-                 (finishedH >= 8.0 && finishedH <= 8.5 && finishedW >= 11.0 && finishedW <= 12.0);
+    // Standard A4 on 18x22 sheet quarters into 4 pieces
+    const isA4 = (finishedW >= 8.0 && finishedW <= 9.0 && finishedH >= 10.5 && finishedH <= 12.0) ||
+                 (finishedH >= 8.0 && finishedH <= 9.0 && finishedW >= 10.5 && finishedW <= 12.0);
 
-    if (isA4 && rawW === 18 && rawH === 22) {
+    // Half of A4 (A5) on 18x22 sheet divides into 8 pieces
+    const isA5 = (finishedW >= 4.0 && finishedW <= 6.0 && finishedH >= 8.0 && finishedH <= 9.5) ||
+                 (finishedH >= 4.0 && finishedH <= 6.0 && finishedW >= 8.0 && finishedW <= 9.5);
+
+    if (isA4 && ((rawW === 18 && rawH === 22) || (rawW === 22 && rawH === 18))) {
       bestYield = 4;
       selectedLayout = "vertical";
       grid = { cols: 2, rows: 2 };
+    } else if (isA5 && ((rawW === 18 && rawH === 22) || (rawW === 22 && rawH === 18))) {
+      bestYield = 8;
+      selectedLayout = (finishedW === 4.5 || finishedH === 4.5) ? "vertical" : "horizontal";
+      grid = (finishedW === 4.5 || finishedH === 4.5) ? { cols: 4, rows: 2 } : { cols: 2, rows: 4 };
     } else {
-      const vCols = Math.floor(rawW / finishedW);
-      const vRows = Math.floor(rawH / finishedH);
+      // Pure mathematical cutting with 0 cutting margin (epsilon protection for exact divisions)
+      const eps = 0.001;
+      const vCols = Math.floor((rawW + eps) / finishedW);
+      const vRows = Math.floor((rawH + eps) / finishedH);
       const vYield = vCols * vRows;
 
-      const hCols = Math.floor(rawW / finishedH);
-      const hRows = Math.floor(rawH / finishedW);
+      const hCols = Math.floor((rawW + eps) / finishedH);
+      const hRows = Math.floor((rawH + eps) / finishedW);
       const hYield = hCols * hRows;
 
       const isHoriz = hYield > vYield;
@@ -478,14 +489,15 @@ export default function CommercialPrintCalculator({
       grid = isHoriz ? { cols: hCols, rows: hRows } : { cols: vCols, rows: vRows };
     }
 
-    // 2. Paper Requirements & Costs (Commercial Ream & Loose Sheet Purchasing Rule)
+    // 2. Paper Requirements & Costs (Zero Cutting Margin & Strict Ream/Loose Rule)
     // Rule:
+    // - Zero cutting margin / wastage is applied (grossRawSheets === netRawSheets).
     // - Every full 500 sheets is purchased at the Rim Price (reamRate).
-    // - Any remaining loose sheets (< 500, e.g. 10 sheets out of 510) are purchased at Loose Price (loosePrice).
+    // - Any remaining loose sheets (< 500) are purchased at Loose Price (loosePrice).
     // - If plies use the SAME paper sheet (same type, GSM, colour, size), their sheet quantities are combined together.
     const totalPagesPerPly = qty * pages; // e.g. 10 books * 100 pages = 1000 sheets
     const netRawSheets = Math.ceil(totalPagesPerPly / bestYield);
-    const wastage = 5; // +5 loose sheets buffer per ply
+    const wastage = 0; // Zero cutting margin / sheet buffer as instructed
     const grossRawSheets = netRawSheets + wastage;
 
     // Group active plies by exact paper identity to combine purchase of the same sheet
@@ -644,16 +656,16 @@ export default function CommercialPrintCalculator({
         transportationCost
     );
 
-    // 8. Recommended Standard Selling Price (approx 35% margin)
-    const recommendedSellingPrice = Math.round(totalVendorCost * 1.35);
+    // 8. Selling Price = Directly Vendor Cost (0% Margin - Margin removed as instructed)
+    const recommendedSellingPrice = totalVendorCost;
 
-    // Final Selling Price (with Salesperson Bargaining Override)
+    // Final Selling Price (with Salesperson Bargaining Override if manually entered)
     const finalSellingPrice =
       manualSellingPrice && !isNaN(Number(manualSellingPrice))
         ? Number(manualSellingPrice)
         : recommendedSellingPrice;
 
-    // Margin & Profit
+    // Margin & Profit (0% by default since margin is removed)
     const netProfit = Math.round(finalSellingPrice - totalVendorCost);
     const profitMarginPercent =
       finalSellingPrice > 0
@@ -1536,8 +1548,8 @@ export default function CommercialPrintCalculator({
                   <span className="font-bold text-slate-900">{calculation.netRawSheets}</span>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-500 block">Wastage / Ply</span>
-                  <span className="font-bold text-amber-600">+{calculation.wastage}</span>
+                  <span className="text-[10px] text-slate-500 block">Cutting Margin / Wastage</span>
+                  <span className="font-bold text-slate-500">0 Sheets</span>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                   <span className="text-[10px] text-slate-500 block">Total Sheets / Ply</span>
@@ -1550,7 +1562,7 @@ export default function CommercialPrintCalculator({
                 <div className="flex justify-between items-center font-bold text-orange-950">
                   <span>Total Order Raw Sheets ({plyCount}-Ply):</span>
                   <span className="text-sm font-extrabold text-orange-600">
-                    {calculation.totalNetRawSheetsAllPlies} Net ({calculation.totalGrossRawSheetsAllPlies} Gross)
+                    {calculation.totalGrossRawSheetsAllPlies} Sheets
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-600 divide-y divide-orange-100">
@@ -1560,7 +1572,7 @@ export default function CommercialPrintCalculator({
                         • Layer {idx + 1} ({p.colour}):
                       </span>
                       <span className="font-bold text-slate-900">
-                        {p.netRawSheets} net (+{p.wastage} wastage = {p.grossRawSheets} gross)
+                        {p.netRawSheets} sheets (0 margin)
                       </span>
                     </div>
                   ))}
@@ -1666,7 +1678,7 @@ export default function CommercialPrintCalculator({
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="p-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white space-y-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-orange-400">
-                Customer Quotation &amp; Pricing
+                Vendor Cost &amp; Pricing
               </span>
               <div className="flex justify-between items-baseline">
                 <div>
@@ -1674,7 +1686,7 @@ export default function CommercialPrintCalculator({
                     ₹{calculation.grandTotal.toLocaleString("en-IN")}
                   </h4>
                   <span className="text-xs text-slate-400">
-                    Net Payable Amount
+                    Vendor Production Cost (0% Margin)
                   </span>
                 </div>
                 <div className="text-right">
@@ -1690,21 +1702,21 @@ export default function CommercialPrintCalculator({
               {/* Salesperson Negotiated Selling Price Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1">
-                  Selling Price (Quotation Amount)
+                  Quotation Amount (Vendor Cost)
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">₹</span>
                   <input
                     type="number"
                     min="0"
-                    placeholder={`Recommended: ₹${calculation.recommendedSellingPrice}`}
+                    placeholder={`Vendor Cost: ₹${calculation.recommendedSellingPrice}`}
                     value={manualSellingPrice}
                     onChange={(e) => setManualSellingPrice(e.target.value)}
                     className="w-full pl-7 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
                 <span className="text-[10px] text-slate-400 mt-1 block">
-                  Recommended standard price: ₹{calculation.recommendedSellingPrice.toLocaleString("en-IN")}
+                  Direct Vendor Cost: ₹{calculation.recommendedSellingPrice.toLocaleString("en-IN")} (0% Margin)
                 </span>
               </div>
 
