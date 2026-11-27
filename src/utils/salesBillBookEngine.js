@@ -609,7 +609,7 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     punching = false,
     bindingType = "normal",
     includeGst = false,
-    salesMarginPercent = 0,
+    salesMarginPercent = 50,
   } = inputs;
 
   const {
@@ -902,8 +902,8 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     ).toFixed(2)
   );
 
-  // 7. Selling Price (0% margin by default = Vendor Raw Price)
-  const marginPct = Math.min(99, Math.max(0, Number(salesMarginPercent ?? 0)));
+  // 7. Selling Price (50% gross margin by default)
+  const marginPct = Math.min(99, Math.max(0, Number(salesMarginPercent ?? 50)));
   const rawSellingPrice = totalProductionCost / (1 - marginPct / 100);
   // Round to friendly whole rupee
   const finalOrderPrice = Math.max(100, Math.ceil(rawSellingPrice));

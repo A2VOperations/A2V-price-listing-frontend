@@ -153,8 +153,8 @@ export default function SalesBillBookCalculator() {
   const [startNumber, setStartNumber] = useState("0001");
   const [punching, setPunching] = useState(false);
 
-  // Sales Margin & GST (0% Margin = Vendor Raw Price)
-  const [salesMarginPercent, setSalesMarginPercent] = useState(0);
+  // Sales Margin & GST (50% Margin by default)
+  const [salesMarginPercent, setSalesMarginPercent] = useState(50);
   const [includeGst, setIncludeGst] = useState(false);
 
   // Customer Contact for Quotation
