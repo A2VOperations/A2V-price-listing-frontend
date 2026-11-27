@@ -19,7 +19,12 @@ import {
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import { useAuth } from "@/context/AuthContext";
-import { fetchPaperMastersApi } from "@/services/api";
+import {
+  fetchPaperMastersApi,
+  fetchPrintingRatesApi,
+  fetchBindingRatesApi,
+  fetchFinishingRatesApi,
+} from "@/services/api";
 import { generateGeneralProductQuotationPdf } from "@/lib/generateQuotationPdf";
 
 // Standard commercial finished sizes (calibrated for Indian commercial print shops)
@@ -119,19 +124,19 @@ function calculateSheetCuttingLayout(rawW, rawH, finishedW, finishedH) {
   const hRows = Math.floor((sH + eps) / pW);
   const horizontalYield = hCols * hRows;
 
-  // Commercial Print Shop Standard Rule: A4 on 18" x 22" sheet quarters into 4 pieces
+  // Commercial Print Shop Standard Rule: A4 (8.27" x 11.69" ± 0.3") on 18" x 22" quarters into 4 pieces
   const isA4 =
-    (pW >= 8.0 && pW <= 9.0 && pH >= 10.5 && pH <= 12.0) ||
-    (pH >= 8.0 && pH <= 9.0 && pW >= 10.5 && pW <= 12.0);
+    (Math.abs(pW - 8.27) <= 0.3 && Math.abs(pH - 11.69) <= 0.3) ||
+    (Math.abs(pH - 8.27) <= 0.3 && Math.abs(pW - 11.69) <= 0.3);
 
-  // Commercial Print Shop Standard Rule: A5 (half of A4) on 18" x 22" sheet divides into 8 pieces
+  // Commercial Print Shop Standard Rule: A5 (5.83" x 8.27" ± 0.3") on 18" x 22" divides into 8 pieces
   const isA5 =
-    (pW >= 4.0 && pW <= 6.0 && pH >= 8.0 && pH <= 9.5) ||
-    (pH >= 4.0 && pH <= 6.0 && pW >= 8.0 && pW <= 9.5);
+    (Math.abs(pW - 5.83) <= 0.3 && Math.abs(pH - 8.27) <= 0.3) ||
+    (Math.abs(pH - 5.83) <= 0.3 && Math.abs(pW - 8.27) <= 0.3);
 
   const is18x22 = (sW === 18 && sH === 22) || (sW === 22 && sH === 18);
 
-  if (isA4 && is18x22) {
+  if (isA4 && is18x22 && 4 * pW * pH <= sW * sH) {
     const cards = [];
     let cNum = 1;
     for (let r = 0; r < 2; r++) {
@@ -174,7 +179,7 @@ function calculateSheetCuttingLayout(rawW, rawH, finishedW, finishedH) {
     };
   }
 
-  if (isA5 && is18x22) {
+  if (isA5 && is18x22 && 8 * pW * pH <= sW * sH) {
     const isV = pW === 4.5 || pH === 4.5;
     const cols = isV ? 4 : 2;
     const rows = isV ? 2 : 4;
@@ -432,25 +437,43 @@ export default function CommercialPrintCalculator({
   const { addToQuote, clientInfo, updateClientInfo } = useQuote();
   const { isManagerOrAdmin } = useAuth();
 
-  // Backend Paper Inventory / Sheets Master
+  // Backend Paper Inventory & Master Rates
   const [backendSheets, setBackendSheets] = useState([]);
+  const [printingRates, setPrintingRates] = useState([]);
+  const [bindingRates, setBindingRates] = useState([]);
+  const [finishingRates, setFinishingRates] = useState([]);
   const [isLoadingPapers, setIsLoadingPapers] = useState(true);
 
   useEffect(() => {
-    async function loadBackendPapers() {
+    async function loadBackendMasters() {
       try {
         setIsLoadingPapers(true);
-        const data = await fetchPaperMastersApi();
-        if (Array.isArray(data) && data.length > 0) {
-          setBackendSheets(data);
+        const [papersRes, printRes, bindRes, finishRes] = await Promise.allSettled([
+          fetchPaperMastersApi(),
+          fetchPrintingRatesApi(),
+          fetchBindingRatesApi(),
+          fetchFinishingRatesApi(),
+        ]);
+
+        if (papersRes.status === "fulfilled" && Array.isArray(papersRes.value) && papersRes.value.length > 0) {
+          setBackendSheets(papersRes.value);
+        }
+        if (printRes.status === "fulfilled" && Array.isArray(printRes.value)) {
+          setPrintingRates(printRes.value);
+        }
+        if (bindRes.status === "fulfilled" && Array.isArray(bindRes.value)) {
+          setBindingRates(bindRes.value);
+        }
+        if (finishRes.status === "fulfilled" && Array.isArray(finishRes.value)) {
+          setFinishingRates(finishRes.value);
         }
       } catch (err) {
-        console.warn("Could not fetch paper masters from backend:", err);
+        console.warn("Could not fetch master rates from backend:", err);
       } finally {
         setIsLoadingPapers(false);
       }
     }
-    loadBackendPapers();
+    loadBackendMasters();
   }, []);
 
   // Master Raw Sheet Size - Dictated by Layer 1 (Layers 2, 3, 4 are strictly locked to this size)
@@ -491,17 +514,15 @@ export default function CommercialPrintCalculator({
   }, [backendSheets]);
 
   // Sheets accessible by layer:
-  // Layer 1 can access all or size-matched sheets.
-  // Layers 2, 3, 4 are STRICTLY locked to Layer 1's sheet size!
-  const getSheetsForLayer = (layerIndex) => {
+  // All layers (including Layer 1) strictly show only DB sheets matching Layer 1's selected sheet size.
+  const getSheetsForLayer = (_layerIndex) => {
     if (!backendSheets || backendSheets.length === 0) return [];
-    if (layerIndex === 0) {
-      return backendSheets;
-    }
+    const targetW = Number(layer1SheetSize.width);
+    const targetH = Number(layer1SheetSize.height);
     return backendSheets.filter(
       (b) =>
-        Number(b.rawWidthInch) === Number(layer1SheetSize.width) &&
-        Number(b.rawHeightInch) === Number(layer1SheetSize.height)
+        (Number(b.rawWidthInch) === targetW && Number(b.rawHeightInch) === targetH) ||
+        (Number(b.rawWidthInch) === targetH && Number(b.rawHeightInch) === targetW)
     );
   };
 
@@ -694,6 +715,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      printRequired: true,
       differentDesign: false, // does this ply have different plate text?
     },
     {
@@ -702,6 +724,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      printRequired: true,
       differentDesign: false,
     },
     {
@@ -710,6 +733,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      printRequired: true,
       differentDesign: false,
     },
     {
@@ -718,6 +742,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      printRequired: true,
       differentDesign: false,
     },
   ]);
@@ -756,10 +781,51 @@ export default function CommercialPrintCalculator({
       ? Math.max(1, parseFloat(customHeight) || 11)
       : selectedSizeObj.h;
 
+  // Resolve live Master Rates from MongoDB (with safe fallbacks)
+  const resolvedBindingOptions = useMemo(() => {
+    const codeMap = {
+      normal: "BIND_NORMAL_A4",
+      stapler: "BIND_STAPLER",
+      gumming: "BIND_GUMMING_PAD",
+      glue: "BIND_GLUE",
+      premium: "BIND_PREMIUM",
+    };
+    return BINDING_OPTIONS.map((opt) => {
+      const code = codeMap[opt.id];
+      const dbMatch = bindingRates.find(
+        (b) => b.bindingCode === code || b.bindingType?.toLowerCase().includes(opt.id)
+      );
+      const liveRate = dbMatch?.ratePerUnit ?? dbMatch?.ratePerBook;
+      return {
+        ...opt,
+        rate: liveRate !== undefined ? Number(liveRate) : opt.rate,
+      };
+    });
+  }, [bindingRates]);
+
   // Active Binding Rate
   const activeBindingObj =
-    BINDING_OPTIONS.find((b) => b.id === selectedBinding) || BINDING_OPTIONS[0];
+    resolvedBindingOptions.find((b) => b.id === selectedBinding) || resolvedBindingOptions[0];
   const bindingRate = activeBindingObj.rate;
+
+  const liveMasterRates = useMemo(() => {
+    const printMap = Object.fromEntries(
+      printingRates.map((r) => [r.rateKey, Number(r.rate)])
+    );
+    const finishMap = Object.fromEntries(
+      finishingRates.map((f) => [f.serviceKey, Number(f.ratePerBook)])
+    );
+    return {
+      masterRate: printMap.OFFSET_MASTER_LEGAL ?? 30,
+      runRate: printMap.OFFSET_RUN_PER_1000 ?? 70,
+      numberingRate: finishMap.FINISH_NUMBERING ?? finishMap.FINISH_NUMBERING_PER_BOOK ?? 2,
+      punchingRate: finishMap.FINISH_PUNCHING ?? 2,
+      transportationRate:
+        finishMap.FINISH_TRANSPORTATION ??
+        printMap.TRANSPORTATION_COST ??
+        50,
+    };
+  }, [printingRates, finishingRates]);
 
   // Helper to adjust quantity in multiples of 5 (min 10)
   const handleQuantityStep = (delta) => {
@@ -808,18 +874,14 @@ export default function CommercialPrintCalculator({
     const cuttingSheetDimensions = cutting.cuttingSheetDimensions;
     const cutType = cutting.cutType;
 
-    // 2. Paper Requirements & Costs (Strict Ream & Loose Sheet Purchasing Rule)
-    // Rule:
-    // - Every layer has +5 extra sheets added for production/press make-ready wastage buffer.
-    // - Every full 500 sheets is purchased at the Rim Price (reamRate).
-    // - Any remaining loose sheets (< 500) are purchased at Loose Price (loosePrice).
-    // - If plies use the SAME paper sheet (same type, GSM, colour, size), their sheet quantities are combined together.
+    // 2. Paper Requirements & Costs (Approved Wastage & Ream/Loose Rule)
+    // - Sum NET sheets per normalized paper group within the order
+    // - Apply wastage ONCE per paper group: 0 -> 0, <500 -> +5, >=500 -> flat +10
+    // - Full 500 sheets = Reams @ reamRate; Remainder = Loose @ loosePrice
     const totalPagesPerPly = qty * pages; // e.g. 10 books * 100 pages = 1000 sheets
-    const netRawSheets = Math.ceil(totalPagesPerPly / bestYield);
-    const wastage = 5; // +5 extra sheets per layer for wastage
-    const grossRawSheets = netRawSheets + wastage;
+    const netRawSheets = totalPagesPerPly === 0 ? 0 : Math.ceil(totalPagesPerPly / bestYield);
 
-    // Group active plies by exact paper identity to combine purchase of the same sheet
+    // Group active plies by exact normalized paper identity
     const paperGroups = new Map();
 
     const resolvedPlies = activePlies.map((ply, idx) => {
@@ -854,25 +916,29 @@ export default function CommercialPrintCalculator({
               600
             );
 
-      const paperKey = `${(ply.paperType || "").trim().toLowerCase()}_${ply.gsm}_${(ply.colour || "").trim().toLowerCase()}_${rawW}x${rawH}`;
+      const normType = (ply.paperType || "Maplitho").trim().replace(/\s+/g, " ");
+      const normColour = (ply.colour || "White").trim().replace(/\s+/g, " ");
+      const paperKey = `${rawW}x${rawH}|${normType.toLowerCase()}|${Number(ply.gsm) || 70}|${normColour.toLowerCase()}`;
 
       if (!paperGroups.has(paperKey)) {
         paperGroups.set(paperKey, {
           paperKey,
-          label: `${ply.paperType} ${ply.gsm} GSM ${ply.colour}`,
-          paperType: ply.paperType,
-          gsm: ply.gsm,
-          colour: ply.colour,
+          label: `${normType} ${ply.gsm} GSM ${normColour}`,
+          paperType: normType,
+          gsm: Number(ply.gsm) || 70,
+          colour: normColour,
           loosePrice,
           reamRate,
           matchingSheet,
+          netSheets: 0,
+          wastage: 0,
           totalSheets: 0,
           pliesCount: 0,
         });
       }
 
       const grp = paperGroups.get(paperKey);
-      grp.totalSheets += grossRawSheets;
+      grp.netSheets += netRawSheets;
       grp.pliesCount += 1;
 
       return {
@@ -885,26 +951,32 @@ export default function CommercialPrintCalculator({
         selectedLayout,
         grid,
         netRawSheets,
-        wastage,
-        grossRawSheets,
+        wastage: 0,
+        grossRawSheets: netRawSheets,
       };
     });
 
-    // Calculate purchasing cost for each grouped paper (Full 500s = Reams @ reamRate; Remainder = Loose @ loosePrice)
+    // Apply wastage ONCE per paper group (0 -> 0, <500 -> +5, >=500 -> flat +10), then compute Ream + Loose cost
     let totalPaperCost = 0;
     const paperPurchasingBreakdown = [];
 
     paperGroups.forEach((grp) => {
-      const fullReams = Math.floor(grp.totalSheets / 500);
-      const remainingLooseSheets = grp.totalSheets % 500;
+      const groupWastage = grp.netSheets === 0 ? 0 : grp.netSheets >= 500 ? 10 : 5;
+      const groupGross = grp.netSheets + groupWastage;
+      const fullReams = Math.floor(groupGross / 500);
+      const remainingLooseSheets = groupGross % 500;
       const reamsCost = fullReams * grp.reamRate;
       const looseCost = remainingLooseSheets * grp.loosePrice;
       const groupCost = Math.round(reamsCost + looseCost);
 
+      grp.wastage = groupWastage;
+      grp.totalSheets = groupGross;
       totalPaperCost += groupCost;
 
       paperPurchasingBreakdown.push({
         ...grp,
+        wastage: groupWastage,
+        totalSheets: groupGross,
         fullReams,
         remainingLooseSheets,
         reamsCost,
@@ -913,37 +985,39 @@ export default function CommercialPrintCalculator({
       });
     });
 
-    // Allocate cost to each ply calculation
+    // Allocate cost & wastage share to each ply calculation
     const plyCalculations = resolvedPlies.map((p) => {
       const grp = paperPurchasingBreakdown.find((g) => g.paperKey === p.paperKey);
+      const isSingle = !grp || grp.pliesCount === 1;
+      const plyWastage = isSingle ? (grp?.wastage ?? 0) : Number((grp.wastage / grp.pliesCount).toFixed(2));
+      const plyGross = isSingle ? (grp?.totalSheets ?? p.netRawSheets) : p.netRawSheets + plyWastage;
       const plyCostShare =
         grp && grp.pliesCount > 0
           ? Math.round(grp.groupCost / grp.pliesCount)
-          : Math.round(p.grossRawSheets * p.loosePrice);
+          : Math.round(p.netRawSheets * p.loosePrice);
 
       return {
         ...p,
+        wastage: plyWastage,
+        grossRawSheets: plyGross,
         plyPaperCost: plyCostShare,
       };
     });
 
-    // 3. Mini Offset Machine Printing Slabs (₹70 per 1,000 sheets per run)
-    // Slabs: 1000 sheets = 1 slab (₹70); 1100 to 2000 = 2 slabs (₹140); 2001 to 3000 = 3 slabs (₹210)
-    const slabCount = Math.max(1, Math.ceil(totalPagesPerPly / 1000));
+    // 3. Mini Offset Machine Printing Slabs (Live Master Rate per 1,000 sheets per run)
+    const printedPlies = activePlies.filter((p) => p.printRequired !== false);
+    const printedPliesCount = printedPlies.length;
+    const slabCount = printedPliesCount > 0 ? Math.max(1, Math.ceil(totalPagesPerPly / 1000)) : 0;
     const sidesCount = printSides === "both" ? 2 : 1;
-    const totalRuns = plyCount * sidesCount;
-    const totalOffsetRunCost = totalRuns * slabCount * 70;
+    const totalRuns = printedPliesCount * sidesCount;
+    const runRate = liveMasterRates.runRate;
+    const totalOffsetRunCost = totalRuns * slabCount * runRate;
 
-    // 4. Master Plates (₹30 per unique plate / ink colour / design)
-    // Rule:
-    // - Same ink colour across all plies = 1 Master (₹30)
-    // - Different ink colour = +₹30 per unique colour (e.g. 2 colours = ₹60, into 2)
-    // - Different design on copy ply = +₹30 per different design
-    // - Both sides = +1 master for back side (+₹30)
+    // 4. Master Plates (Live Master Rate per unique plate / ink colour / design)
     const uniqueFrontMasters = new Set();
     const uniqueInkColoursSet = new Set();
 
-    activePlies.forEach((p, idx) => {
+    printedPlies.forEach((p, idx) => {
       const ink = (p.inkColour || "Black").trim().toUpperCase();
       uniqueInkColoursSet.add(ink);
       const designTag = idx > 0 && p.differentDesign ? `DIFF_DESIGN_${idx + 1}` : "COMMON_DESIGN";
@@ -951,20 +1025,21 @@ export default function CommercialPrintCalculator({
     });
 
     let masterCount = uniqueFrontMasters.size;
-    if (printSides === "both") {
+    if (printSides === "both" && printedPliesCount > 0) {
       masterCount += 1; // +1 back master plate
     }
-    const masterCost = masterCount * 30;
+    const masterRate = liveMasterRates.masterRate;
+    const masterCost = masterCount * masterRate;
     const uniqueInkColoursCount = uniqueInkColoursSet.size;
 
-    // 5. Binding & Finishing
+    // 5. Binding & Finishing (Live Master Rates)
     const bindingCost = qty * bindingRate;
-    const numberingCost = hasNumbering ? qty * 2 : 0;
-    const punchingCost = hasPunching ? qty * 2 : 0;
+    const numberingCost = hasNumbering ? qty * liveMasterRates.numberingRate : 0;
+    const punchingCost = hasPunching ? qty * liveMasterRates.punchingRate : 0;
     const totalFinishingCost = bindingCost + numberingCost + punchingCost;
 
-    // 6. Fixed Transportation Cost (Always ₹50 as instructed)
-    const transportationCost = 50;
+    // 6. Transportation Cost (Live Master Rate)
+    const transportationCost = liveMasterRates.transportationRate;
 
     // 7. Total Internal Vendor Cost
     const totalVendorCost = Math.round(
@@ -1000,8 +1075,14 @@ export default function CommercialPrintCalculator({
       ? `${String(startNumber).padStart(4, "0")} – ${String(endNumber).padStart(4, "0")}`
       : "None";
 
+    const totalWastageSheets = paperPurchasingBreakdown.reduce(
+      (sum, g) => sum + (g.wastage || 0),
+      0
+    );
     const totalNetRawSheetsAllPlies = netRawSheets * plyCount;
-    const totalGrossRawSheetsAllPlies = grossRawSheets * plyCount;
+    const totalGrossRawSheetsAllPlies = totalNetRawSheetsAllPlies + totalWastageSheets;
+    const wastage = totalWastageSheets;
+    const grossRawSheets = netRawSheets + (paperPurchasingBreakdown[0]?.wastage ?? 0);
 
     return {
       qty,
@@ -1026,6 +1107,8 @@ export default function CommercialPrintCalculator({
       sidesCount,
       totalRuns,
       totalOffsetRunCost,
+      masterRate,
+      runRate,
       masterCount,
       masterCost,
       uniqueInkColoursCount,
@@ -1061,6 +1144,7 @@ export default function CommercialPrintCalculator({
     manualSellingPrice,
     backendSheets,
     layer1SheetSize,
+    liveMasterRates,
   ]);
 
   // Handle Add to Quotation Cart
@@ -1072,12 +1156,13 @@ export default function CommercialPrintCalculator({
     addToQuote(
       {
         id: `billbook-${Date.now()}`,
+        code: product?.code || "BB-001",
         name: `${productType} (${plyCount}-Ply)`,
+        slug: product?.slug || "bill-books",
         category: "commercial-printing",
         image: product?.image || "",
-        price: Math.round(calculation.finalSellingPrice / calculation.qty),
+        unitName: "Books",
       },
-      calculation.qty,
       {
         size: `${finishedW}" × ${finishedH}"`,
         pagesPerBook: `${calculation.pages} Sets`,
@@ -1087,6 +1172,11 @@ export default function CommercialPrintCalculator({
         binding: activeBindingObj.name,
         numbering: calculation.numberingRange,
         punching: hasPunching ? "Included" : "None",
+      },
+      calculation.qty,
+      {
+        subtotal: calculation.finalSellingPrice,
+        gstAmount: 0,
         totalAmount: calculation.grandTotal,
         unitPrice: Math.round(calculation.finalSellingPrice / calculation.qty),
       }
@@ -1624,8 +1714,18 @@ export default function CommercialPrintCalculator({
                             const newType = e.target.value;
                             handleUpdatePly(idx, "paperType", newType);
                             const validGsms = getGSMsForLayerAndType(idx, newType);
-                            if (!validGsms.includes(Number(ply.gsm)) && validGsms.length > 0) {
-                              handleUpdatePly(idx, "gsm", validGsms[0]);
+                            const nextGsm =
+                              !validGsms.includes(Number(ply.gsm)) && validGsms.length > 0
+                                ? validGsms[0]
+                                : Number(ply.gsm);
+                            if (nextGsm !== Number(ply.gsm)) {
+                              handleUpdatePly(idx, "gsm", nextGsm);
+                            }
+                            if (!isLayerOne) {
+                              const validColours = getColoursForLayerTypeAndGsm(idx, newType, nextGsm);
+                              if (validColours.length > 0 && !validColours.includes(ply.colour)) {
+                                handleUpdatePly(idx, "colour", validColours[0]);
+                              }
                             }
                           }}
                           className="w-full text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-medium"
@@ -1645,7 +1745,16 @@ export default function CommercialPrintCalculator({
                         </label>
                         <select
                           value={ply.gsm}
-                          onChange={(e) => handleUpdatePly(idx, "gsm", Number(e.target.value))}
+                          onChange={(e) => {
+                            const newGsm = Number(e.target.value);
+                            handleUpdatePly(idx, "gsm", newGsm);
+                            if (!isLayerOne) {
+                              const validColours = getColoursForLayerTypeAndGsm(idx, ply.paperType, newGsm);
+                              if (validColours.length > 0 && !validColours.includes(ply.colour)) {
+                                handleUpdatePly(idx, "colour", validColours[0]);
+                              }
+                            }
+                          }}
                           className="w-full text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-medium"
                         >
                           {getGSMsForLayerAndType(idx, ply.paperType).map((g) => (
@@ -1688,29 +1797,53 @@ export default function CommercialPrintCalculator({
                         </label>
                         <select
                           value={ply.inkColour}
+                          disabled={ply.printRequired === false}
                           onChange={(e) => handleUpdatePly(idx, "inkColour", e.target.value)}
-                          className="w-full text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-medium"
+                          className={`w-full text-xs border border-slate-300 rounded-lg p-1.5 font-medium ${
+                            ply.printRequired === false
+                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                              : "bg-white"
+                          }`}
                         >
                           <option value="Black">Black Ink</option>
                           <option value="Red">Red Ink</option>
                           <option value="Blue">Blue Ink</option>
                           <option value="Green">Green Ink</option>
                         </select>
-                        {idx > 0 && (
+                        {ply.printRequired === false ? (
+                          <span className="text-[9px] block mt-1 font-semibold text-slate-500 leading-tight">
+                            No Print (Blank Sheet — ₹0 Printing)
+                          </span>
+                        ) : idx > 0 ? (
                           <span className="text-[9px] block mt-1 font-semibold leading-tight">
                             {(ply.inkColour || "Black").toLowerCase() === (plyConfigs[0]?.inkColour || "Black").toLowerCase() ? (
-                              <span className="text-emerald-700">✓ Same ink as Layer 1 (Shares Master Plate ₹30)</span>
+                              <span className="text-emerald-700">✓ Same ink as Layer 1 (Shares Master Plate ₹{calculation.masterRate})</span>
                             ) : (
-                              <span className="text-amber-800 font-bold">⚡ Different ink (+₹30 Master Plate)</span>
+                              <span className="text-amber-800 font-bold">⚡ Different ink (+₹{calculation.masterRate} Master Plate)</span>
                             )}
                           </span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
 
-                    {/* Master Plate Checkbox if design differs from layer 1 */}
-                    {!isLayerOne && (
-                      <div className="pt-1">
+                    {/* Print Required Toggle + Master Plate Checkbox */}
+                    <div className="pt-1 flex flex-wrap items-center justify-between gap-2">
+                      <label className="flex items-center gap-2 cursor-pointer text-[11px] font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={ply.printRequired !== false}
+                          onChange={(e) => handleUpdatePly(idx, "printRequired", e.target.checked)}
+                          className="w-3.5 h-3.5 text-orange-600 rounded"
+                        />
+                        <span>
+                          Print Required on Layer {idx + 1}{" "}
+                          {ply.printRequired === false && (
+                            <span className="text-[10px] font-bold text-slate-500">(Blank / No Print)</span>
+                          )}
+                        </span>
+                      </label>
+
+                      {!isLayerOne && ply.printRequired !== false && (
                         <label className="flex items-center gap-2 cursor-pointer text-[11px] text-slate-600">
                           <input
                             type="checkbox"
@@ -1718,10 +1851,10 @@ export default function CommercialPrintCalculator({
                             onChange={(e) => handleUpdatePly(idx, "differentDesign", e.target.checked)}
                             className="w-3.5 h-3.5 text-orange-600 rounded"
                           />
-                          <span>Different text/design on this copy (+₹30 Master Plate)</span>
+                          <span>Different text/design than Layer 1</span>
                         </label>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -1745,7 +1878,7 @@ export default function CommercialPrintCalculator({
                 Binding Style
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {BINDING_OPTIONS.map((bind) => {
+                {resolvedBindingOptions.map((bind) => {
                   const isSelected = selectedBinding === bind.id;
                   return (
                     <button
@@ -2190,17 +2323,17 @@ export default function CommercialPrintCalculator({
                     <span className="font-bold text-slate-900">₹{calculation.totalPaperCost}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Master Plates ({calculation.masterCount} × ₹30):</span>
+                    <span className="text-slate-500 block">Master Plates ({calculation.masterCount} × ₹{calculation.masterRate}):</span>
                     <span className="font-bold text-slate-900">₹{calculation.masterCost}</span>
                     <span className="text-[10px] text-slate-500 block">
                       {calculation.uniqueInkColoursCount === 1
-                        ? "Same ink colour across plies (1 Master ₹30)"
+                        ? `Same ink colour across plies (1 Master ₹${calculation.masterRate})`
                         : `${calculation.uniqueInkColoursCount} unique ink colours (${calculation.uniqueInkColoursCount} Masters)`}
                     </span>
                   </div>
                   <div>
                     <span className="text-slate-500 block">
-                      Offset Runs ({calculation.totalRuns} runs × {calculation.slabCount} slab × ₹70):
+                      Offset Runs ({calculation.totalRuns} runs × {calculation.slabCount} slab × ₹{calculation.runRate}):
                     </span>
                     <span className="font-bold text-slate-900">₹{calculation.totalOffsetRunCost}</span>
                   </div>

@@ -282,12 +282,12 @@ export default function PrintingRatesManager() {
       await updateBindingRateApi(
         editingBindingRate.bindingCode,
         {
-          ratePerBook: Number(bindingRateForm.ratePerBook),
+          ratePerUnit: Number(bindingRateForm.ratePerBook),
           notes: bindingRateForm.notes,
         },
         token
       );
-      setSuccessMsg(`Binding rate for '${editingBindingRate.name}' updated!`);
+      setSuccessMsg(`Binding rate for '${editingBindingRate.bindingType || editingBindingRate.bindingCode}' updated!`);
       setEditingBindingRate(null);
       loadAllRates();
     } catch (err) {
@@ -314,7 +314,7 @@ export default function PrintingRatesManager() {
         },
         token
       );
-      setSuccessMsg(`Finishing rate for '${editingFinishingRate.serviceName}' updated!`);
+      setSuccessMsg(`Finishing rate for '${editingFinishingRate.name || editingFinishingRate.serviceKey}' updated!`);
       setEditingFinishingRate(null);
       loadAllRates();
     } catch (err) {

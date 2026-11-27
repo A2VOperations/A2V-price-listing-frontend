@@ -286,6 +286,152 @@ export const SALES_BINDING_OPTIONS = [
 // ============================================================================
 
 /**
+ * Compute cutting yield for a raw sheet (sW x sH) and finished product (pW x pH)
+ * Aligned with backend calculateCuttingYield() in printingCalcEngine.js
+ */
+export function computeCuttingYieldForSheet(sheetW, sheetH, productW, productH) {
+  const sW = Number(sheetW);
+  const sH = Number(sheetH);
+  const pW = Number(productW);
+  const pH = Number(productH);
+  if (!sW || !sH || !pW || !pH || sW <= 0 || sH <= 0 || pW <= 0 || pH <= 0) {
+    return { bestYield: 0, selectedLayout: "none" };
+  }
+  const eps = 0.05;
+  const isA4 =
+    (Math.abs(pW - 8.27) <= 0.3 && Math.abs(pH - 11.69) <= 0.3) ||
+    (Math.abs(pH - 8.27) <= 0.3 && Math.abs(pW - 11.69) <= 0.3);
+  const isA5 =
+    (Math.abs(pW - 5.83) <= 0.3 && Math.abs(pH - 8.27) <= 0.3) ||
+    (Math.abs(pH - 5.83) <= 0.3 && Math.abs(pW - 8.27) <= 0.3);
+  const is18x22 = (sW === 18 && sH === 22) || (sW === 22 && sH === 18);
+
+  if (isA4 && is18x22 && 4 * pW * pH <= sW * sH) {
+    return { bestYield: 4, selectedLayout: "vertical" };
+  }
+  if (isA5 && is18x22 && 8 * pW * pH <= sW * sH) {
+    return { bestYield: 8, selectedLayout: pW === 4.5 || pH === 4.5 ? "vertical" : "horizontal" };
+  }
+
+  let bestYield = 0;
+  let selectedLayout = "vertical";
+
+  const orientations = [
+    [sW, sH],
+    [sH, sW],
+  ];
+  orientations.forEach(([W, H]) => {
+    for (let orient = 0; orient < 2; orient++) {
+      const wA = orient === 0 ? pW : pH;
+      const hA = orient === 0 ? pH : pW;
+      const wB = orient === 0 ? pH : pW;
+      const hB = orient === 0 ? pW : pH;
+
+      const maxRows1 = Math.floor((H + eps) / hA);
+      for (let r1 = 1; r1 <= maxRows1; r1++) {
+        const H1 = r1 * hA;
+        const c1 = Math.floor((W + eps) / wA);
+        const count1 = c1 * r1;
+        const remH = H - H1;
+        const c2 = Math.floor((W + eps) / wB);
+        const r2 = Math.floor((remH + eps) / hB);
+        const total = count1 + c2 * r2;
+        if (total > bestYield) {
+          bestYield = total;
+          selectedLayout = c2 * r2 > 0 ? "combination" : orient === 0 ? "vertical" : "horizontal";
+        }
+      }
+
+      const maxCols1 = Math.floor((W + eps) / wA);
+      for (let c1 = 1; c1 <= maxCols1; c1++) {
+        const W1 = c1 * wA;
+        const r1 = Math.floor((H + eps) / hA);
+        const count1 = c1 * r1;
+        const remW = W - W1;
+        const c2 = Math.floor((remW + eps) / wB);
+        const r2 = Math.floor((H + eps) / hB);
+        const total = count1 + c2 * r2;
+        if (total > bestYield) {
+          bestYield = total;
+          selectedLayout = c2 * r2 > 0 ? "combination" : orient === 0 ? "vertical" : "horizontal";
+        }
+      }
+    }
+  });
+
+  return { bestYield, selectedLayout };
+}
+
+/**
+ * Automatically pick the least-wastage raw sheet from the database PaperMaster list
+ * based on finished book width & height.
+ */
+export function selectLeastWastageSheetFromDb(
+  papers = [],
+  finishedW,
+  finishedH,
+  fallbackRule = null
+) {
+  const pW = Number(finishedW) || 8.27;
+  const pH = Number(finishedH) || 11.69;
+  const sourceList =
+    Array.isArray(papers) && papers.length > 0 ? papers : DEFAULT_PAPER_MASTERS;
+
+  const uniqueSizes = new Map();
+  sourceList.forEach((p) => {
+    const sW = Number(p.rawWidthInch || p.rawSheetWidth || 0);
+    const sH = Number(p.rawHeightInch || p.rawSheetHeight || 0);
+    if (!sW || !sH) return;
+    const key = `${Math.min(sW, sH)}x${Math.max(sW, sH)}`;
+    if (!uniqueSizes.has(key)) {
+      uniqueSizes.set(key, {
+        rawWidthInch: sW,
+        rawHeightInch: sH,
+        looseSheetRate: Number(p.looseSheetRate ?? p.currentRate?.looseRatePerSheet ?? 1.5),
+      });
+    }
+  });
+
+  let best = null;
+  let minWaste = Infinity;
+  let maxYield = -1;
+
+  uniqueSizes.forEach((s) => {
+    const cut = computeCuttingYieldForSheet(s.rawWidthInch, s.rawHeightInch, pW, pH);
+    if (cut.bestYield <= 0) return;
+    const sheetArea = s.rawWidthInch * s.rawHeightInch;
+    const usedArea = cut.bestYield * pW * pH;
+    const wasteRatio = sheetArea > 0 ? Math.max(0, (sheetArea - usedArea) / sheetArea) : 1;
+
+    if (
+      wasteRatio < minWaste - 0.001 ||
+      (Math.abs(wasteRatio - minWaste) <= 0.001 && cut.bestYield > maxYield)
+    ) {
+      minWaste = wasteRatio;
+      maxYield = cut.bestYield;
+      best = {
+        rawWidthInch: s.rawWidthInch,
+        rawHeightInch: s.rawHeightInch,
+        yieldPerSheet: cut.bestYield,
+        selectedLayout: cut.selectedLayout,
+        wastePercent: Math.round(wasteRatio * 1000) / 10,
+        efficiencyPercent: Math.round((1 - wasteRatio) * 1000) / 10,
+      };
+    }
+  });
+
+  if (best) return best;
+  return {
+    rawWidthInch: fallbackRule?.rawSheetWidth || 18,
+    rawHeightInch: fallbackRule?.rawSheetHeight || 22,
+    yieldPerSheet: fallbackRule?.yieldPerSheet || 4,
+    selectedLayout: "vertical",
+    wastePercent: 0,
+    efficiencyPercent: 100,
+  };
+}
+
+/**
  * Filter paper records for a specific book size rule's raw sheet
  */
 export function getPapersForSizeRule(papers = [], sizeRule) {
@@ -353,7 +499,14 @@ export function getAvailableColours(papersForSize = [], paperType = "Maplitho", 
  * Match exact paper master from database and resolve looseSheetRate & reamRate
  */
 export function resolvePaperRates(papers = [], targetW, targetH, paperType, gsm, colour) {
-  const masterList = Array.isArray(papers) && papers.length > 0 ? papers : DEFAULT_PAPER_MASTERS;
+  const hasDbPapers = Array.isArray(papers) && papers.length > 0;
+  const masterList = hasDbPapers ? papers : DEFAULT_PAPER_MASTERS;
+
+  const isTypeMatch = (pType, targetType) =>
+    !targetType ||
+    (pType &&
+      (pType.toLowerCase() === targetType.toLowerCase() ||
+        (/news/i.test(pType) && /news/i.test(targetType))));
 
   // 1. Try exact 5-point match (Width, Height, Type, GSM, Colour)
   let match = masterList.find((p) => {
@@ -361,37 +514,57 @@ export function resolvePaperRates(papers = [], targetW, targetH, paperType, gsm,
     const ph = Number(p.rawHeightInch || p.rawSheetHeight || 0);
     const matchesSize =
       (pw === targetW && ph === targetH) || (pw === targetH && ph === targetW);
-    const matchesType = !paperType || (p.paperType && p.paperType.toLowerCase() === paperType.toLowerCase());
+    const matchesType = isTypeMatch(p.paperType, paperType);
     const matchesGsm = !gsm || Number(p.gsm) === Number(gsm);
     const matchesColour = !colour || (p.colour && p.colour.toLowerCase() === colour.toLowerCase());
     return matchesSize && matchesType && matchesGsm && matchesColour;
   });
 
-  // 2. Try match without colour
+  // 2. Try match without colour (same size, type, GSM)
   if (!match) {
     match = masterList.find((p) => {
       const pw = Number(p.rawWidthInch || p.rawSheetWidth || 0);
       const ph = Number(p.rawHeightInch || p.rawSheetHeight || 0);
       const matchesSize =
         (pw === targetW && ph === targetH) || (pw === targetH && ph === targetW);
-      const matchesType = !paperType || (p.paperType && p.paperType.toLowerCase() === paperType.toLowerCase());
+      const matchesType = isTypeMatch(p.paperType, paperType);
       const matchesGsm = !gsm || Number(p.gsm) === Number(gsm);
       return matchesSize && matchesType && matchesGsm;
     });
   }
 
-  // 3. Fallback to default estimated rate
+  // 3. Try match by size + type (nearest GSM in DB) before ever touching defaults
   if (!match) {
-    match = DEFAULT_PAPER_MASTERS[0];
+    match = masterList.find((p) => {
+      const pw = Number(p.rawWidthInch || p.rawSheetWidth || 0);
+      const ph = Number(p.rawHeightInch || p.rawSheetHeight || 0);
+      const matchesSize =
+        (pw === targetW && ph === targetH) || (pw === targetH && ph === targetW);
+      return matchesSize && isTypeMatch(p.paperType, paperType);
+    });
   }
 
-  const looseRate = Number(match.looseSheetRate || (match.reamRate ? match.reamRate / 500 * 1.1 : 1.50));
-  const reamRate = Number(match.reamRate || (match.looseSheetRate ? match.looseSheetRate * 500 * 0.9 : 700));
+  // 4. Only if DB list is empty/offline, use DEFAULT_PAPER_MASTERS
+  if (!match) {
+    match = hasDbPapers ? masterList[0] : DEFAULT_PAPER_MASTERS[0];
+  }
+
+  const dbLoose =
+    match.looseSheetRate !== undefined && Number(match.looseSheetRate) > 0
+      ? Number(match.looseSheetRate)
+      : Number(match.currentRate?.looseRatePerSheet ?? match.activeRate?.looseSheetRate ?? 0);
+  const dbReam =
+    match.reamRate !== undefined && Number(match.reamRate) > 0
+      ? Number(match.reamRate)
+      : Number(match.currentRate?.reamRate ?? match.activeRate?.reamRate ?? 0);
+
+  const looseRate = dbLoose > 0 ? dbLoose : (dbReam > 0 ? (dbReam / 500) * 1.1 : 0);
+  const reamRate = dbReam > 0 ? dbReam : (dbLoose > 0 ? dbLoose * 500 * 0.9 : 0);
 
   return {
     looseSheetRate: Number(looseRate.toFixed(2)),
     reamRate: Number(reamRate.toFixed(2)),
-    code: match.code || `PAP-${targetW}${targetH}-${gsm || 70}`,
+    code: match.code || `PAP-${targetW}${targetH}-${gsm || match.gsm || 70}`,
     foundInDb: Boolean(match._id),
   };
 }
@@ -433,9 +606,10 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     printProcess = "single_color_offset",
     inkColour = "Black",
     numbering = false,
+    punching = false,
     bindingType = "normal",
     includeGst = false,
-    salesMarginPercent = 25,
+    salesMarginPercent = 0,
   } = inputs;
 
   const {
@@ -445,12 +619,18 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     finishingRates = [],
   } = masterData;
 
-  // 1. Resolve size rule
+  // 1. Resolve size rule & auto-pick least-wastage raw sheet from DB papers
   const sizeRule =
     SALES_BOOK_SIZE_RULES.find((r) => r.id === sizeId) || SALES_BOOK_SIZE_RULES[0];
-  const yieldPerSheet = sizeRule.yieldPerSheet || 4;
-  const rawSheetW = sizeRule.rawSheetWidth;
-  const rawSheetH = sizeRule.rawSheetHeight;
+  const optimalSheet = selectLeastWastageSheetFromDb(
+    papers,
+    sizeRule.widthInch,
+    sizeRule.heightInch,
+    sizeRule
+  );
+  const yieldPerSheet = optimalSheet.yieldPerSheet || sizeRule.yieldPerSheet || 4;
+  const rawSheetW = optimalSheet.rawWidthInch || sizeRule.rawSheetWidth;
+  const rawSheetH = optimalSheet.rawHeightInch || sizeRule.rawSheetHeight;
 
   const numBooks = Math.max(1, Number(quantity) || 1);
   const numSets = Math.max(1, Number(setsPerBook) || 100);
@@ -462,13 +642,15 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
   // Net raw sheets needed per ply
   const netRawSheetsPerPly = Math.ceil(totalFinishedSheetsPerPly / yieldPerSheet);
 
-  // Business rule: in every layer add 5 sheet extra for the wastage sheet and include the price of that also
-  const wastageSheetsPerPly = 5;
-  const totalRawSheetsPerPly = netRawSheetsPerPly + wastageSheetsPerPly;
+  const calcGroupWastage = (netSheets) => {
+    const net = Math.max(0, Number(netSheets) || 0);
+    if (net === 0) return 0;
+    return net >= 500 ? 10 : 5;
+  };
 
-  // 2. Paper Cost Calculation per Ply
-  let totalPaperCost = 0;
-  const plyBreakdown = [];
+  // 2. Normalize, group identical paper specs within the order, then apply wastage ONCE per group
+  const paperGroups = new Map();
+  const plyConfigsResolved = [];
 
   for (let i = 0; i < numPlies; i++) {
     const plyConfig = plies[i] || {
@@ -477,52 +659,103 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
       colour: i === 0 ? "White" : "Yellow",
     };
 
+    const normType = String(plyConfig.paperType || "Maplitho").trim().replace(/\s+/g, " ");
+    const normGsm = Number(plyConfig.gsm) || 70;
+    const normColour = String(plyConfig.colour || "White").trim().replace(/\s+/g, " ");
+    const paperKey = `${rawSheetW}x${rawSheetH}|${normType.toLowerCase()}|${normGsm}|${normColour.toLowerCase()}`;
+
     const rateInfo = resolvePaperRates(
       papers,
       rawSheetW,
       rawSheetH,
-      plyConfig.paperType,
-      plyConfig.gsm,
-      plyConfig.colour
+      normType,
+      normGsm,
+      normColour
     );
 
-    let plyCost = 0;
-    let purchaseMode = "loose";
-    let reams = 0;
-    let loose = totalRawSheetsPerPly;
-
-    if (totalRawSheetsPerPly >= 500) {
-      purchaseMode = "ream_plus_loose";
-      reams = Math.floor(totalRawSheetsPerPly / 500);
-      loose = totalRawSheetsPerPly % 500;
-      plyCost = reams * rateInfo.reamRate + loose * rateInfo.looseSheetRate;
-    } else {
-      purchaseMode = "loose";
-      plyCost = totalRawSheetsPerPly * rateInfo.looseSheetRate;
+    if (!paperGroups.has(paperKey)) {
+      paperGroups.set(paperKey, {
+        paperKey,
+        paperType: normType,
+        gsm: normGsm,
+        colour: normColour,
+        groupNetSheets: 0,
+        plyCountInGroup: 0,
+        looseSheetRate: rateInfo.looseSheetRate,
+        reamRate: rateInfo.reamRate,
+      });
     }
+    const grp = paperGroups.get(paperKey);
+    grp.groupNetSheets += netRawSheetsPerPly;
+    grp.plyCountInGroup += 1;
 
-    plyCost = Number(plyCost.toFixed(2));
-    totalPaperCost += plyCost;
-
-    plyBreakdown.push({
+    plyConfigsResolved.push({
       plyIndex: i + 1,
-      layerName: i === 0 ? "Original (Top)" : `Copy ${i} (Duplicate)`,
-      paperType: plyConfig.paperType,
-      gsm: plyConfig.gsm,
-      colour: plyConfig.colour,
+      paperType: normType,
+      gsm: normGsm,
+      colour: normColour,
+      inkColour: String(plyConfig.inkColour || inkColour || "Black").trim(),
+      printRequired: plyConfig.printRequired !== false,
+      paperKey,
       netSheets: netRawSheetsPerPly,
-      wastageSheets: wastageSheetsPerPly,
-      totalSheets: totalRawSheetsPerPly,
-      purchaseMode,
-      reams,
-      loose,
       looseSheetRate: rateInfo.looseSheetRate,
       reamRate: rateInfo.reamRate,
-      cost: plyCost,
     });
   }
 
+  let totalPaperCost = 0;
+  let totalRawSheetsOrder = 0;
+  let wastageSheetsTotal = 0;
+
+  paperGroups.forEach((grp) => {
+    const wastage = calcGroupWastage(grp.groupNetSheets);
+    const gross = grp.groupNetSheets + wastage;
+    const reams = Math.floor(gross / 500);
+    const loose = gross % 500;
+    const groupCost = Number((reams * grp.reamRate + loose * grp.looseSheetRate).toFixed(2));
+
+    grp.wastageSheets = wastage;
+    grp.groupGrossSheets = gross;
+    grp.reams = reams;
+    grp.loose = loose;
+    grp.purchaseMode = gross >= 500 ? "ream_plus_loose" : "loose";
+    grp.groupCost = groupCost;
+
+    totalPaperCost += groupCost;
+    totalRawSheetsOrder += gross;
+    wastageSheetsTotal += wastage;
+  });
+
   totalPaperCost = Number(totalPaperCost.toFixed(2));
+
+  const plyBreakdown = plyConfigsResolved.map((p) => {
+    const grp = paperGroups.get(p.paperKey);
+    const isSingle = grp.plyCountInGroup === 1;
+    const plyWastage = isSingle
+      ? grp.wastageSheets
+      : Number((grp.wastageSheets / grp.plyCountInGroup).toFixed(2));
+    const plyTotalSheets = isSingle ? grp.groupGrossSheets : p.netSheets + plyWastage;
+    const plyCost = Number((grp.groupCost / grp.plyCountInGroup).toFixed(2));
+
+    return {
+      plyIndex: p.plyIndex,
+      layerName: p.plyIndex === 1 ? "Original (Top)" : `Copy ${p.plyIndex - 1} (Duplicate)`,
+      paperType: p.paperType,
+      gsm: p.gsm,
+      colour: p.colour,
+      printRequired: p.printRequired,
+      paperKey: p.paperKey,
+      netSheets: p.netSheets,
+      wastageSheets: plyWastage,
+      totalSheets: plyTotalSheets,
+      purchaseMode: grp.purchaseMode,
+      reams: isSingle ? grp.reams : Math.floor(plyTotalSheets / 500),
+      loose: isSingle ? grp.loose : plyTotalSheets % 500,
+      looseSheetRate: p.looseSheetRate,
+      reamRate: p.reamRate,
+      cost: plyCost,
+    };
+  });
 
   // 3. Printing Cost Calculation
   let masterRate = rawSheetW === 23 && rawSheetH === 36 ? 50 : 30;
@@ -532,37 +765,70 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
   if (Array.isArray(printingRates) && printingRates.length > 0) {
     const masterObj = printingRates.find((r) =>
       rawSheetW === 23 && rawSheetH === 36
-        ? r.rateKey === "OFFSET_MASTER_DEMY"
+        ? r.rateKey === "OFFSET_MASTER_DEMY" || r.rateKey === "OFFSET_MASTER_LEGAL"
         : r.rateKey === "OFFSET_MASTER_LEGAL"
     );
-    if (masterObj && masterObj.rate) masterRate = Number(masterObj.rate);
+    if (masterObj && masterObj.rate !== undefined) masterRate = Number(masterObj.rate);
 
     const runObj = printingRates.find(
-      (r) => r.rateKey === "OFFSET_IMPRESSION_RUN_1000"
+      (r) => r.rateKey === "OFFSET_RUN_PER_1000" || r.rateKey === "OFFSET_IMPRESSION_RUN_1000"
     );
-    if (runObj && runObj.rate) runRatePer1000 = Number(runObj.rate);
+    if (runObj && runObj.rate !== undefined) runRatePer1000 = Number(runObj.rate);
   }
 
-  let totalImpressions = totalFinishedSheetsPerPly * numPlies;
+  const printedPlies = plyConfigsResolved.filter((p) => p.printRequired !== false);
+  const printedPlyCount = printedPlies.length;
+
+  let totalImpressions = totalFinishedSheetsPerPly * printedPlyCount;
   let numMasters = 1;
+  let masterCost = 0;
+  let runCost = 0;
+  let totalRuns = printedPlyCount;
+  let slabCount = printedPlyCount > 0 ? Math.max(1, Math.ceil(totalFinishedSheetsPerPly / 1000)) : 0;
   let printingCost = 0;
 
-  if (printProcess === "two_color_offset") {
+  if (printedPlyCount === 0) {
+    numMasters = 0;
+    totalRuns = 0;
+    slabCount = 0;
+    printingCost = 0;
+  } else if (printProcess === "two_color_offset") {
     numMasters = 2;
-    const masterCost = numMasters * masterRate;
+    masterCost = numMasters * masterRate;
+    totalRuns = printedPlyCount * 2;
     const runUnits = Math.max(1, Math.ceil((totalImpressions * 2) / 1000));
-    const runCost = runUnits * runRatePer1000;
+    runCost = runUnits * runRatePer1000;
     printingCost = masterCost + runCost;
   } else if (printProcess === "digital") {
-    // Digital printing per finished A4 equivalent sheet
-    const digitalRatePerSheet = 6.0;
-    printingCost = totalFinishedSheetsPerPly * numPlies * digitalRatePerSheet;
+    // Digital printing: strictly White paper only, calculated on 12x18 sheet yield
+    const hasNonWhite = printedPlies.some(
+      (p) => !p.colour || p.colour.trim().toLowerCase() !== "white"
+    );
+    if (hasNonWhite) {
+      throw new Error("Digital Printing is strictly restricted to White paper only.");
+    }
+    const digRateObj = printingRates.find((r) => r.rateKey === "DIGITAL_12X18_FRONT");
+    const digitalRatePerSheet = digRateObj ? Number(digRateObj.rate) : 6.0;
+    const digYield = Math.max(
+      1,
+      Math.floor(18 / sizeRule.widthInch) * Math.floor(12 / sizeRule.heightInch),
+      Math.floor(18 / sizeRule.heightInch) * Math.floor(12 / sizeRule.widthInch),
+      sizeRule.id === "a4" ? 2 : 1
+    );
+    const digSheets = Math.ceil((totalFinishedSheetsPerPly * printedPlyCount) / digYield);
+    numMasters = 0;
+    totalRuns = 0;
+    slabCount = 0;
+    printingCost = digSheets * digitalRatePerSheet;
   } else {
-    // Single color mini offset (default)
-    numMasters = 1;
-    const masterCost = numMasters * masterRate;
+    // Single color mini offset (default) — count unique ink colours across printed plies
+    const uniqueInks = new Set(
+      printedPlies.map((p) => (p.inkColour || inkColour || "Black").trim().toUpperCase())
+    );
+    numMasters = Math.max(1, uniqueInks.size);
+    masterCost = numMasters * masterRate;
     const runUnits = Math.max(1, Math.ceil(totalImpressions / 1000));
-    const runCost = runUnits * runRatePer1000;
+    runCost = runUnits * runRatePer1000;
     printingCost = masterCost + runCost;
   }
 
@@ -574,8 +840,14 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
   if (bindingObj) bindingRatePerBook = bindingObj.ratePerBook;
 
   if (Array.isArray(bindingRates) && bindingRates.length > 0) {
-    const liveBind = bindingRates.find((b) => b.bindingCode === bindingType || b.bindingType === bindingType);
-    if (liveBind && liveBind.ratePerBook) bindingRatePerBook = Number(liveBind.ratePerBook);
+    const liveBind = bindingRates.find(
+      (b) =>
+        b.bindingCode === bindingType ||
+        b.bindingType === bindingType ||
+        (bindingObj && b.bindingType?.toLowerCase().includes(bindingType.toLowerCase()))
+    );
+    const liveRate = liveBind?.ratePerUnit ?? liveBind?.ratePerBook;
+    if (liveRate !== undefined) bindingRatePerBook = Number(liveRate);
   }
 
   const bindingCost = Number((numBooks * bindingRatePerBook).toFixed(2));
@@ -585,23 +857,54 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
   if (numbering) {
     let numberingRate = 2.0; // ₹2 per book
     if (Array.isArray(finishingRates) && finishingRates.length > 0) {
-      const numObj = finishingRates.find((f) => f.serviceKey === "FINISH_NUMBERING_PER_BOOK");
-      if (numObj && numObj.ratePerBook) numberingRate = Number(numObj.ratePerBook);
+      const numObj = finishingRates.find(
+        (f) => f.serviceKey === "FINISH_NUMBERING" || f.serviceKey === "FINISH_NUMBERING_PER_BOOK"
+      );
+      if (numObj && numObj.ratePerBook !== undefined) numberingRate = Number(numObj.ratePerBook);
     }
     numberingCost = Number((numBooks * numberingRate).toFixed(2));
+  }
+
+  let punchingCost = 0;
+  if (punching) {
+    let punchingRate = 2.0; // ₹2 per book
+    if (Array.isArray(finishingRates) && finishingRates.length > 0) {
+      const punchObj = finishingRates.find((f) => f.serviceKey === "FINISH_PUNCHING");
+      if (punchObj && punchObj.ratePerBook !== undefined) punchingRate = Number(punchObj.ratePerBook);
+    }
+    punchingCost = Number((numBooks * punchingRate).toFixed(2));
   }
 
   // Cover & Gatta backing cost (included in normal & hardbound, ₹5 if plain stapler/pad)
   const coverGattaCost = bindingType === "stapler" ? numBooks * 5 : 0;
 
-  // 6. Base Production Cost
+  // Transportation Cost (aligned with CommercialPrintCalculator & backend printingCalcEngine)
+  let transportationCost = 50;
+  if (Array.isArray(finishingRates) && finishingRates.length > 0) {
+    const transObj = finishingRates.find((f) => f.serviceKey === "FINISH_TRANSPORTATION");
+    if (transObj && transObj.ratePerBook !== undefined) transportationCost = Number(transObj.ratePerBook);
+  }
+  if (Array.isArray(printingRates) && printingRates.length > 0) {
+    const transPrint = printingRates.find((r) => r.rateKey === "TRANSPORTATION_COST");
+    if (transPrint && transPrint.rate !== undefined) transportationCost = Number(transPrint.rate);
+  }
+
+  // 6. Base Production Cost (Vendor Raw Price)
   const totalProductionCost = Number(
-    (totalPaperCost + printingCost + bindingCost + numberingCost + coverGattaCost).toFixed(2)
+    (
+      totalPaperCost +
+      printingCost +
+      bindingCost +
+      numberingCost +
+      punchingCost +
+      coverGattaCost +
+      transportationCost
+    ).toFixed(2)
   );
 
-  // 7. Selling Price with Sales Margin
-  const marginMultiplier = 1 + (Number(salesMarginPercent) || 25) / 100;
-  const rawSellingPrice = totalProductionCost * marginMultiplier;
+  // 7. Selling Price (0% margin by default = Vendor Raw Price)
+  const marginPct = Math.min(99, Math.max(0, Number(salesMarginPercent ?? 0)));
+  const rawSellingPrice = totalProductionCost / (1 - marginPct / 100);
   // Round to friendly whole rupee
   const finalOrderPrice = Math.max(100, Math.ceil(rawSellingPrice));
   const pricePerBook = Number((finalOrderPrice / numBooks).toFixed(2));
@@ -618,6 +921,8 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     finishedDimensions: sizeRule.dimensions,
     rawSheetDimensions: `${rawSheetW}" × ${rawSheetH}"`,
     yieldPerSheet,
+    wastePercent: optimalSheet.wastePercent,
+    selectedLayout: optimalSheet.selectedLayout,
     numBooks,
     numSets,
     numPlies,
@@ -627,12 +932,18 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     // Paper details
     plyBreakdown,
     totalPaperCost,
-    totalRawSheetsOrder: totalRawSheetsPerPly * numPlies,
-    wastageSheetsTotal: wastageSheetsPerPly * numPlies,
+    totalRawSheetsOrder,
+    wastageSheetsTotal,
     // Printing details
     printProcess,
     inkColour,
     numMasters,
+    masterRate,
+    masterCost,
+    runRatePer1000,
+    runCost,
+    totalRuns,
+    slabCount,
     totalImpressions,
     printingCost,
     // Binding & Finishing
@@ -641,7 +952,10 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     bindingCost,
     numbering,
     numberingCost,
+    punching,
+    punchingCost,
     coverGattaCost,
+    transportationCost,
     // Final Customer Pricing
     totalProductionCost,
     finalOrderPrice,

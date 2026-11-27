@@ -17,6 +17,7 @@ import {
   FiCheckCircle,
   FiInfo,
   FiChevronDown,
+  FiTruck,
 } from "react-icons/fi";
 import { useQuote } from "@/context/QuoteContext";
 import { useAuth } from "@/context/AuthContext";
@@ -33,13 +34,14 @@ import {
   getAvailablePaperTypes,
   getAvailableGsms,
   getAvailableColours,
+  selectLeastWastageSheetFromDb,
   calculateSalesBillBookQuote,
 } from "@/utils/salesBillBookEngine";
 import { generateGeneralProductQuotationPdf } from "@/lib/generateQuotationPdf";
 
 export default function SalesBillBookCalculator() {
   const { addToQuote } = useQuote();
-  const { user, isManagerOrAdmin } = useAuth();
+  const { isManagerOrAdmin } = useAuth();
 
   // ---------------------------------------------------------------------------
   // 1. MASTER DATA STATE (Fetched from Admin Master Collections)
@@ -55,12 +57,13 @@ export default function SalesBillBookCalculator() {
   const loadAdminMasters = useCallback(async () => {
     try {
       setLoadingMasters(true);
-      const [papersRes, printRes, bindRes, finishRes] = await Promise.allSettled([
-        fetchPaperMastersApi(),
-        fetchPrintingRatesApi(),
-        fetchBindingRatesApi(),
-        fetchFinishingRatesApi(),
-      ]);
+      const [papersRes, printRes, bindRes, finishRes] =
+        await Promise.allSettled([
+          fetchPaperMastersApi(),
+          fetchPrintingRatesApi(),
+          fetchBindingRatesApi(),
+          fetchFinishingRatesApi(),
+        ]);
 
       if (papersRes.status === "fulfilled" && Array.isArray(papersRes.value)) {
         setPapers(papersRes.value);
@@ -76,7 +79,10 @@ export default function SalesBillBookCalculator() {
         setFinishingRates(finishRes.value);
       }
     } catch (err) {
-      console.warn("Could not fetch some master rates, using calibrated defaults:", err);
+      console.warn(
+        "Could not fetch some master rates, using calibrated defaults:",
+        err,
+      );
     } finally {
       setLoadingMasters(false);
     }
@@ -105,10 +111,34 @@ export default function SalesBillBookCalculator() {
 
   // Configuration for each ply
   const [pliesConfig, setPliesConfig] = useState([
-    { paperType: "Maplitho", gsm: 70, colour: "White" },
-    { paperType: "Maplitho", gsm: 70, colour: "Yellow" },
-    { paperType: "Maplitho", gsm: 70, colour: "Pink" },
-    { paperType: "Maplitho", gsm: 70, colour: "Blue" },
+    {
+      paperType: "Maplitho",
+      gsm: 70,
+      colour: "White",
+      inkColour: "Black",
+      printRequired: true,
+    },
+    {
+      paperType: "Maplitho",
+      gsm: 70,
+      colour: "Yellow",
+      inkColour: "Black",
+      printRequired: true,
+    },
+    {
+      paperType: "Maplitho",
+      gsm: 70,
+      colour: "Pink",
+      inkColour: "Black",
+      printRequired: true,
+    },
+    {
+      paperType: "Maplitho",
+      gsm: 70,
+      colour: "Blue",
+      inkColour: "Black",
+      printRequired: true,
+    },
   ]);
 
   // Printing & Inking
@@ -118,12 +148,13 @@ export default function SalesBillBookCalculator() {
   // Binding
   const [bindingType, setBindingType] = useState("normal");
 
-  // Serial Numbering
+  // Serial Numbering & Punching
   const [numbering, setNumbering] = useState(false);
   const [startNumber, setStartNumber] = useState("0001");
+  const [punching, setPunching] = useState(false);
 
-  // Sales Margin & GST
-  const [salesMarginPercent, setSalesMarginPercent] = useState(25);
+  // Sales Margin & GST (0% Margin = Vendor Raw Price)
+  const [salesMarginPercent, setSalesMarginPercent] = useState(0);
   const [includeGst, setIncludeGst] = useState(false);
 
   // Customer Contact for Quotation
@@ -147,21 +178,81 @@ export default function SalesBillBookCalculator() {
     );
   }, [selectedSizeId]);
 
-  // Papers matching current size's raw sheet (18x22, 23x36)
-  const sizePapers = useMemo(() => {
-    return getPapersForSizeRule(papers, currentSizeRule);
+  // Auto-select the least-wastage raw sheet from backend PaperMaster using finished width & height
+  const optimalSheet = useMemo(() => {
+    return selectLeastWastageSheetFromDb(
+      papers,
+      currentSizeRule.widthInch,
+      currentSizeRule.heightInch,
+      currentSizeRule
+    );
   }, [papers, currentSizeRule]);
+
+  // Papers matching the auto-selected least-wastage raw sheet (e.g. 18x22 or 23x36)
+  const sizePapers = useMemo(() => {
+    return getPapersForSizeRule(papers, {
+      ...currentSizeRule,
+      rawSheetWidth: optimalSheet.rawWidthInch,
+      rawSheetHeight: optimalSheet.rawHeightInch,
+    });
+  }, [papers, currentSizeRule, optimalSheet]);
 
   // Dynamic dropdown options for plies
   const availablePaperTypes = useMemo(() => {
     return getAvailablePaperTypes(sizePapers);
   }, [sizePapers]);
 
-  // Handle ply field update
+  // Auto-sync ply configs to valid backend PaperMaster entries when DB papers load or size changes
+  useEffect(() => {
+    if (!Array.isArray(papers) || papers.length === 0 || sizePapers.length === 0) return;
+    setPliesConfig((prev) =>
+      prev.map((ply) => {
+        const validType = availablePaperTypes.includes(ply.paperType)
+          ? ply.paperType
+          : availablePaperTypes[0] || ply.paperType;
+        const validGsms = getAvailableGsms(sizePapers, validType);
+        const validGsm = validGsms.includes(Number(ply.gsm))
+          ? Number(ply.gsm)
+          : validGsms[0] || ply.gsm;
+        const validColours = getAvailableColours(sizePapers, validType, validGsm);
+        const validColour = validColours.includes(ply.colour)
+          ? ply.colour
+          : validColours[0] || ply.colour;
+        if (
+          validType === ply.paperType &&
+          validGsm === Number(ply.gsm) &&
+          validColour === ply.colour
+        ) {
+          return ply;
+        }
+        return { ...ply, paperType: validType, gsm: validGsm, colour: validColour };
+      })
+    );
+  }, [papers, sizePapers, availablePaperTypes]);
+
+  // Handle ply field update & auto-sync valid GSM / Colour from backend PaperMaster
   const handlePlyChange = (index, field, value) => {
     setPliesConfig((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
+      const nextPly = { ...updated[index], [field]: value };
+
+      if (field === "paperType") {
+        const validGsms = getAvailableGsms(sizePapers, value);
+        if (validGsms.length > 0 && !validGsms.includes(Number(nextPly.gsm))) {
+          nextPly.gsm = validGsms[0];
+        }
+        const validColours = getAvailableColours(sizePapers, value, nextPly.gsm);
+        if (validColours.length > 0 && !validColours.includes(nextPly.colour)) {
+          nextPly.colour = validColours[0];
+        }
+      } else if (field === "gsm") {
+        const validColours = getAvailableColours(sizePapers, nextPly.paperType, Number(value));
+        if (validColours.length > 0 && !validColours.includes(nextPly.colour)) {
+          nextPly.colour = validColours[0];
+        }
+      }
+
+      updated[index] = nextPly;
       return updated;
     });
   };
@@ -173,7 +264,9 @@ export default function SalesBillBookCalculator() {
     return pliesConfig.slice(0, plyCount);
   }, [pliesConfig, plyCount]);
 
-  const activeQuantity = customQuantity ? Number(customQuantity) || 1 : quantity;
+  const activeQuantity = customQuantity
+    ? Number(customQuantity) || 1
+    : quantity;
   const activeSets = customSets ? Number(customSets) || 100 : setsPerBook;
 
   const quote = useMemo(() => {
@@ -186,16 +279,17 @@ export default function SalesBillBookCalculator() {
         printProcess,
         inkColour,
         numbering,
+        punching,
         bindingType,
         includeGst,
-        salesMarginPercent: Number(salesMarginPercent) || 25,
+        salesMarginPercent: Number(salesMarginPercent ?? 0),
       },
       {
         papers,
         printingRates,
         bindingRates,
         finishingRates,
-      }
+      },
     );
   }, [
     selectedSizeId,
@@ -205,6 +299,7 @@ export default function SalesBillBookCalculator() {
     printProcess,
     inkColour,
     numbering,
+    punching,
     bindingType,
     includeGst,
     salesMarginPercent,
@@ -256,7 +351,9 @@ _A2V Commercial Printing & Design Hub_`;
     const selectedOptions = {
       Size: `${quote.finishedSizeName} (${quote.finishedDimensions})`,
       "Copies (Ply)": `${quote.numPlies}-Ply (${quote.numSets} Sets/Book)`,
-      Paper: quote.plyBreakdown.map((p) => `${p.layerName}: ${p.paperType} ${p.gsm} GSM (${p.colour})`).join(" | "),
+      Paper: quote.plyBreakdown
+        .map((p) => `${p.layerName}: ${p.paperType} ${p.gsm} GSM (${p.colour})`)
+        .join(" | "),
       Printing: `${printProcess === "two_color_offset" ? "2-Color" : "Single Color"} (${inkColour})`,
       Binding: quote.bindingName,
       Numbering: numbering ? `Yes (${startNumber}+)` : "No",
@@ -284,7 +381,9 @@ _A2V Commercial Printing & Design Hub_`;
         .join("; "),
       "Printing Ink": `${printProcess === "two_color_offset" ? "2-Color Offset" : "Single Color Offset"} (${inkColour} Ink)`,
       "Book Binding": quote.bindingName,
-      "Serial Numbering": numbering ? `Consecutive (${startNumber} onwards)` : "Not Included",
+      "Serial Numbering": numbering
+        ? `Consecutive (${startNumber} onwards)`
+        : "Not Included",
       "Production Turnaround": quote.turnaroundDays,
     };
 
@@ -322,7 +421,7 @@ _A2V Commercial Printing & Design Hub_`;
   return (
     <div className="space-y-8">
       {/* 1. Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-slate-800">
+      <div className="bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-slate-800">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold tracking-wide uppercase">
@@ -333,8 +432,9 @@ _A2V Commercial Printing & Design Hub_`;
               Bill Book &amp; Cash Memo Calculator
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Fast, accurate customer quotations for Invoices, Receipts, Challans, and Pads.
-              Raw paper sizes and sheet cutting are automated behind the scenes using live Admin Masters.
+              Fast, accurate customer quotations for Invoices, Receipts,
+              Challans, and Pads. Raw paper sizes and sheet cutting are
+              automated behind the scenes using live Admin Masters.
             </p>
           </div>
 
@@ -388,7 +488,8 @@ _A2V Commercial Printing & Design Hub_`;
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span>Choose Size from Dropdown:</span>
                 <span className="text-orange-600 font-semibold">
-                  Selected: {currentSizeRule.name} ({currentSizeRule.dimensions})
+                  Selected: {currentSizeRule.name} ({currentSizeRule.dimensions}
+                  )
                 </span>
               </label>
 
@@ -399,15 +500,19 @@ _A2V Commercial Printing & Design Hub_`;
                   className="w-full text-sm font-bold pl-4 pr-10 py-3 bg-white border-2 border-orange-500/40 hover:border-orange-500 rounded-xl text-slate-900 focus:ring-2 focus:ring-orange-500 focus:outline-none transition-all shadow-xs appearance-none cursor-pointer"
                 >
                   <optgroup label="⭐ Popular & Most Ordered">
-                    {SALES_BOOK_SIZE_RULES.filter((r) => r.popular).map((rule) => (
-                      <option key={`pop-${rule.id}`} value={rule.id}>
-                        {rule.name} — {rule.dimensions} ({rule.tag})
-                      </option>
-                    ))}
+                    {SALES_BOOK_SIZE_RULES.filter((r) => r.popular).map(
+                      (rule) => (
+                        <option key={`pop-${rule.id}`} value={rule.id}>
+                          {rule.name} — {rule.dimensions} ({rule.tag})
+                        </option>
+                      ),
+                    )}
                   </optgroup>
 
                   <optgroup label="📄 ISO Standard A-Series">
-                    {SALES_BOOK_SIZE_RULES.filter((r) => r.group === "ISO A-Series").map((rule) => (
+                    {SALES_BOOK_SIZE_RULES.filter(
+                      (r) => r.group === "ISO A-Series",
+                    ).map((rule) => (
                       <option key={rule.id} value={rule.id}>
                         {rule.name} — {rule.dimensions} ({rule.tag})
                       </option>
@@ -415,7 +520,9 @@ _A2V Commercial Printing & Design Hub_`;
                   </optgroup>
 
                   <optgroup label="🏢 Office & US Letter Sizes">
-                    {SALES_BOOK_SIZE_RULES.filter((r) => r.group === "Office & Letter").map((rule) => (
+                    {SALES_BOOK_SIZE_RULES.filter(
+                      (r) => r.group === "Office & Letter",
+                    ).map((rule) => (
                       <option key={rule.id} value={rule.id}>
                         {rule.name} — {rule.dimensions} ({rule.tag})
                       </option>
@@ -423,7 +530,9 @@ _A2V Commercial Printing & Design Hub_`;
                   </optgroup>
 
                   <optgroup label="📐 Fractional Demy Press Cuts">
-                    {SALES_BOOK_SIZE_RULES.filter((r) => r.group === "Fractional Demy").map((rule) => (
+                    {SALES_BOOK_SIZE_RULES.filter(
+                      (r) => r.group === "Fractional Demy",
+                    ).map((rule) => (
                       <option key={rule.id} value={rule.id}>
                         {rule.name} — {rule.dimensions} ({rule.tag})
                       </option>
@@ -433,59 +542,6 @@ _A2V Commercial Printing & Design Hub_`;
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-orange-600">
                   <FiChevronDown className="w-5 h-5 stroke-[2.5]" />
                 </div>
-              </div>
-            </div>
-
-            {/* Quick-Pick Popular Chips */}
-            <div className="space-y-1.5 pt-1">
-              <div className="text-[11px] font-bold text-slate-500">Quick-Pick Popular Sizes:</div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { id: "a4", label: "A4", dim: "8.27×11.69" },
-                  { id: "a5", label: "A5", dim: "5.83×8.27" },
-                  { id: "1-8", label: "1/8", dim: "5.5×7" },
-                  { id: "letter", label: "Letter", dim: "8.5×11" },
-                  { id: "legal", label: "Legal", dim: "8.5×14" },
-                  { id: "1-4", label: "1/4", dim: "8.5×10.5" },
-                ].map((chip) => {
-                  const isSelected = selectedSizeId === chip.id;
-                  return (
-                    <button
-                      key={chip.id}
-                      type="button"
-                      onClick={() => setSelectedSizeId(chip.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                        isSelected
-                          ? "bg-slate-900 text-white border-slate-900 shadow-xs"
-                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      {chip.label} <span className="opacity-70 text-[10px]">({chip.dim})</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Active Selected Size Card Preview */}
-            <div className="p-3.5 rounded-xl bg-gradient-to-r from-orange-50/70 to-amber-50/70 border border-orange-200/80 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
-                  {currentSizeRule.name}
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900 text-xs sm:text-sm">
-                    {currentSizeRule.name} Size ({currentSizeRule.dimensions})
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    {currentSizeRule.description}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-orange-200 text-orange-700 text-[11px] font-black">
-                  {currentSizeRule.yieldPerSheet} Out of {currentSizeRule.rawSheetWidth}×{currentSizeRule.rawSheetHeight}
-                </span>
               </div>
             </div>
           </div>
@@ -506,7 +562,10 @@ _A2V Commercial Printing & Design Hub_`;
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span>Number of Books</span>
                 <span className="text-slate-500 font-normal">
-                  Selected: <strong className="text-slate-900">{activeQuantity} Books</strong>
+                  Selected:{" "}
+                  <strong className="text-slate-900">
+                    {activeQuantity} Books
+                  </strong>
                 </span>
               </label>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -545,7 +604,8 @@ _A2V Commercial Printing & Design Hub_`;
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span>Sets / Pages per Book</span>
                 <span className="text-slate-500 font-normal">
-                  Selected: <strong className="text-slate-900">{activeSets} Sets</strong>
+                  Selected:{" "}
+                  <strong className="text-slate-900">{activeSets} Sets</strong>
                 </span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -602,7 +662,9 @@ _A2V Commercial Printing & Design Hub_`;
                     }`}
                   >
                     <div className="text-xs font-black">{ply.label}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{ply.sub}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">
+                      {ply.sub}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -631,13 +693,20 @@ _A2V Commercial Printing & Design Hub_`;
                   idx === 0
                     ? "Layer 1 - Original (Top Copy)"
                     : idx === 1
-                    ? "Layer 2 - Duplicate Copy"
-                    : idx === 2
-                    ? "Layer 3 - Triplicate Copy"
-                    : "Layer 4 - Quadruplicate Copy";
+                      ? "Layer 2 - Duplicate Copy"
+                      : idx === 2
+                        ? "Layer 3 - Triplicate Copy"
+                        : "Layer 4 - Quadruplicate Copy";
 
-                const layerAvailableGsms = getAvailableGsms(sizePapers, ply.paperType);
-                const layerAvailableColours = getAvailableColours(sizePapers, ply.paperType, ply.gsm);
+                const layerAvailableGsms = getAvailableGsms(
+                  sizePapers,
+                  ply.paperType,
+                );
+                const layerAvailableColours = getAvailableColours(
+                  sizePapers,
+                  ply.paperType,
+                  ply.gsm,
+                );
 
                 // Find matching breakdown info
                 const breakdownItem = quote.plyBreakdown[idx] || {};
@@ -654,10 +723,10 @@ _A2V Commercial Printing & Design Hub_`;
                             ply.colour === "Yellow"
                               ? "bg-amber-300 border-amber-400"
                               : ply.colour === "Pink"
-                              ? "bg-pink-300 border-pink-400"
-                              : ply.colour === "Blue"
-                              ? "bg-sky-300 border-sky-400"
-                              : "bg-white border-slate-300"
+                                ? "bg-pink-300 border-pink-400"
+                                : ply.colour === "Blue"
+                                  ? "bg-sky-300 border-sky-400"
+                                  : "bg-white border-slate-300"
                           }`}
                         />
                         <span className="font-bold text-xs text-slate-800">
@@ -668,12 +737,13 @@ _A2V Commercial Printing & Design Hub_`;
                       {/* Live Rate Pill */}
                       {breakdownItem.looseSheetRate && (
                         <span className="text-[10px] text-slate-600 font-medium">
-                          ₹{breakdownItem.looseSheetRate}/sheet • ₹{breakdownItem.reamRate}/ream
+                          ₹{breakdownItem.looseSheetRate}/sheet • ₹
+                          {breakdownItem.reamRate}/ream
                         </span>
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                       {/* Paper Type */}
                       <div>
                         <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">
@@ -681,7 +751,9 @@ _A2V Commercial Printing & Design Hub_`;
                         </label>
                         <select
                           value={ply.paperType}
-                          onChange={(e) => handlePlyChange(idx, "paperType", e.target.value)}
+                          onChange={(e) =>
+                            handlePlyChange(idx, "paperType", e.target.value)
+                          }
                           className="w-full text-xs font-semibold px-2.5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         >
                           {availablePaperTypes.map((type) => (
@@ -699,7 +771,9 @@ _A2V Commercial Printing & Design Hub_`;
                         </label>
                         <select
                           value={ply.gsm}
-                          onChange={(e) => handlePlyChange(idx, "gsm", Number(e.target.value))}
+                          onChange={(e) =>
+                            handlePlyChange(idx, "gsm", Number(e.target.value))
+                          }
                           className="w-full text-xs font-semibold px-2.5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         >
                           {layerAvailableGsms.map((g) => (
@@ -717,7 +791,9 @@ _A2V Commercial Printing & Design Hub_`;
                         </label>
                         <select
                           value={ply.colour}
-                          onChange={(e) => handlePlyChange(idx, "colour", e.target.value)}
+                          onChange={(e) =>
+                            handlePlyChange(idx, "colour", e.target.value)
+                          }
                           className="w-full text-xs font-semibold px-2.5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         >
                           {layerAvailableColours.map((col) => (
@@ -727,6 +803,79 @@ _A2V Commercial Printing & Design Hub_`;
                           ))}
                         </select>
                       </div>
+
+                      {/* Ink Colour */}
+                      <div>
+                        <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">
+                          Ink Colour
+                        </label>
+                        <select
+                          value={ply.inkColour || inkColour || "Black"}
+                          disabled={ply.printRequired === false}
+                          onChange={(e) =>
+                            handlePlyChange(idx, "inkColour", e.target.value)
+                          }
+                          className={`w-full text-xs font-semibold px-2.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+                            ply.printRequired === false
+                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                              : "bg-white"
+                          }`}
+                        >
+                          <option value="Black">Black Ink</option>
+                          <option value="Red">Red Ink</option>
+                          <option value="Blue">Blue Ink</option>
+                          <option value="Green">Green Ink</option>
+                        </select>
+                        {ply.printRequired === false ? (
+                          <span className="text-[9px] block mt-1 font-semibold text-slate-500 leading-tight">
+                            No Print (Blank — ₹0 Master/Run)
+                          </span>
+                        ) : idx > 0 ? (
+                          <span className="text-[9px] block mt-1 font-semibold leading-tight">
+                            {(
+                              ply.inkColour ||
+                              inkColour ||
+                              "Black"
+                            ).toLowerCase() ===
+                            (
+                              pliesConfig[0]?.inkColour ||
+                              inkColour ||
+                              "Black"
+                            ).toLowerCase() ? (
+                              <span className="text-emerald-700">
+                                ✓ Same ink as Layer 1 (Shares Master Plate)
+                              </span>
+                            ) : (
+                              <span className="text-amber-800 font-bold">
+                                ⚡ Different ink (+₹30 Master Plate)
+                              </span>
+                            )}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200/70 flex items-center justify-between">
+                      <label className="flex items-center gap-2 cursor-pointer text-[11px] font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={ply.printRequired !== false}
+                          onChange={(e) =>
+                            handlePlyChange(
+                              idx,
+                              "printRequired",
+                              e.target.checked,
+                            )
+                          }
+                          className="w-3.5 h-3.5 text-orange-600 rounded"
+                        />
+                        <span>Print Required on this Layer</span>
+                      </label>
+                      {ply.printRequired === false && (
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">
+                          No Print (Blank Sheet)
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -734,76 +883,19 @@ _A2V Commercial Printing & Design Hub_`;
             </div>
           </div>
 
-          {/* STEP 4: Printing & Binding */}
+          {/* STEP 4: Binding & Numbering */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
             <div className="flex items-center gap-2">
               <span className="w-7 h-7 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">
                 4
               </span>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-                Printing Ink &amp; Book Binding
+                Book Binding &amp; Numbering
               </h3>
             </div>
 
-            {/* Printing Process */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700">
-                Printing Technology &amp; Color:
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setPrintProcess("single_color_offset")}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    printProcess === "single_color_offset"
-                      ? "border-orange-500 bg-orange-50/70 ring-2 ring-orange-500/20 text-orange-900"
-                      : "border-slate-200 hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  <div className="text-xs font-bold">Single Color Mini Offset</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    Standard Black, Royal Blue, or Red Ink (1 Master Plate)
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPrintProcess("two_color_offset")}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    printProcess === "two_color_offset"
-                      ? "border-orange-500 bg-orange-50/70 ring-2 ring-orange-500/20 text-orange-900"
-                      : "border-slate-200 hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  <div className="text-xs font-bold">Two-Color Offset</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    Dual color printing (e.g. Red Title + Black Body - 2 Masters)
-                  </div>
-                </button>
-              </div>
-
-              {/* Ink Color Picker */}
-              <div className="flex items-center gap-2 pt-2">
-                <span className="text-xs text-slate-600 font-medium">Ink Colour:</span>
-                {["Black", "Royal Blue", "Red", "Multi"].map((col) => (
-                  <button
-                    key={col}
-                    type="button"
-                    onClick={() => setInkColour(col)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
-                      inkColour === col
-                        ? "bg-slate-900 text-white border-slate-900 shadow-xs"
-                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    {col}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Binding Style */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="space-y-2">
               <label className="text-xs font-bold text-slate-700">
                 Book Binding Style:
               </label>
@@ -859,12 +951,37 @@ _A2V Commercial Printing & Design Hub_`;
                   type="button"
                   onClick={() => setNumbering(!numbering)}
                   className={`w-12 h-6 flex items-center rounded-full p-1 transition-all ${
-                    numbering ? "bg-orange-600 justify-end" : "bg-slate-300 justify-start"
+                    numbering
+                      ? "bg-orange-600 justify-end"
+                      : "bg-slate-300 justify-start"
                   }`}
                 >
                   <span className="bg-white w-4 h-4 rounded-full shadow-md" />
                 </button>
               </div>
+            </div>
+
+            {/* Punching / Perforation Toggle */}
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <div className="text-xs font-bold text-slate-800">
+                  Punching / Perforation
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Tear-off line perforation along the margin across all plies (+₹2/book)
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPunching(!punching)}
+                className={`w-12 h-6 flex items-center rounded-full p-1 transition-all ${
+                  punching
+                    ? "bg-orange-600 justify-end"
+                    : "bg-slate-300 justify-start"
+                }`}
+              >
+                <span className="bg-white w-4 h-4 rounded-full shadow-md" />
+              </button>
             </div>
           </div>
         </div>
@@ -903,23 +1020,33 @@ _A2V Commercial Printing & Design Hub_`;
                     Total Order Value
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-orange-400 mt-1">
-                    ₹{includeGst ? quote.grandTotalWithGst.toLocaleString("en-IN") : quote.finalOrderPrice.toLocaleString("en-IN")}
+                    ₹
+                    {includeGst
+                      ? quote.grandTotalWithGst.toLocaleString("en-IN")
+                      : quote.finalOrderPrice.toLocaleString("en-IN")}
                   </div>
                 </div>
               </div>
 
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-                <span>{quote.finishedSizeName} • {quote.numPlies}-Ply</span>
+                <span>
+                  {quote.finishedSizeName} • {quote.numPlies}-Ply
+                </span>
                 <span>{quote.turnaroundDays}</span>
               </div>
             </div>
 
             {/* Specification Summary Chips */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-slate-700">Specification Details:</div>
+              <div className="text-xs font-bold text-slate-700">
+                Specification Details:
+              </div>
               <div className="flex flex-wrap gap-1.5 text-xs">
                 <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-medium">
                   Size: {quote.finishedSizeName} ({quote.finishedDimensions})
+                </span>
+                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-medium">
+                  Auto Sheet: {quote.rawSheetDimensions} ({quote.yieldPerSheet}-Out • {quote.wastePercent}% waste)
                 </span>
                 <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-medium">
                   {quote.numSets} Sets / Book
@@ -928,7 +1055,10 @@ _A2V Commercial Printing & Design Hub_`;
                   {quote.bindingName}
                 </span>
                 <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-medium">
-                  {printProcess === "two_color_offset" ? "2-Color Offset" : "Single Color"} ({inkColour})
+                  {printProcess === "two_color_offset"
+                    ? "2-Color Offset"
+                    : "Single Color"}{" "}
+                  ({inkColour})
                 </span>
                 {numbering && (
                   <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-medium">
@@ -942,17 +1072,23 @@ _A2V Commercial Printing & Design Hub_`;
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
               <div className="flex justify-between text-slate-600">
                 <span>Total Finished Pages</span>
-                <strong className="text-slate-900">{quote.totalFinishedPages.toLocaleString()} Leaves</strong>
+                <strong className="text-slate-900">
+                  {quote.totalFinishedPages.toLocaleString()} Leaves
+                </strong>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Paper &amp; Materials</span>
                 <strong className="text-slate-900">
-                  {quote.plyBreakdown.map((p) => `${p.colour} ${p.paperType}`).join(", ")}
+                  {quote.plyBreakdown
+                    .map((p) => `${p.colour} ${p.paperType}`)
+                    .join(", ")}
                 </strong>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Printing Technology</span>
-                <strong className="text-slate-900">Mini Offset High Speed</strong>
+                <strong className="text-slate-900">
+                  Mini Offset High Speed
+                </strong>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Binding &amp; Finishing</span>
@@ -969,7 +1105,9 @@ _A2V Commercial Printing & Design Hub_`;
                   <span>Include 18% GST in Total</span>
                 </label>
                 {includeGst && (
-                  <span className="font-bold text-orange-600">+₹{quote.gstAmount.toFixed(2)}</span>
+                  <span className="font-bold text-orange-600">
+                    +₹{quote.gstAmount.toFixed(2)}
+                  </span>
                 )}
               </div>
             </div>
@@ -984,14 +1122,18 @@ _A2V Commercial Printing & Design Hub_`;
                   type="text"
                   placeholder="Client / Company Name"
                   value={clientInfo.name}
-                  onChange={(e) => setClientInfo({ ...clientInfo, name: e.target.value })}
+                  onChange={(e) =>
+                    setClientInfo({ ...clientInfo, name: e.target.value })
+                  }
                   className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
                 <input
                   type="text"
                   placeholder="Phone Number"
                   value={clientInfo.phone}
-                  onChange={(e) => setClientInfo({ ...clientInfo, phone: e.target.value })}
+                  onChange={(e) =>
+                    setClientInfo({ ...clientInfo, phone: e.target.value })
+                  }
                   className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               </div>
@@ -1022,7 +1164,8 @@ _A2V Commercial Printing & Design Hub_`;
                 onClick={handleDownloadPdf}
                 className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99]"
               >
-                <FiDownload className="w-4 h-4" /> Download Official Quotation PDF
+                <FiDownload className="w-4 h-4" /> Download Official Quotation
+                PDF
               </button>
 
               {/* Add to Quote Cart */}
@@ -1042,6 +1185,68 @@ _A2V Commercial Printing & Design Hub_`;
                 )}
               </button>
             </div>
+
+            {/* MANAGER / ADMIN PRODUCTION AUDIT (CONFIDENTIAL FIREWALL) */}
+            {isManagerOrAdmin && (
+              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+                  <span className="flex items-center gap-1.5">
+                    <FiShield className="w-4 h-4 text-amber-600" />
+                    Manager Production Audit (Confidential)
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                    {salesMarginPercent}% Margin
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                  <div>
+                    <span className="text-slate-500 block">Total Paper Cost:</span>
+                    <span className="font-bold text-slate-900">₹{Math.round(quote.totalPaperCost)}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">
+                      Master Plates ({quote.numMasters} × ₹{quote.masterRate}):
+                    </span>
+                    <span className="font-bold text-slate-900">₹{Math.round(quote.masterCost)}</span>
+                    <span className="text-[10px] text-slate-500 block">
+                      {quote.numMasters <= 1
+                        ? `Same ink colour across plies (1 Master ₹${quote.masterRate})`
+                        : `${quote.numMasters} unique ink masters`}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">
+                      Offset Runs ({quote.totalRuns} runs × {quote.slabCount} slab × ₹{quote.runRatePer1000}):
+                    </span>
+                    <span className="font-bold text-slate-900">₹{Math.round(quote.runCost)}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Binding &amp; Finishing:</span>
+                    <span className="font-bold text-slate-900">
+                      ₹{Math.round(quote.bindingCost + quote.numberingCost + (quote.punchingCost || 0) + quote.coverGattaCost)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block flex items-center gap-1">
+                      <FiTruck className="w-3 h-3 text-slate-400" /> Transportation:
+                    </span>
+                    <span className="font-bold text-slate-900">₹{Math.round(quote.transportationCost)}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Total Vendor Cost:</span>
+                    <span className="font-extrabold text-slate-900">₹{Math.round(quote.totalProductionCost)}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-amber-200/80 flex justify-between items-center text-xs">
+                  <span className="font-bold text-slate-800">Net Company Profit:</span>
+                  <span className="font-black text-emerald-700">
+                    ₹{Math.round(quote.finalOrderPrice - quote.totalProductionCost)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
