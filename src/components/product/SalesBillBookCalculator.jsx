@@ -863,42 +863,11 @@ _A2V Commercial Printing & Design Hub_`;
                             );
                           })}
                         </div>
-                        {ply.printRequired === false ? (
+                        {ply.printRequired === false && (
                           <span className="text-[9px] block mt-1 font-semibold text-slate-500 leading-tight">
-                            No Print (Blank — ₹0 Master/Run)
+                            No Print (Blank)
                           </span>
-                        ) : (() => {
-                          const prevInks = new Set(
-                            pliesConfig
-                              .slice(0, idx)
-                              .filter((p) => p.printRequired !== false)
-                              .flatMap((p) =>
-                                Array.isArray(p.inkColours) && p.inkColours.length > 0
-                                  ? p.inkColours
-                                  : [p.inkColour || "Black"]
-                              )
-                              .map((c) => c.toUpperCase())
-                          );
-                          const currInks =
-                            Array.isArray(ply.inkColours) && ply.inkColours.length > 0
-                              ? ply.inkColours
-                              : [ply.inkColour || "Black"];
-                          const newCount =
-                            idx === 0
-                              ? currInks.length
-                              : currInks.filter((c) => !prevInks.has(c.toUpperCase())).length;
-                          return newCount === 0 ? (
-                            <span className="text-[9px] block mt-1 font-semibold text-emerald-700 leading-tight">
-                              ✓ Shares existing Master Plate(s) (₹0 extra master)
-                            </span>
-                          ) : (
-                            <span className="text-[9px] block mt-1 font-semibold text-amber-800 leading-tight">
-                              {idx === 0
-                                ? `${newCount} Colour(s) = ${newCount} Master(s) (₹${newCount * (quote.masterRate || 30)})`
-                                : `⚡ +${newCount} new Master(s) (+₹${newCount * (quote.masterRate || 30)})`}
-                            </span>
-                          );
-                        })()}
+                        )}
                       </div>
                     </div>
 

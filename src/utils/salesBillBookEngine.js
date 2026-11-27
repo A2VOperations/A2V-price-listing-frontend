@@ -842,8 +842,8 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     masterCost = numMasters * masterRate;
     totalRuns = runsPerPrintedLayerSum;
     totalImpressions = totalFinishedSheetsPerPly * totalRuns;
-    const runUnits = Math.max(1, Math.ceil(totalImpressions / 1000));
-    runCost = runUnits * runRatePer1000;
+    slabCount = Math.max(1, Math.ceil(totalFinishedSheetsPerPly / 1000));
+    runCost = totalRuns * slabCount * runRatePer1000;
     printingCost = masterCost + runCost;
   }
 
