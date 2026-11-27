@@ -718,6 +718,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
       differentDesign: false, // does this ply have different plate text?
     },
@@ -727,6 +728,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
       differentDesign: false,
     },
@@ -736,6 +738,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
       differentDesign: false,
     },
@@ -745,6 +748,7 @@ export default function CommercialPrintCalculator({
       paperType: "Newspaper",
       gsm: 58,
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
       differentDesign: false,
     },
@@ -838,6 +842,31 @@ export default function CommercialPrintCalculator({
   // Helper to adjust pages in steps of 50 (min 50)
   const handlePagesStep = (delta) => {
     setPagesPerBook((prev) => Math.max(50, Number(prev) + delta));
+  };
+
+  // Toggle an ink colour (1 to 4 colours) independently on any layer
+  const handleTogglePlyInk = (index, colour) => {
+    setPlyConfigs((prev) => {
+      const updated = [...prev];
+      const ply = updated[index];
+      const current =
+        Array.isArray(ply?.inkColours) && ply.inkColours.length > 0
+          ? ply.inkColours
+          : [ply?.inkColour || "Black"];
+      let nextInks;
+      if (current.includes(colour)) {
+        if (current.length === 1) return prev; // Keep at least 1 ink colour
+        nextInks = current.filter((c) => c !== colour);
+      } else {
+        nextInks = [...current, colour];
+      }
+      updated[index] = {
+        ...ply,
+        inkColours: nextInks,
+        inkColour: nextInks.join(" + "),
+      };
+      return updated;
+    });
   };
 
   // Update a single ply attribute
@@ -1012,20 +1041,28 @@ export default function CommercialPrintCalculator({
     const printedPliesCount = printedPlies.length;
     const slabCount = printedPliesCount > 0 ? Math.max(1, Math.ceil(totalPagesPerPly / 1000)) : 0;
     const sidesCount = printSides === "both" ? 2 : 1;
-    const totalRuns = printedPliesCount * sidesCount;
     const runRate = liveMasterRates.runRate;
-    const totalOffsetRunCost = totalRuns * slabCount * runRate;
 
-    // 4. Master Plates (Live Master Rate per unique plate / ink colour / design)
+    // 4. Master Plates (1 Master per unique ink colour across all printed layers)
     const uniqueFrontMasters = new Set();
     const uniqueInkColoursSet = new Set();
+    let totalRuns = 0;
 
-    printedPlies.forEach((p, idx) => {
-      const ink = (p.inkColour || "Black").trim().toUpperCase();
-      uniqueInkColoursSet.add(ink);
-      const designTag = idx > 0 && p.differentDesign ? `DIFF_DESIGN_${idx + 1}` : "COMMON_DESIGN";
-      uniqueFrontMasters.add(`${designTag}_${ink}`);
+    printedPlies.forEach((p) => {
+      const plyInks =
+        Array.isArray(p.inkColours) && p.inkColours.length > 0
+          ? p.inkColours
+          : [p.inkColour || "Black"];
+      totalRuns += plyInks.length * sidesCount;
+
+      plyInks.forEach((inkName) => {
+        const ink = String(inkName || "Black").trim().toUpperCase();
+        uniqueInkColoursSet.add(ink);
+        uniqueFrontMasters.add(`COMMON_DESIGN_${ink}`);
+      });
     });
+
+    const totalOffsetRunCost = totalRuns * slabCount * runRate;
 
     let masterCount = uniqueFrontMasters.size;
     if (printSides === "both" && printedPliesCount > 0) {
@@ -1845,43 +1882,77 @@ export default function CommercialPrintCalculator({
                         )}
                       </div>
 
-                      {/* Ink Colour */}
+                      {/* Ink Colour (Independent 1–4 colours per layer; unique colours across layers = Masters) */}
                       <div>
                         <label className="block text-[10px] font-bold text-slate-600 mb-1">
-                          Ink Colour
+                          Ink Colour (1–4 Colours)
                         </label>
-                        <select
-                          value={ply.inkColour}
-                          disabled={ply.printRequired === false}
-                          onChange={(e) => handleUpdatePly(idx, "inkColour", e.target.value)}
-                          className={`w-full text-xs border border-slate-300 rounded-lg p-1.5 font-medium ${
-                            ply.printRequired === false
-                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                              : "bg-white"
-                          }`}
-                        >
-                          <option value="Black">Black Ink</option>
-                          <option value="Red">Red Ink</option>
-                          <option value="Blue">Blue Ink</option>
-                          <option value="Green">Green Ink</option>
-                        </select>
+                        <div className="flex flex-wrap gap-1">
+                          {["Black", "Red", "Blue", "Green"].map((col) => {
+                            const selectedInks =
+                              Array.isArray(ply.inkColours) && ply.inkColours.length > 0
+                                ? ply.inkColours
+                                : [ply.inkColour || "Black"];
+                            const isSel = selectedInks.includes(col);
+                            return (
+                              <button
+                                key={col}
+                                type="button"
+                                disabled={ply.printRequired === false}
+                                onClick={() => handleTogglePlyInk(idx, col)}
+                                className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-all ${
+                                  ply.printRequired === false
+                                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                    : isSel
+                                      ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
+                                      : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                                }`}
+                              >
+                                {col}
+                              </button>
+                            );
+                          })}
+                        </div>
                         {ply.printRequired === false ? (
                           <span className="text-[9px] block mt-1 font-semibold text-slate-500 leading-tight">
-                            No Print (Blank Sheet — ₹0 Printing)
+                            Blank Sheet — ₹0 Master/Run
                           </span>
-                        ) : idx > 0 ? (
-                          <span className="text-[9px] block mt-1 font-semibold leading-tight">
-                            {(ply.inkColour || "Black").toLowerCase() === (plyConfigs[0]?.inkColour || "Black").toLowerCase() ? (
-                              <span className="text-emerald-700">✓ Same ink as Layer 1 (Shares Master Plate ₹{calculation.masterRate})</span>
-                            ) : (
-                              <span className="text-amber-800 font-bold">⚡ Different ink (+₹{calculation.masterRate} Master Plate)</span>
-                            )}
-                          </span>
-                        ) : null}
+                        ) : (() => {
+                          const prevInks = new Set(
+                            plyConfigs
+                              .slice(0, idx)
+                              .filter((p) => p.printRequired !== false)
+                              .flatMap((p) =>
+                                Array.isArray(p.inkColours) && p.inkColours.length > 0
+                                  ? p.inkColours
+                                  : [p.inkColour || "Black"]
+                              )
+                              .map((c) => c.toUpperCase())
+                          );
+                          const currInks =
+                            Array.isArray(ply.inkColours) && ply.inkColours.length > 0
+                              ? ply.inkColours
+                              : [ply.inkColour || "Black"];
+                          const newCount =
+                            idx === 0
+                              ? currInks.length
+                              : currInks.filter((c) => !prevInks.has(c.toUpperCase())).length;
+                          return newCount === 0 ? (
+                            <span className="text-[9px] block mt-1 font-semibold text-emerald-700 leading-tight">
+                              ✓ Shares existing Master Plate(s) (₹0 extra master)
+                            </span>
+                          ) : (
+                            <span className="text-[9px] block mt-1 font-semibold text-amber-800 leading-tight">
+                              {idx === 0
+                                ? `${newCount} Colour(s) = ${newCount} Master(s) (₹${newCount * calculation.masterRate})`
+                                : `⚡ +${newCount} new Master(s) (+₹${newCount * calculation.masterRate})`}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
 
-                    {/* Print Required Toggle + Master Plate Checkbox */}
+                    {/* Print Required Toggle */}
                     <div className="pt-1 flex flex-wrap items-center justify-between gap-2">
                       <label className="flex items-center gap-2 cursor-pointer text-[11px] font-semibold text-slate-700">
                         <input
@@ -1897,18 +1968,6 @@ export default function CommercialPrintCalculator({
                           )}
                         </span>
                       </label>
-
-                      {!isLayerOne && ply.printRequired !== false && (
-                        <label className="flex items-center gap-2 cursor-pointer text-[11px] text-slate-600">
-                          <input
-                            type="checkbox"
-                            checked={ply.differentDesign}
-                            onChange={(e) => handleUpdatePly(idx, "differentDesign", e.target.checked)}
-                            className="w-3.5 h-3.5 text-orange-600 rounded"
-                          />
-                          <span>Different text/design than Layer 1</span>
-                        </label>
-                      )}
                     </div>
                   </div>
                 );

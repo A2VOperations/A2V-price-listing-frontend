@@ -116,6 +116,7 @@ export default function SalesBillBookCalculator() {
       gsm: 70,
       colour: "White",
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
     },
     {
@@ -123,6 +124,7 @@ export default function SalesBillBookCalculator() {
       gsm: 70,
       colour: "Yellow",
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
     },
     {
@@ -130,6 +132,7 @@ export default function SalesBillBookCalculator() {
       gsm: 70,
       colour: "Pink",
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
     },
     {
@@ -137,6 +140,7 @@ export default function SalesBillBookCalculator() {
       gsm: 70,
       colour: "Blue",
       inkColour: "Black",
+      inkColours: ["Black"],
       printRequired: true,
     },
   ]);
@@ -243,6 +247,31 @@ export default function SalesBillBookCalculator() {
       }),
     );
   }, [papers, sizePapers, availablePaperTypes]);
+
+  // Toggle an ink colour (1 to 4 colours) independently on any layer
+  const handleTogglePlyInk = (index, colour) => {
+    setPliesConfig((prev) => {
+      const updated = [...prev];
+      const ply = updated[index];
+      const current =
+        Array.isArray(ply?.inkColours) && ply.inkColours.length > 0
+          ? ply.inkColours
+          : [ply?.inkColour || "Black"];
+      let nextInks;
+      if (current.includes(colour)) {
+        if (current.length === 1) return prev;
+        nextInks = current.filter((c) => c !== colour);
+      } else {
+        nextInks = [...current, colour];
+      }
+      updated[index] = {
+        ...ply,
+        inkColours: nextInks,
+        inkColour: nextInks.join(" + "),
+      };
+      return updated;
+    });
+  };
 
   // Handle ply field update & auto-sync valid GSM / Colour from backend PaperMaster
   const handlePlyChange = (index, field, value) => {
@@ -803,54 +832,73 @@ _A2V Commercial Printing & Design Hub_`;
                         </select>
                       </div>
 
-                      {/* Ink Colour */}
+                      {/* Ink Colour (Independent 1–4 colours per layer; unique colours across layers = Masters) */}
                       <div>
                         <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">
-                          Ink Colour
+                          Ink Colour (1–4 Colours)
                         </label>
-                        <select
-                          value={ply.inkColour || inkColour || "Black"}
-                          disabled={ply.printRequired === false}
-                          onChange={(e) =>
-                            handlePlyChange(idx, "inkColour", e.target.value)
-                          }
-                          className={`w-full text-xs font-semibold px-2.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none ${
-                            ply.printRequired === false
-                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                              : "bg-white"
-                          }`}
-                        >
-                          <option value="Black">Black Ink</option>
-                          <option value="Red">Red Ink</option>
-                          <option value="Blue">Blue Ink</option>
-                          <option value="Green">Green Ink</option>
-                        </select>
+                        <div className="flex flex-wrap gap-1">
+                          {["Black", "Red", "Blue", "Green"].map((col) => {
+                            const selectedInks =
+                              Array.isArray(ply.inkColours) && ply.inkColours.length > 0
+                                ? ply.inkColours
+                                : [ply.inkColour || "Black"];
+                            const isSel = selectedInks.includes(col);
+                            return (
+                              <button
+                                key={col}
+                                type="button"
+                                disabled={ply.printRequired === false}
+                                onClick={() => handleTogglePlyInk(idx, col)}
+                                className={`px-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
+                                  ply.printRequired === false
+                                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                    : isSel
+                                      ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
+                                      : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                                }`}
+                              >
+                                {col}
+                              </button>
+                            );
+                          })}
+                        </div>
                         {ply.printRequired === false ? (
                           <span className="text-[9px] block mt-1 font-semibold text-slate-500 leading-tight">
                             No Print (Blank — ₹0 Master/Run)
                           </span>
-                        ) : idx > 0 ? (
-                          <span className="text-[9px] block mt-1 font-semibold leading-tight">
-                            {(
-                              ply.inkColour ||
-                              inkColour ||
-                              "Black"
-                            ).toLowerCase() ===
-                            (
-                              pliesConfig[0]?.inkColour ||
-                              inkColour ||
-                              "Black"
-                            ).toLowerCase() ? (
-                              <span className="text-emerald-700">
-                                ✓ Same ink as Layer 1 (Shares Master Plate)
-                              </span>
-                            ) : (
-                              <span className="text-amber-800 font-bold">
-                                ⚡ Different ink (+₹30 Master Plate)
-                              </span>
-                            )}
-                          </span>
-                        ) : null}
+                        ) : (() => {
+                          const prevInks = new Set(
+                            pliesConfig
+                              .slice(0, idx)
+                              .filter((p) => p.printRequired !== false)
+                              .flatMap((p) =>
+                                Array.isArray(p.inkColours) && p.inkColours.length > 0
+                                  ? p.inkColours
+                                  : [p.inkColour || "Black"]
+                              )
+                              .map((c) => c.toUpperCase())
+                          );
+                          const currInks =
+                            Array.isArray(ply.inkColours) && ply.inkColours.length > 0
+                              ? ply.inkColours
+                              : [ply.inkColour || "Black"];
+                          const newCount =
+                            idx === 0
+                              ? currInks.length
+                              : currInks.filter((c) => !prevInks.has(c.toUpperCase())).length;
+                          return newCount === 0 ? (
+                            <span className="text-[9px] block mt-1 font-semibold text-emerald-700 leading-tight">
+                              ✓ Shares existing Master Plate(s) (₹0 extra master)
+                            </span>
+                          ) : (
+                            <span className="text-[9px] block mt-1 font-semibold text-amber-800 leading-tight">
+                              {idx === 0
+                                ? `${newCount} Colour(s) = ${newCount} Master(s) (₹${newCount * (quote.masterRate || 30)})`
+                                : `⚡ +${newCount} new Master(s) (+₹${newCount * (quote.masterRate || 30)})`}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
 

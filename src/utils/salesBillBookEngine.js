@@ -689,12 +689,18 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     grp.groupNetSheets += netRawSheetsPerPly;
     grp.plyCountInGroup += 1;
 
+    const plyInks =
+      Array.isArray(plyConfig.inkColours) && plyConfig.inkColours.length > 0
+        ? plyConfig.inkColours
+        : [String(plyConfig.inkColour || inkColour || "Black").trim()];
+
     plyConfigsResolved.push({
       plyIndex: i + 1,
       paperType: normType,
       gsm: normGsm,
       colour: normColour,
-      inkColour: String(plyConfig.inkColour || inkColour || "Black").trim(),
+      inkColour: plyInks.join(" + "),
+      inkColours: plyInks,
       printRequired: plyConfig.printRequired !== false,
       paperKey,
       netSheets: netRawSheetsPerPly,
@@ -821,12 +827,21 @@ export function calculateSalesBillBookQuote(inputs = {}, masterData = {}) {
     slabCount = 0;
     printingCost = digSheets * digitalRatePerSheet;
   } else {
-    // Single color mini offset (default) — count unique ink colours across printed plies
-    const uniqueInks = new Set(
-      printedPlies.map((p) => (p.inkColour || inkColour || "Black").trim().toUpperCase())
-    );
+    // Unique ink colours across all printed layers = Masters; runs = sum of colours per printed layer
+    const uniqueInks = new Set();
+    let runsPerPrintedLayerSum = 0;
+    printedPlies.forEach((p) => {
+      const inks =
+        Array.isArray(p.inkColours) && p.inkColours.length > 0
+          ? p.inkColours
+          : [p.inkColour || inkColour || "Black"];
+      runsPerPrintedLayerSum += inks.length;
+      inks.forEach((c) => uniqueInks.add(String(c || "Black").trim().toUpperCase()));
+    });
     numMasters = Math.max(1, uniqueInks.size);
     masterCost = numMasters * masterRate;
+    totalRuns = runsPerPrintedLayerSum;
+    totalImpressions = totalFinishedSheetsPerPly * totalRuns;
     const runUnits = Math.max(1, Math.ceil(totalImpressions / 1000));
     runCost = runUnits * runRatePer1000;
     printingCost = masterCost + runCost;
