@@ -2419,3 +2419,343 @@ export function generateStickerQuotationPdf(data) {
   }
 }
 
+/**
+ * Generates a Vendor Production Job Card PDF for company employees / managers
+ * to take to the printing vendor, detailing paper (type, GSM, colour, sheets, price),
+ * cutting layout, master plates, offset runs, binding, numbering, punching, and total vendor cost.
+ *
+ * @param {Object} data Production & vendor cost breakdown
+ * @returns {string|null} Blob URL of the generated PDF document
+ */
+export function generateVendorJobCardPdf(data) {
+  const {
+    productName = "Bill Book",
+    qty = 10,
+    pages = 100,
+    plyCount = 1,
+    finishedW = 8.27,
+    finishedH = 11.69,
+    optimalRawSheet = {},
+    bestYield = 4,
+    selectedLayout = "vertical",
+    efficiency = 0,
+    printSides = "single",
+    bindingName = "Normal Binding",
+    bindingRate = 25,
+    hasNumbering = false,
+    numberingRange = "None",
+    hasPunching = false,
+    plyCalculations = [],
+    paperPurchasingBreakdown = [],
+    totalPaperCost = 0,
+    masterCount = 1,
+    masterRate = 30,
+    masterCost = 30,
+    totalRuns = 1,
+    slabCount = 1,
+    runRate = 70,
+    totalOffsetRunCost = 70,
+    bindingCost = 0,
+    numberingCost = 0,
+    punchingCost = 0,
+    transportationCost = 50,
+    totalVendorCost = 0,
+    clientInfo = {},
+  } = data;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 14;
+  const contentWidth = 182;
+  const rightEdge = margin + contentWidth;
+  const jobRef = `JC-BB-${Math.floor(100000 + Math.random() * 900000)}`;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // Outer Frame
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(10, 8, 190, 281, 2, 2, "D");
+
+  // Header Banner
+  const headerY = 13;
+  const headerHeight = 23;
+  doc.setFillColor(11, 25, 44);
+  doc.rect(margin, headerY, contentWidth, headerHeight, "F");
+
+  doc.setFillColor(194, 65, 12);
+  doc.triangle(
+    rightEdge - 28,
+    headerY,
+    rightEdge,
+    headerY,
+    rightEdge,
+    headerY + headerHeight,
+    "F"
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A2V", margin + 6, headerY + 11);
+  const a2vW = doc.getTextWidth("A2V ");
+  doc.setTextColor(249, 115, 22);
+  doc.text("PRINTS", margin + 6 + a2vW, headerY + 11);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(226, 232, 240);
+  doc.text("VENDOR PRODUCTION JOB CARD & MATERIAL SLIP", margin + 6, headerY + 18);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`JOB REF: ${jobRef}`, rightEdge - 6, headerY + 10, { align: "right" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(`Date: ${dateStr}`, rightEdge - 6, headerY + 17, { align: "right" });
+
+  // Section 1: Job & Cutting Specifications
+  let y = headerY + headerHeight + 6;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(margin, y, contentWidth, 30, 1.5, 1.5, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("1. PRODUCTION & CUTTING SPECIFICATIONS", margin + 4, y + 5.5);
+
+  doc.setFontSize(8);
+  doc.setTextColor(30, 41, 59);
+  const col1X = margin + 4;
+  const col2X = margin + 66;
+  const col3X = margin + 128;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Product:", col1X, y + 11.5);
+  doc.text("Quantity:", col2X, y + 11.5);
+  doc.text("Finished Size:", col3X, y + 11.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${productName} (${plyCount}-Ply)`, col1X + 16, y + 11.5);
+  doc.text(`${qty} Books × ${pages} Sets`, col2X + 17, y + 11.5);
+  doc.text(`${finishedW}" × ${finishedH}"`, col3X + 23, y + 11.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Raw Sheet:", col1X, y + 17.5);
+  doc.text("Cutting Yield:", col2X, y + 17.5);
+  doc.text("Print Sides:", col3X, y + 17.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${optimalRawSheet?.width || 18}" × ${optimalRawSheet?.height || 22}"`, col1X + 19, y + 17.5);
+  doc.text(`${bestYield}-Out (${selectedLayout}, ${efficiency}%)`, col2X + 22, y + 17.5);
+  doc.text(printSides === "both" ? "Both Sides (F&B)" : "Front Side Only", col3X + 20, y + 17.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Binding:", col1X, y + 23.5);
+  doc.text("Numbering:", col2X, y + 23.5);
+  doc.text("Punching:", col3X, y + 23.5);
+  doc.setFont("helvetica", "normal");
+  const shortBind = String(bindingName).split("(")[0].trim();
+  doc.text(`${shortBind} (Rs.${bindingRate}/bk)`, col1X + 15, y + 23.5);
+  doc.text(hasNumbering ? numberingRange : "None", col2X + 19, y + 23.5);
+  doc.text(hasPunching ? "Yes (Perforation)" : "No", col3X + 18, y + 23.5);
+
+  if (clientInfo?.name || clientInfo?.companyName) {
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    const refParty = [clientInfo.companyName, clientInfo.name].filter(Boolean).join(" / ");
+    doc.text(`Order Ref: ${refParty}`, rightEdge - 4, y + 5.5, { align: "right" });
+  }
+
+  // Section 2: Layer-by-Layer Paper & Printing Requirements
+  y += 35;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("2. PAPER & LAYER SPECIFICATIONS (PER PLY)", margin, y);
+  y += 2.5;
+
+  // Table Header
+  doc.setFillColor(15, 23, 42);
+  doc.rect(margin, y, contentWidth, 7, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.setTextColor(255, 255, 255);
+  doc.text("Layer", margin + 2, y + 4.7);
+  doc.text("Paper Type", margin + 17, y + 4.7);
+  doc.text("GSM", margin + 45, y + 4.7);
+  doc.text("Colour", margin + 59, y + 4.7);
+  doc.text("Print / Ink", margin + 79, y + 4.7);
+  doc.text("Net", margin + 111, y + 4.7, { align: "right" });
+  doc.text("Wast.", margin + 123, y + 4.7, { align: "right" });
+  doc.text("Gross", margin + 137, y + 4.7, { align: "right" });
+  doc.text("Rate/Sh", margin + 157, y + 4.7, { align: "right" });
+  doc.text("Paper Cost", rightEdge - 2, y + 4.7, { align: "right" });
+  y += 7;
+
+  plyCalculations.forEach((p, idx) => {
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(margin, y, contentWidth, 7, "F");
+    }
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, y + 7, rightEdge, y + 7);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(30, 41, 59);
+    const inkLabel =
+      p.printRequired === false ? "No Print (Blank)" : `${p.inkColour || "Black"} Ink`;
+    doc.text(`Layer ${idx + 1}`, margin + 2, y + 4.7);
+    doc.text(String(p.paperType || "Paper").slice(0, 16), margin + 17, y + 4.7);
+    doc.text(`${p.gsm}`, margin + 45, y + 4.7);
+    doc.text(String(p.colour || "White").slice(0, 11), margin + 59, y + 4.7);
+    doc.text(inkLabel.slice(0, 18), margin + 79, y + 4.7);
+    doc.text(`${p.netRawSheets ?? 0}`, margin + 111, y + 4.7, { align: "right" });
+    doc.text(`+${p.wastage ?? 0}`, margin + 123, y + 4.7, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.text(`${p.grossRawSheets ?? 0}`, margin + 137, y + 4.7, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.text(`Rs.${Number(p.loosePrice || 0).toFixed(2)}`, margin + 157, y + 4.7, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.text(`Rs.${p.plyPaperCost ?? 0}`, rightEdge - 2, y + 4.7, { align: "right" });
+    y += 7;
+  });
+
+  // Section 3: Consolidated Paper Purchase Summary (Reams + Loose)
+  y += 5;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("3. PAPER DEALER PURCHASE BREAKDOWN (REAM + LOOSE)", margin, y);
+  y += 2.5;
+
+  const purchBoxH = Math.max(12, paperPurchasingBreakdown.length * 6.5 + 5);
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(253, 186, 116);
+  doc.roundedRect(margin, y, contentWidth, purchBoxH, 1.5, 1.5, "FD");
+
+  let py = y + 5;
+  doc.setFontSize(7.5);
+  doc.setTextColor(30, 41, 59);
+  paperPurchasingBreakdown.forEach((grp) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(`• ${grp.label}:`, margin + 4, py);
+    doc.setFont("helvetica", "normal");
+    const reamStr = grp.fullReams > 0 ? `${grp.fullReams} Ream(s) @ Rs.${grp.reamRate}` : "";
+    const looseStr =
+      grp.remainingLooseSheets > 0
+        ? `${grp.remainingLooseSheets} Loose @ Rs.${Number(grp.loosePrice).toFixed(2)}`
+        : "";
+    const qtySummary = [reamStr, looseStr].filter(Boolean).join(" + ") || "0 Sheets";
+    doc.text(`${grp.totalSheets} Gross Sheets (${qtySummary})`, margin + 56, py);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Rs.${grp.groupCost}`, rightEdge - 4, py, { align: "right" });
+    py += 6.5;
+  });
+  y += purchBoxH + 6;
+
+  // Section 4: Complete Vendor Cost Breakdown
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(194, 65, 12);
+  doc.text("4. VENDOR PRODUCTION COST BREAKDOWN", margin, y);
+  y += 2.5;
+
+  doc.setFillColor(15, 23, 42);
+  doc.rect(margin, y, contentWidth, 7, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("Cost Head / Operation", margin + 4, y + 4.7);
+  doc.text("Calculation Basis", margin + 78, y + 4.7);
+  doc.text("Amount (INR)", rightEdge - 4, y + 4.7, { align: "right" });
+  y += 7;
+
+  const costRows = [
+    ["Paper Purchase Total", "Grouped Ream + Loose Sheets (incl. wastage)", `Rs. ${totalPaperCost}`],
+    ["Master Plates", `${masterCount} Plate(s) × Rs. ${masterRate}`, `Rs. ${masterCost}`],
+    ["Offset Machine Running", `${totalRuns} Run(s) × ${slabCount} Slab(s) × Rs. ${runRate}`, `Rs. ${totalOffsetRunCost}`],
+    ["Book Binding", `${qty} Books × Rs. ${bindingRate}`, `Rs. ${bindingCost}`],
+  ];
+  if (hasNumbering) {
+    costRows.push(["Serial Numbering", `${qty} Books (${numberingRange})`, `Rs. ${numberingCost}`]);
+  }
+  if (hasPunching) {
+    costRows.push(["Punching / Perforation", `${qty} Books`, `Rs. ${punchingCost}`]);
+  }
+  costRows.push(["Transportation / Delivery", "Workshop Pickup & Delivery", `Rs. ${transportationCost}`]);
+
+  costRows.forEach((row, idx) => {
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(margin, y, contentWidth, 7, "F");
+    }
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, y + 7, rightEdge, y + 7);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text(row[0], margin + 4, y + 4.7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(71, 85, 105);
+    doc.text(row[1], margin + 78, y + 4.7);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text(row[2], rightEdge - 4, y + 4.7, { align: "right" });
+    y += 7;
+  });
+
+  // Total Vendor Cost Highlight Box
+  y += 3;
+  doc.setFillColor(11, 25, 44);
+  doc.roundedRect(margin, y, contentWidth, 12, 1.5, 1.5, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text("TOTAL VENDOR PRODUCTION COST:", margin + 5, y + 7.5);
+  doc.setFontSize(11);
+  doc.setTextColor(249, 115, 22);
+  const perBookVendor = qty > 0 ? Math.round(totalVendorCost / qty) : totalVendorCost;
+  doc.text(
+    `Rs. ${Number(totalVendorCost).toLocaleString("en-IN")}/-  (Rs. ${perBookVendor}/Book)`,
+    rightEdge - 5,
+    y + 7.7,
+    { align: "right" }
+  );
+
+  // Section 5: Employee / Vendor Sign-Off
+  y += 19;
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(margin, y, contentWidth, 24, 1.5, 1.5, "D");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(30, 41, 59);
+  doc.text("WORKSHOP VERIFICATION CHECKLIST", margin + 4, y + 6);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.text(
+    "[  ] Paper GSM & Colour Checked    [  ] Master Plate Proof Approved    [  ] Cutting & Yield Checked    [  ] Numbering & Binding Verified",
+    margin + 4,
+    y + 12
+  );
+  doc.text("Company Employee Signature: _______________________", margin + 4, y + 20);
+  doc.text("Vendor / Press Acceptance: _______________________", margin + 102, y + 20);
+
+  const filename = `A2V_Vendor_JobCard_${jobRef}.pdf`;
+  doc.save(filename);
+
+  try {
+    return doc.output("bloburl");
+  } catch {
+    return null;
+  }
+}
+

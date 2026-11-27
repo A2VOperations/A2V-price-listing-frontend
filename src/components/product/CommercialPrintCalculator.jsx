@@ -25,7 +25,10 @@ import {
   fetchBindingRatesApi,
   fetchFinishingRatesApi,
 } from "@/services/api";
-import { generateGeneralProductQuotationPdf } from "@/lib/generateQuotationPdf";
+import {
+  generateGeneralProductQuotationPdf,
+  generateVendorJobCardPdf,
+} from "@/lib/generateQuotationPdf";
 
 // Standard commercial finished sizes (calibrated for Indian commercial print shops)
 const PRESET_SIZES = [
@@ -1230,6 +1233,58 @@ export default function CommercialPrintCalculator({
     }
   };
 
+  // Vendor Job Card PDF Download (for employee/manager taking job to vendor)
+  const handleDownloadVendorJobCardPdf = () => {
+    try {
+      setIsGeneratingPdf(true);
+      const docUrl = generateVendorJobCardPdf({
+        productName: productType,
+        qty: calculation.qty,
+        pages: calculation.pages,
+        plyCount,
+        finishedW,
+        finishedH,
+        optimalRawSheet: calculation.optimalRawSheet,
+        bestYield: calculation.bestYield,
+        selectedLayout: calculation.selectedLayout,
+        efficiency: calculation.efficiency,
+        printSides,
+        bindingName: activeBindingObj.name,
+        bindingRate,
+        hasNumbering,
+        numberingRange: calculation.numberingRange,
+        hasPunching,
+        plyCalculations: calculation.plyCalculations,
+        paperPurchasingBreakdown: calculation.paperPurchasingBreakdown,
+        totalPaperCost: calculation.totalPaperCost,
+        masterCount: calculation.masterCount,
+        masterRate: calculation.masterRate,
+        masterCost: calculation.masterCost,
+        totalRuns: calculation.totalRuns,
+        slabCount: calculation.slabCount,
+        runRate: calculation.runRate,
+        totalOffsetRunCost: calculation.totalOffsetRunCost,
+        bindingCost: calculation.bindingCost,
+        numberingCost: calculation.numberingCost,
+        punchingCost: calculation.punchingCost,
+        transportationCost: calculation.transportationCost,
+        totalVendorCost: calculation.totalVendorCost,
+        clientInfo: {
+          name: clientName || "Walk-in Client",
+          companyName,
+        },
+      });
+      if (docUrl) {
+        window.open(docUrl, "_blank");
+      }
+    } catch (err) {
+      console.error("Vendor Job Card PDF generation failed:", err);
+      alert("Error generating Vendor Job Card PDF.");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* HEADER SECTION */}
@@ -2230,74 +2285,6 @@ export default function CommercialPrintCalculator({
               </div>
             </div>
 
-            <div className="p-5 space-y-4">
-              {/* Salesperson Negotiated Selling Price Input */}
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
-                  Quotation Amount (Vendor Cost)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-bold text-slate-400">₹</span>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder={`Vendor Cost: ₹${calculation.recommendedSellingPrice}`}
-                    value={manualSellingPrice}
-                    onChange={(e) => setManualSellingPrice(e.target.value)}
-                    className="w-full pl-7 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  Direct Vendor Cost: ₹{calculation.recommendedSellingPrice.toLocaleString("en-IN")} (0% Margin)
-                </span>
-              </div>
-
-              {/* Client Info Inputs */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <span className="text-[11px] font-bold text-slate-700 block">
-                  Client Information (For Quotation):
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    placeholder="Customer Name"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    className="w-full p-2 text-xs bg-white border border-slate-300 rounded-lg"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Phone / WhatsApp"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    className="w-full p-2 text-xs bg-white border border-slate-300 rounded-lg"
-                  />
-                </div>
-              </div>
-
-              {/* ACTION BUTTONS */}
-              <div className="space-y-2 pt-2">
-                <button
-                  type="button"
-                  onClick={handleAddToQuote}
-                  className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <FiCheck className="w-4 h-4" />
-                  {addedSuccess ? "Added to Quote Cart!" : "Add to Client Quote Cart"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDownloadPdf}
-                  disabled={isGeneratingPdf}
-                  className="w-full py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <FiDownload className="w-4 h-4 text-orange-600" />
-                  {isGeneratingPdf ? "Generating PDF..." : "Download Official PDF Quote"}
-                </button>
-              </div>
-            </div>
-
             {/* MANAGER / ADMIN PRODUCTION AUDIT (CONFIDENTIAL FIREWALL) */}
             {isManagerOrAdmin && (
               <div className="p-4 bg-amber-50/70 border-t border-amber-200 space-y-2.5">
@@ -2370,6 +2357,16 @@ export default function CommercialPrintCalculator({
                     Warning: Selling price is below vendor production cost!
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  onClick={handleDownloadVendorJobCardPdf}
+                  disabled={isGeneratingPdf}
+                  className="w-full mt-2 py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  <FiDownload className="w-4 h-4 text-orange-400" />
+                  {isGeneratingPdf ? "Generating Job Card..." : "Download Vendor Job Card PDF"}
+                </button>
               </div>
             )}
           </div>
