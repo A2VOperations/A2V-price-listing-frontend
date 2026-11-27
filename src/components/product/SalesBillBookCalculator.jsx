@@ -2,20 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   FiBookOpen,
   FiLayers,
-  FiTag,
   FiCheck,
   FiDownload,
   FiCopy,
-  FiPhone,
-  FiUser,
-  FiBriefcase,
   FiShield,
-  FiRefreshCw,
-  FiPercent,
-  FiPrinter,
-  FiSliders,
-  FiCheckCircle,
-  FiInfo,
   FiChevronDown,
   FiTruck,
 } from "react-icons/fi";
@@ -109,41 +99,17 @@ export default function SalesBillBookCalculator() {
   // Copy / Ply count: 1 to 4 plies
   const [plyCount, setPlyCount] = useState(2); // Default Duplicate (2-ply)
 
-  // Configuration for each ply
-  const [pliesConfig, setPliesConfig] = useState([
-    {
-      paperType: "Maplitho",
-      gsm: 70,
-      colour: "White",
+  // Configuration for each ply (populated dynamically from MongoDB PaperMaster)
+  const [pliesConfig, setPliesConfig] = useState(() =>
+    Array.from({ length: 4 }, () => ({
+      paperType: "",
+      gsm: "",
+      colour: "",
       inkColour: "Black",
       inkColours: ["Black"],
       printRequired: true,
-    },
-    {
-      paperType: "Maplitho",
-      gsm: 70,
-      colour: "Yellow",
-      inkColour: "Black",
-      inkColours: ["Black"],
-      printRequired: true,
-    },
-    {
-      paperType: "Maplitho",
-      gsm: 70,
-      colour: "Pink",
-      inkColour: "Black",
-      inkColours: ["Black"],
-      printRequired: true,
-    },
-    {
-      paperType: "Maplitho",
-      gsm: 70,
-      colour: "Blue",
-      inkColour: "Black",
-      inkColours: ["Black"],
-      printRequired: true,
-    },
-  ]);
+    }))
+  );
 
   // Printing & Inking
   const [printProcess, setPrintProcess] = useState("single_color_offset");
